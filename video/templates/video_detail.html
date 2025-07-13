@@ -68,14 +68,14 @@ Video | Detail Page
                             {% endif %}
                             <div class="d-flex justify-content-between mb-30">
                                 <div class="post-meta d-flex align-items-center">
-                                    <a href="#" class="post-author">By Jane</a>
+                                    <a href="#" class="post-author">By Gargachary Times</a>
                                     <i class="fa fa-circle" aria-hidden="true"></i>
-                                    <a href="#" class="post-date">{{news.created_at}}</a>
+                                    <a href="#" class="post-date">{{news.created_at|date:"j F Y, H:i"}}</a>
                                 </div>
                                 <div class="post-meta d-flex">
-                                    <a href="#"><i class="fa fa-comments-o" aria-hidden="true"></i> 32</a>
-                                    <a href="#"><i class="fa fa-eye" aria-hidden="true"></i> 42</a>
-                                    <a href="#"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> 7</a>
+<!--                                    <a href="#"><i class="fa fa-comments-o" aria-hidden="true"></i> 32</a>-->
+                                    <a href="#"><i class="fa fa-eye" aria-hidden="true"></i> {{news.count}}</a>
+<!--                                    <a href="#"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> 7</a>-->
                                 </div>
                             </div>
                         </div>
