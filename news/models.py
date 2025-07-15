@@ -10,7 +10,7 @@ class News(models.Model):
     text = models.TextField(null=True, blank=True)
     featured_image = models.ImageField(upload_to='news_image', null=True, blank=True)
     count = models.IntegerField(default=0)
-    reporter = models.CharField(max_length=100, default='Admin')
+    reporter = models.CharField(max_length=100, default='Gargachary Times')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 

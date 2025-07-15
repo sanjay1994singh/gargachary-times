@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block css %}
+
+{% endblock css %}
+
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">User Login</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="news_category" class="form-label">News Category</label>
+            <select name="news_category" id="news_category" class="form-control">
+                <option value="">Select Category</option>
+                {% for i in category %}
+                <option value="">{{i.name}}</option>
+                {% endfor%}
+            </select>
+            <input type="text" class="form-control" name="title" id="title" placeholder="Enter News Tile">
+            <textarea name="news_text" id="news_text" class="form-control"  cols="30" rows="10" placeholder="Enter News Text"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="file_image" class="form-label">Image</label>
+            <input type="file" class="form-control" name="file_image" id="file_image">
+            <label for="file_image" class="form-label">Video</label>
+            <input type="file" class="form-control" name="file_video" id="file_video">
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock content %}
+
+{% block js %}
+{% endblock js %}
+
