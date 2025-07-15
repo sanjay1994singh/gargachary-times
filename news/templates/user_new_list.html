@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block css %}
+
+{% endblock css %}
+
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">User List</h2>
+    <table class="table table-bordered table-hover text-center">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Category</th>
+                <th>Title</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for news in news %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ news.category }}</td>
+                <td>{{ news.title }}</td>
+                <td>{{ news.reporter }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No users found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
+
+{% block js %}
+{% endblock js %}
+
