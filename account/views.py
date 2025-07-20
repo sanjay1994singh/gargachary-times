@@ -5,6 +5,7 @@ from account.models import User
 from django.http import JsonResponse
 from django.shortcuts import redirect
 
+
 # Create your views here.
 def user_login(request):
     if request.method == 'POST':
@@ -103,3 +104,21 @@ def register_new_report(request):
 
     else:
         return render(request, 'register_reporter.html')
+
+
+def update_password(request):
+    if request.method == 'POST':
+        mobile = request.POST.get('mobile')
+        password = request.POST.get('password')
+        user = User.objects.get(username=mobile)
+        user.set_password('password')
+        user.save()
+        msg = 'This User Already Exists.'
+        data_json = {
+            'id': id,
+            'msg': msg,
+        }
+
+        return JsonResponse(data_json)
+    else:
+        return render(request, 'update_password.html')
