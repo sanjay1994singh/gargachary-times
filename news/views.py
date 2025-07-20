@@ -7,11 +7,16 @@ from account.models import User
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from category.models import Category
-
+import random
 
 # Create your views here.
 def news_detail(request, id):
     news = News.objects.get(id=id)
+    count = news.count
+    number = random.randint(1, 5)
+    total_count = int(number + count)
+    news.count = total_count
+    news.save()
     try:
         absolute_image_url = request.build_absolute_uri(news.featured_image.url)
     except:
