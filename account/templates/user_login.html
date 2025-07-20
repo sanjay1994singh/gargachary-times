@@ -12,11 +12,11 @@
         {% csrf_token %}
         <div class="mb-3">
             <label for="mobile" class="form-label">Mobile Number</label>
-            <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Enter mobile number">
+            <input type="text" class="form-control" name="mobile" id="mobile" placeholder="Enter mobile number" required>
         </div>
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <input type="password" class="form-control" name="password" id="password" placeholder="Enter password">
+            <input type="password" class="form-control" name="password" id="password" placeholder="Enter password" required>
         </div>
         <div class="text-center">
             <button type="submit" class="btn btn-primary">Submit</button>
