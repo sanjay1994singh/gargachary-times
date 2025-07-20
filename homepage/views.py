@@ -9,8 +9,7 @@ from account.models import User
 
 # Create your views here.
 def homepage(request):
-    user = User.objects.all()
-    print(user, '============user')
+    user_id = request.session.get('user_id')
     breaking_video = Video.objects.all().order_by('-id')
     news = News.objects.all().order_by('-id')
     context = {

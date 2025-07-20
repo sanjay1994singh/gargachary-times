@@ -2,6 +2,8 @@ from django.db import models
 
 from category.models import Category
 
+from account.models import User
+
 
 # Create your models here.
 class News(models.Model):
@@ -11,6 +13,7 @@ class News(models.Model):
     featured_image = models.ImageField(upload_to='news_image', null=True, blank=True)
     count = models.IntegerField(default=0)
     reporter = models.CharField(max_length=100, default='Gargachary Times')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
