@@ -16,7 +16,7 @@
 body {
   font-family: "Roboto", sans-serif;
   font-size: 14px;
-  background-color: #ffffff;
+  background-color: #222627;
   color: #a6a6a6; }
 
 h1,
@@ -1921,7 +1921,9 @@ input:focus {
   border: none;
   border-radius: 0; }
   .form-control:focus {
-    box-shadow: none; }
+    box-shadow: none;
+    background-color: #ffffff;
+    }
 
 select.form-control {
   -webkit-appearance: none;
