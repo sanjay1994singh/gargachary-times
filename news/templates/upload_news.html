@@ -12,14 +12,14 @@
         {% csrf_token %}
         <div class="mb-3">
             <label for="news_category" class="form-label">News Category</label>
-            <select name="news_category" id="news_category" class="form-control">
-                <option value="">Select Category</option>
+            <select name="news_category" id="news_category" class="form-control" required>
+                <option value="0">Select Category</option>
                 {% for i in category %}
                 <option value="{{i.id}}">{{i.name}}</option>
                 {% endfor%}
             </select>
-            <input type="text" class="form-control" name="title" id="title" placeholder="Enter News Tile">
-            <textarea name="news_text" id="news_text" class="form-control"  cols="30" rows="10" placeholder="Enter News Text"></textarea>
+            <input type="text" class="form-control" name="title" id="title" placeholder="Enter News Tile" required>
+            <textarea name="news_text" id="news_text" class="form-control"  cols="30" rows="10" placeholder="Enter News Text" required></textarea>
         </div>
         <div class="mb-3">
             <label for="file_image" class="form-label">Image</label>
@@ -38,6 +38,17 @@
 
 <script>
     $('#newsForm').on('submit', function (e) {
+        var news_category = $('#news_category').val()
+        if(news_category == 0){
+               Swal.fire({
+                  title: 'Error',
+                  text: 'select category first!',
+                  icon: 'error',
+                  confirmButtonColor: '#3085d6',
+                  confirmButtonText: 'OK'
+              });
+              return false;
+        }
         e.preventDefault();
 
         var formData = new FormData(this);
