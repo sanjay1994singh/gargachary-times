@@ -21,10 +21,11 @@ def news_detail(request, id):
         absolute_image_url = request.build_absolute_uri(news.featured_image.url)
     except:
         absolute_image_url = ''
-
+    category = Category.objects.all().order_by('-id')
     context = {
         'news': news,
         'absolute_image_url': absolute_image_url,
+        'category': category,
     }
     return render(request, 'news_detail.html', context)
 
