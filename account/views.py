@@ -111,7 +111,7 @@ def update_password(request):
         mobile = request.POST.get('mobile')
         password = request.POST.get('password')
         user = User.objects.get(username=mobile)
-        user.set_password('password')
+        user.set_password(password)
         user.save()
         msg = 'This User Already Exists.'
         data_json = {
