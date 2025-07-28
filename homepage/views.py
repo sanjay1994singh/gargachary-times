@@ -23,7 +23,7 @@ def homepage(request):
         'news_col2': column_2,
         'news_col3': column_3,
     }
-    return render(request, 'index1.html', context)
+    return render(request, 'index.html', context)
 
 
 def category_news(request, id):
