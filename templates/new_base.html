@@ -131,9 +131,8 @@
             <ul class="flex space-x-6 min-w-max">
                 <li><a href="/" class="hover:underline">Home</a></li>
                 {% for i in category %}
-                <li><a href="#" class="hover:underline">{{i.name}}</a></li>
+                <li><a href="/category_news/{{i.id}}/" class="hover:underline">{{i.name}}</a></li>
                 {% endfor %}
-
             </ul>
         </div>
     </div>
