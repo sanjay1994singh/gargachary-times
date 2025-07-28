@@ -14,7 +14,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
     <div class="row g-4">
 
         <!-- 🏛️ Column 1 -->
-        <div class="col-md-4 col-sm-6 col-12">
+        <div class="col-md-4 col-sm-6 col-12 order-2 order-md-1">
             <div class="p-3 bg-light rounded h-100 border">
                 <h4 class="heading">अन्य खबरें</h4>
                 <ul class="custom-list1">
@@ -28,7 +28,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
         </div>
 
         <!-- 💻 Column 2 (Latest) -->
-        <div class="col-md-4 col-sm-6 col-12">
+        <div class="col-md-4 col-sm-6 col-12 order-1 order-md-2">
             <div class="p-3 bg-light rounded h-100 border">
                 <h4 class="heading">लेटेस्ट खबरें</h4>
                 {% if news_col2 %}
@@ -49,7 +49,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
         </div>
 
         <!-- ⚽ Column 3 -->
-        <div class="col-md-4 col-sm-6 col-12">
+        <div class="col-md-4 col-sm-6 col-12 order-3 order-md-3">
             <div class="p-3 bg-light rounded h-100 border">
                 <h4 class="heading text-danger">खबरें और भी</h4>
                 <ul class="custom-list">
@@ -65,6 +65,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 
     </div>
 </div>
+
 {% endblock content %}
 
 {% block js %}
