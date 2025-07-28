@@ -27,7 +27,7 @@ def homepage(request):
 
 
 def category_news(request, id):
-    category = Category.objects.get(id=id)
+    category_name = Category.objects.get(id=id)
     all_news = list(News.objects.filter(category_id=id).order_by('-id')[:30])
 
     # Split into 3 parts
@@ -39,6 +39,6 @@ def category_news(request, id):
         'news_col1': column_1,
         'news_col2': column_2,
         'news_col3': column_3,
-        'category': category.name,
+        'category_name': category_name,
     }
     return render(request, 'category_news.html', context)
