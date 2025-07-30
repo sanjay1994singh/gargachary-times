@@ -11,7 +11,7 @@ from category.models import Category
 # Create your views here.
 import requests
 
-API_KEY = 'AIzaSyCzsOJL0XQHTuSc7MgiR_HkJeeOrks4UhI'
+API_KEY = 'AIzaSyAYzY1vH_A9fzixHx9GMZjJ6AoNl49Fi98'
 CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
 
 
@@ -28,7 +28,6 @@ def get_youtube_videos(max_results=20):
 
     response = requests.get(url, params=params)
     data = response.json()
-    print(response, '==============response')
     videos = []
     for item in data.get('items', []):
         video_id = item['id']['videoId']
@@ -42,7 +41,6 @@ def get_youtube_videos(max_results=20):
             'publishedAt': published,
             'url': f'https://www.youtube.com/watch?v={video_id}'
         })
-    print(videos, '==============videos')
     return videos
 
 
@@ -54,13 +52,12 @@ def homepage(request):
     column_1 = all_news[10:20]  # next 10
     column_3 = all_news[20:30]  # last 10
 
-    shorts = get_youtube_videos()
-    print(shorts, '=====================shorts')
+    videos = get_youtube_videos()
     context = {
         'news_col1': column_1,
         'news_col2': column_2,
         'news_col3': column_3,
-        'shorts': shorts,
+        'videos': videos,
     }
     return render(request, 'index.html', context)
 

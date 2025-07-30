@@ -11,26 +11,6 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 
 {% block content %}
 
-<section class="py-6 px-4 bg-gray-100">
-    <h2 class="text-2xl font-bold mb-4">📺 Latest YouTube Videos</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {% for video in youtube_videos %}
-        <div class="bg-white rounded shadow-md overflow-hidden">
-            <a href="{{ video.url }}" target="_blank" rel="noopener noreferrer">
-                <img src="{{ video.thumbnail }}" alt="{{ video.title }}" class="w-full h-auto">
-                <div class="p-2">
-                    <h3 class="text-sm font-semibold">{{ video.title }}</h3>
-                    <p class="text-xs text-gray-500">{{ video.publishedAt|date:"F j, Y" }}</p>
-                </div>
-            </a>
-        </div>
-        {% endfor %}
-    </div>
-</section>
-
-
-
-
 <div class="container-box">
     <div class="row g-4">
 
@@ -96,6 +76,29 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 
     </div>
 </div>
+
+
+<div class="container-box">
+    <div class="row g-4">
+        <section class="py-6 px-4 bg-gray-100">
+            <h2 class="text-2xl font-bold mb-4">📺 Latest YouTube Videos</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {% for video in videos %}
+                <div class="bg-white rounded shadow-md overflow-hidden">
+                    <a href="{{ video.url }}" target="_blank" rel="noopener noreferrer">
+                        <img src="{{ video.thumbnail }}" alt="{{ video.title }}" class="w-full h-auto">
+                        <div class="p-2">
+                            <h3 class="text-sm font-semibold">{{ video.title }}</h3>
+                            <p class="text-xs text-gray-500">{{ video.publishedAt|date:"F j, Y" }}</p>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+</div>
+
 
 {% endblock content %}
 
