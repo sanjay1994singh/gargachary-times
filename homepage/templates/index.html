@@ -16,8 +16,10 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
         <!-- 🏛️ Column 1 -->
         <div class="col-md-4 col-sm-6 col-12 order-2 order-md-1">
             <div class="p-3 bg-light rounded h-100 border">
-                 <h4 class="heading">अन्य खबरें</h4>
-                <img src="/static/1.jpg" alt="" class="img-fluid mb-3">
+                <h4 class="heading">अन्य खबरें</h4>
+                <amp-auto-ads type="adsense"
+                              data-ad-client="ca-pub-2694102409566246">
+                </amp-auto-ads>
                 <ul class="custom-list1">
                     {% for i in news_col1 %}
                     <li class="mb-3">
@@ -35,10 +37,11 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
             <div class="p-3 bg-light rounded h-100 border">
                 <h4 class="heading">लेटेस्ट खबरें</h4>
                 {% if news_col2 %}
-                    <img src="{{news_col2.0.featured_image.url}}" class="img-fluid mb-3" alt=""/>
-                    <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5" title="{{news_col2.0.title}}">
-                        {{news_col2.0.title}}
-                    </a>
+                <img src="{{news_col2.0.featured_image.url}}" class="img-fluid mb-3" alt=""/>
+                <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5"
+                   title="{{news_col2.0.title}}">
+                    {{news_col2.0.title}}
+                </a>
                 {% endif %}
                 <ul class="custom-list mt-3">
                     {% for i in news_col2|slice:"1:" %}
