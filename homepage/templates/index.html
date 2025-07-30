@@ -14,88 +14,74 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 <div class="container-box">
     <div class="row g-4">
         <!-- 🏛️ Column 1 -->
-        <div class="col-md-4 col-sm-6 col-12 order-2 order-md-1">
-            <div class="p-3 bg-light rounded h-100 border">
-                <h4 class="heading">अन्य खबरें</h4>
-                <amp-auto-ads type="adsense" data-ad-client="ca-pub-2694102409566246">
-                </amp-auto-ads>
-                <ul class="custom-list1">
-                    {% for i in news_col1 %}
-                    <li class="mb-3">
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                        <h3><span class="text-danger">{{i.category}}</span></h3>
-                    </li>
-                    {% endfor %}
-                </ul>
-
-            </div>
+        <div class="col-md-2 col-sm-4 col-12 order-2 order-md-1">
+            <h4 class="heading">अन्य खबरें</h4>
+            <amp-auto-ads type="adsense" data-ad-client="ca-pub-2694102409566246">
+            </amp-auto-ads>
+            <ul class="custom-list1">
+                {% for i in news_col1 %}
+                <li class="mb-3">
+                    <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
+                    <h3><span class="text-danger">{{i.category}}</span></h3>
+                </li>
+                {% endfor %}
+            </ul>
         </div>
 
         <!-- 💻 Column 2 (Latest) -->
-        <div class="col-md-4 col-sm-6 col-12 order-1 order-md-2">
-            <div class="p-3 bg-light rounded h-100 border">
-                <h4 class="heading">लाइव टीवी / लेटेस्ट खबरें</h4>
-                <div class="mb-3" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
-                    <iframe
-                            src="https://www.youtube.com/embed/live_stream?channel=UC8eaQTAUBKj_OrNmXThrvbQ&autoplay=1&mute=1&playsinline=1"
-                            frameborder="0"
-                            allow="autoplay; encrypted-media"
-                            allowfullscreen
-                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
-                    </iframe>
-                </div>
-
-
-                {% if news_col2 %}
-                <img src="{{news_col2.0.featured_image.url}}" class="img-fluid mb-3" alt=""/>
-                <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5"
-                   title="{{news_col2.0.title}}">
-                    {{news_col2.0.title}}
-                </a>
-                {% endif %}
-                <ul class="custom-list mt-3">
-                    {% for i in news_col2|slice:"1:" %}
-                    <li class="mb-3 d-flex align-items-center">
-                        <img src="{{i.featured_image.url}}" class="me-3 rounded" width="90" height="60" alt="">
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                    </li>
-                    <h3><span class="text-danger">{{i.category}}</span></h3>
-                    {% endfor %}
-
-                </ul>
+        <div class="col-md-6 col-sm-6 col-12 order-1 order-md-2">
+            <h4 class="heading">लाइव टीवी / लेटेस्ट खबरें</h4>
+            <div class="mb-3" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                <iframe
+                        src="https://www.youtube.com/embed/live_stream?channel=UC8eaQTAUBKj_OrNmXThrvbQ&autoplay=1&mute=1&playsinline=1"
+                        frameborder="0"
+                        allow="autoplay; encrypted-media"
+                        allowfullscreen
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                </iframe>
             </div>
+
+            <hr>
+            {% if news_col2 %}
+            <img src="{{news_col2.0.featured_image.url}}" class="img-fluid mb-3" alt=""/>
+            <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5"
+               title="{{news_col2.0.title}}">
+                {{news_col2.0.title}}
+            </a>
+            <span class="text-danger">{{news_col2.0.category}}</span>
+            {% endif %}
+            <ul class="custom-list mt-3">
+                {% for i in news_col2|slice:"1:" %}
+                <li class="mb-3 d-flex align-items-center">
+                    <img src="{{i.featured_image.url}}" class="me-3 rounded" width="90" height="60" alt="">
+                    <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
+                </li>
+                <h3><span class="text-danger">{{i.category}}</span></h3>
+                {% endfor %}
+
+            </ul>
         </div>
 
         <!-- ⚽ Column 3 -->
         <div class="col-md-4 col-sm-6 col-12 order-3 order-md-3">
-            <div class="p-3 bg-light rounded h-100 border">
-                <h4 class="heading text-danger">खबरें और भी</h4>
-                <img src="/static/2.png" alt="" class="img-fluid mb-3">
-                <ul class="custom-list">
-                    {% for i in news_col3 %}
-                    <li class="mb-3 d-flex align-items-center">
-                        <img src="{{i.featured_image.url}}" class="me-3 rounded" width="90" height="60" alt="">
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                    </li>
-                    <h3><span class="text-danger">{{i.category}}</span></h3>
-                    {% endfor %}
-                </ul>
-            </div>
+            <h4 class="heading text-danger">खबरें और भी</h4>
+            <img src="/static/2.png" alt="" class="img-fluid mb-3">
+            <ul class="custom-list">
+                {% for i in news_col3 %}
+                <li class="mb-3 d-flex align-items-center">
+                    <img src="{{i.featured_image.url}}" class="me-3 rounded" width="90" height="60" alt="">
+                    <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
+                </li>
+                <h3><span class="text-danger">{{i.category}}</span></h3>
+                {% endfor %}
+            </ul>
         </div>
 
     </div>
 </div>
 
 
-
-
-
 {% endblock content %}
 
 {% block js %}
 {% endblock js %}
-
-
-
-
-
