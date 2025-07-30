@@ -22,7 +22,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                     {% for i in news_col1 %}
                     <li class="mb-3">
                         <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                        <h3><span class="text-light">{{i.category}}</span></h3>
+                        <h3><span class="text-danger">{{i.category}}</span></h3>
                     </li>
                     {% endfor %}
                 </ul>
@@ -46,7 +46,9 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                         <img src="{{i.featured_image.url}}" class="me-3 rounded" width="90" height="60" alt="">
                         <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                     </li>
+                    <h3><span class="text-danger">{{i.category}}</span></h3>
                     {% endfor %}
+
                 </ul>
             </div>
         </div>
@@ -62,6 +64,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                         <img src="{{i.featured_image.url}}" class="me-3 rounded" width="90" height="60" alt="">
                         <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                     </li>
+                    <h3><span class="text-danger">{{i.category}}</span></h3>
                     {% endfor %}
                 </ul>
             </div>
