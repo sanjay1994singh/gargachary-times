@@ -8,8 +8,44 @@ from account.models import User
 
 from category.models import Category
 
-
 # Create your views here.
+import requests
+
+API_KEY = 'AIzaSyCzsOJL0XQHTuSc7MgiR_HkJeeOrks4UhI'
+CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
+
+
+def get_youtube_videos(max_results=20):
+    url = 'https://www.googleapis.com/youtube/v3/search'
+    params = {
+        'key': API_KEY,
+        'channelId': CHANNEL_ID,
+        'part': 'snippet',
+        'order': 'date',
+        'maxResults': max_results,
+        'type': 'video'
+    }
+
+    response = requests.get(url, params=params)
+    data = response.json()
+    print(response, '==============response')
+    videos = []
+    for item in data.get('items', []):
+        video_id = item['id']['videoId']
+        title = item['snippet']['title']
+        thumbnail = item['snippet']['thumbnails']['high']['url']
+        published = item['snippet']['publishedAt']
+        videos.append({
+            'video_id': video_id,
+            'title': title,
+            'thumbnail': thumbnail,
+            'publishedAt': published,
+            'url': f'https://www.youtube.com/watch?v={video_id}'
+        })
+    print(videos, '==============videos')
+    return videos
+
+
 def homepage(request):
     all_news = list(News.objects.all().order_by('-id')[:30])
 
@@ -18,10 +54,13 @@ def homepage(request):
     column_1 = all_news[10:20]  # next 10
     column_3 = all_news[20:30]  # last 10
 
+    shorts = get_youtube_videos()
+    print(shorts, '=====================shorts')
     context = {
         'news_col1': column_1,
         'news_col2': column_2,
         'news_col3': column_3,
+        'shorts': shorts,
     }
     return render(request, 'index.html', context)
 
