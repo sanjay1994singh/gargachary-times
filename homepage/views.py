@@ -52,14 +52,20 @@ def homepage(request):
     column_1 = all_news[10:20]  # next 10
     column_3 = all_news[20:30]  # last 10
 
-    videos = get_youtube_videos()
     context = {
         'news_col1': column_1,
         'news_col2': column_2,
         'news_col3': column_3,
-        'videos': videos,
     }
     return render(request, 'index.html', context)
+
+
+def video(request):
+    videos = get_youtube_videos()
+    context = {
+        'videos': videos,
+    }
+    return render(request, 'video.html', context)
 
 
 def category_news(request, id):
