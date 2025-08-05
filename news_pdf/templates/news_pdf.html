@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/dearflip/jquery.dearflip.min.css">
+<style>
+    .pdf-container {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh; /* Full height of screen */
+        padding: 0;
+        margin: 0 auto;
+    }
+
+    .pdf-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    @media (max-width: 768px) {
+        .pdf-container {
+            height: 80vh; /* Slightly shorter height for mobile usability */
+        }
+    }
+</style>
+
+
+
+{% endblock %}
+
+{% block content %}
+<div class="pdf-container">
+    <iframe src="{{ pdf.pdf_file.url }}"></iframe>
+</div>
+<!--<div class="df-flipbook" source="{{ pdf.pdf_file.url }}" id="flipbook"></div>-->
+
+<!--<iframe src="{{ pdf.pdf_file.url }}" width="100%" height="800px" style="border: none;"></iframe>-->
+
+
+
+{% endblock %}
+
+{% block js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://unpkg.com/dearflip/jquery.dearflip.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        if ($.fn.flipBook) {
+            $('#flipbook').flipBook();
+        } else {
+            console.error("❌ flipBook not loaded");
+        }
+    });
+</script>
+
+
+{% endblock %}

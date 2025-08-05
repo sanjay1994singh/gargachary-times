@@ -9,6 +9,7 @@ urlpatterns = [
     path('video/', include('video.urls')),
     path('news/', include('news.urls')),
     path('account/', include('account.urls')),
+    path('news_pdf/', include('news_pdf.urls')),
 ]
 
 if settings.DEBUG:
