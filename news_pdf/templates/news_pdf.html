@@ -34,14 +34,16 @@
 <!-- 📅 Calendar -->
 <div class="calendar-container">
     <label for="calendar">Select Date:</label>
-    <input type="date" id="calendar" name="calendar">
+    <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
 </div>
 
 <div class="pdf-container">
-    <iframe src="{{ pdf.pdf_file.url }}"></iframe>
+    {% if pdf %}
+        <iframe src="{{ pdf.pdf_file.url }}"></iframe>
+    {% else %}
+        <p style="text-align:center; margin-top:20px;">No PDF available for this date.</p>
+    {% endif %}
 </div>
-
-
 {% endblock %}
 
 {% block js %}
@@ -55,17 +57,18 @@
         } else {
             console.error("❌ flipBook not loaded");
         }
-    });
 
-    $('#calendar').on('change', function () {
-            let selectedDate = $(this).val(); // format YYYY-MM-DD
+        // 📅 set today's date in the input by default
+        let today = new Date().toISOString().split('T')[0]; // format: YYYY-MM-DD
+        $("#calendar").val(today);
+
+        // redirect when user selects date
+        $('#calendar').on('change', function () {
+            let selectedDate = $(this).val();
             if (selectedDate) {
-                // Example: redirect with query param
                 window.location.href = "?date=" + selectedDate;
-
-                // Or, if you want to a specific Django URL
-                // window.location.href = "/your-view-url/" + selectedDate + "/";
             }
         });
+    });
 </script>
 {% endblock %}

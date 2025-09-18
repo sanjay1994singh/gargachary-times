@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import NewsPDF
-
+from datetime import date
 
 # Create your views here.
 def news_pdf(request):
