@@ -58,10 +58,6 @@
             console.error("❌ flipBook not loaded");
         }
 
-        // 📅 set today's date in the input by default
-        let today = new Date().toISOString().split('T')[0]; // format: YYYY-MM-DD
-        $("#calendar").val(today);
-
         // redirect when user selects date
         $('#calendar').on('change', function () {
             let selectedDate = $(this).val();
