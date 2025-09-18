@@ -17,33 +17,27 @@
         border: none;
     }
 
-    .calendar-container {
-        margin: 20px auto;
-        text-align: center;
-    }
-
     @media (max-width: 768px) {
         .pdf-container {
             height: 80vh; /* Slightly shorter height for mobile usability */
         }
     }
 </style>
+
+
+
 {% endblock %}
 
 {% block content %}
-<!-- 📅 Calendar -->
-<div class="calendar-container">
-    <label for="calendar">Select Date:</label>
-    <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
-</div>
-
 <div class="pdf-container">
-    {% if pdf %}
-        <iframe src="{{ pdf.pdf_file.url }}"></iframe>
-    {% else %}
-        <p style="text-align:center; margin-top:20px;">No PDF available for this date.</p>
-    {% endif %}
+    <iframe src="{{ pdf.pdf_file.url }}"></iframe>
 </div>
+<!--<div class="df-flipbook" source="{{ pdf.pdf_file.url }}" id="flipbook"></div>-->
+
+<!--<iframe src="{{ pdf.pdf_file.url }}" width="100%" height="800px" style="border: none;"></iframe>-->
+
+
+
 {% endblock %}
 
 {% block js %}
@@ -57,14 +51,8 @@
         } else {
             console.error("❌ flipBook not loaded");
         }
-
-        // redirect when user selects date
-        $('#calendar').on('change', function () {
-            let selectedDate = $(this).val();
-            if (selectedDate) {
-                window.location.href = "?date=" + selectedDate;
-            }
-        });
     });
 </script>
+
+
 {% endblock %}

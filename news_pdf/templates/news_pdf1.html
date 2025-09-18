@@ -1,17 +1,55 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Flipbook Test</title>
-    <link rel="stylesheet" href="https://unpkg.com/dearflip/jquery.dearflip.min.css">
-</head>
-<body>
+{% extends 'new_base.html' %}
 
-<h2>Test Flipbook</h2>
-<div id="flipbook" class="df-flipbook" source="/media/news_pdf.pdf"></div>
-<iframe src="https://mozilla.github.io/pdf.js/web/viewer.html?file={{ pdf.pdf_file.url }}" width="100%"
-        height="800px"></iframe>
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/dearflip/jquery.dearflip.min.css">
+<style>
+    .pdf-container {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh; /* Full height of screen */
+        padding: 0;
+        margin: 0 auto;
+    }
+
+    .pdf-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    .calendar-container {
+        margin: 20px auto;
+        text-align: center;
+    }
+
+    @media (max-width: 768px) {
+        .pdf-container {
+            height: 80vh; /* Slightly shorter height for mobile usability */
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 📅 Calendar -->
+<div class="calendar-container">
+    <label for="calendar">Select Date:</label>
+    <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
+</div>
+
+<div class="pdf-container">
+    {% if pdf %}
+        <iframe src="{{ pdf.pdf_file.url }}"></iframe>
+    {% else %}
+        <p style="text-align:center; margin-top:20px;">No PDF available for this date.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block js %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://unpkg.com/dearflip/jquery.dearflip.min.js"></script>
+
 <script>
     $(document).ready(function () {
         if ($.fn.flipBook) {
@@ -19,8 +57,14 @@
         } else {
             console.error("❌ flipBook not loaded");
         }
+
+        // redirect when user selects date
+        $('#calendar').on('change', function () {
+            let selectedDate = $(this).val();
+            if (selectedDate) {
+                window.location.href = "?date=" + selectedDate;
+            }
+        });
     });
 </script>
-
-</body>
-</html>
+{% endblock %}
