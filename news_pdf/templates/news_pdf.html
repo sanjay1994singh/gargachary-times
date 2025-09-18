@@ -3,12 +3,43 @@
 {% block css %}
 <link rel="stylesheet" href="https://unpkg.com/dearflip/jquery.dearflip.min.css">
 <style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* 📅 Calendar */
+    .calendar-container {
+        margin: 15px auto;
+        text-align: center;
+        padding: 10px;
+    }
+
+    .calendar-container label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .calendar-container input[type="date"] {
+        padding: 8px 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 250px;
+    }
+
+    /* 📄 PDF Container */
     .pdf-container {
         width: 100%;
-        max-width: 100%;
-        height: 100vh; /* Full height of screen */
-        padding: 0;
+        height: calc(100vh - 120px); /* leave space for calendar */
         margin: 0 auto;
+        padding: 0;
+        position: relative;
     }
 
     .pdf-container iframe {
@@ -17,27 +48,44 @@
         border: none;
     }
 
+    /* 📱 Mobile adjustments */
     @media (max-width: 768px) {
         .pdf-container {
-            height: 80vh; /* Slightly shorter height for mobile usability */
+            height: 70vh; /* shorter height for usability */
+        }
+
+        .calendar-container label {
+            font-size: 14px;
+        }
+
+        .calendar-container input[type="date"] {
+            font-size: 14px;
         }
     }
 </style>
-
-
-
 {% endblock %}
 
 {% block content %}
-<div class="pdf-container">
-    <iframe src="{{ pdf.pdf_file.url }}"></iframe>
+<!-- 📅 Calendar -->
+<div class="calendar-container">
+    <label for="calendar">Select Date:</label>
+    <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
 </div>
-<!--<div class="df-flipbook" source="{{ pdf.pdf_file.url }}" id="flipbook"></div>-->
 
-<!--<iframe src="{{ pdf.pdf_file.url }}" width="100%" height="800px" style="border: none;"></iframe>-->
+{% if pdf %}
+    <div class="pdf-container d-none d-md-block">
+        <iframe src="{{ pdf.pdf_file.url }}"></iframe>
+    </div>
 
-
-
+    <!-- 📱 Mobile: Show button instead of iframe -->
+    <div class="text-center d-md-none" style="margin-top: 15px;">
+        <a href="{{ pdf.pdf_file.url }}" target="_blank" class="btn btn-primary">
+            📄 Open PDF
+        </a>
+    </div>
+{% else %}
+    <p style="text-align:center; margin-top:20px;">No PDF available for this date.</p>
+{% endif %}
 {% endblock %}
 
 {% block js %}
@@ -46,13 +94,13 @@
 
 <script>
     $(document).ready(function () {
-        if ($.fn.flipBook) {
-            $('#flipbook').flipBook();
-        } else {
-            console.error("❌ flipBook not loaded");
-        }
+        // redirect when user selects date
+        $('#calendar').on('change', function () {
+            let selectedDate = $(this).val();
+            if (selectedDate) {
+                window.location.href = "?date=" + selectedDate;
+            }
+        });
     });
 </script>
-
-
 {% endblock %}
