@@ -17,25 +17,29 @@
         border: none;
     }
 
+    .calendar-container {
+        margin: 20px auto;
+        text-align: center;
+    }
+
     @media (max-width: 768px) {
         .pdf-container {
             height: 80vh; /* Slightly shorter height for mobile usability */
         }
     }
 </style>
-
-
-
 {% endblock %}
 
 {% block content %}
+<!-- 📅 Calendar -->
+<div class="calendar-container">
+    <label for="calendar">Select Date:</label>
+    <input type="date" id="calendar" name="calendar">
+</div>
+
 <div class="pdf-container">
     <iframe src="{{ pdf.pdf_file.url }}"></iframe>
 </div>
-<!--<div class="df-flipbook" source="{{ pdf.pdf_file.url }}" id="flipbook"></div>-->
-
-<!--<iframe src="{{ pdf.pdf_file.url }}" width="100%" height="800px" style="border: none;"></iframe>-->
-
 
 
 {% endblock %}
@@ -52,7 +56,16 @@
             console.error("❌ flipBook not loaded");
         }
     });
+
+    $('#calendar').on('change', function () {
+            let selectedDate = $(this).val(); // format YYYY-MM-DD
+            if (selectedDate) {
+                // Example: redirect with query param
+                window.location.href = "?date=" + selectedDate;
+
+                // Or, if you want to a specific Django URL
+                // window.location.href = "/your-view-url/" + selectedDate + "/";
+            }
+        });
 </script>
-
-
 {% endblock %}
