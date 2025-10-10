@@ -11,11 +11,11 @@ def news_pdf(request):
         latest_pdf = NewsPDF.objects.filter(
             uploaded_at__date=selected_date
         ).first()
-        absolute_image_url = request.build_absolute_uri(latest_pdf.pdf_file.url)
+        absolute_image_url = request.build_absolute_uri(latest_pdf.featured_image.url)
     else:
         # fallback → latest PDF
         latest_pdf = NewsPDF.objects.last()
-        absolute_image_url = request.build_absolute_uri(latest_pdf.pdf_file.url)
+        absolute_image_url = request.build_absolute_uri(latest_pdf.featured_image.url)
 
         # print(absolute_image_url, '==============absolute_image_url')
     context = {
