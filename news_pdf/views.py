@@ -23,7 +23,7 @@ def news_pdf(request):
         'absolute_image_url': absolute_image_url,
     }
     print(context, '=====================context')
-    return render(request, 'news_pdf1.html', context)
+    return render(request, 'news_pdf.html', context)
 
 
 def news_pdf1(request):
@@ -46,4 +46,4 @@ def news_pdf1(request):
         'absolute_image_url': absolute_image_url,
     }
     print(context, '=====================context')
-    return render(request, 'news_pdf.html', context)
+    return render(request, 'news_pdf1.html', context)
