@@ -1,27 +1,41 @@
 {% extends 'new_base.html' %}
 
+{% block metatags %}
+<meta property="og:title" content="{{news.title}}">
+<meta property="og:description" content="{{ news.title|truncatewords:30 }}">
+<meta property="og:image" content="{{ absolute_image_url }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+<!-- Optional: Twitter Card meta tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ news.title }}">
+<meta name="twitter:image" content="{{ news.featured_image.url }}">
+{% endblock metatags %}
+
 {% block css %}
 <style>
     body, html {
         margin: 0;
         padding: 0;
         width: 100%;
+        height: 100%;
         overflow-x: hidden;
-        font-family: Arial, sans-serif;
     }
 
     /* 📅 Calendar */
     .calendar-container {
-        margin: 20px auto;
+        margin: 15px auto;
         text-align: center;
         padding: 10px;
     }
+
     .calendar-container label {
         display: block;
         margin-bottom: 8px;
         font-size: 16px;
         font-weight: 600;
     }
+
     .calendar-container input[type="date"] {
         padding: 8px 12px;
         font-size: 16px;
@@ -31,42 +45,53 @@
         max-width: 250px;
     }
 
-    /* 📄 PDF Slider */
-    .swiper {
-        width: 95%;
-        max-width: 1000px;
-        height: auto;
-        margin: 30px auto;
-    }
-    .swiper-slide {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .swiper-slide canvas {
+    /* 📄 Responsive PDF Container */
+    .pdf-container {
+        position: relative;
         width: 100%;
-        height: auto;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        padding-top: 141.42%; /* A4 ratio (1:1.414) */
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        margin: 20px auto;
+        max-width: 1000px; /* optional max width */
     }
 
-    /* Mobile adjustments */
+    .pdf-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+
+    /* 📱 Mobile adjustments */
     @media (max-width: 768px) {
-        .calendar-container label { font-size: 14px; }
-        .calendar-container input[type="date"] { font-size: 14px; }
-        .swiper-slide canvas { max-width: 95%; }
-    }
+        .calendar-container label {
+            font-size: 14px;
+        }
 
-    /* Share links */
-    .share-links { margin: 10px 0; text-align: center; }
+        .calendar-container input[type="date"] {
+            font-size: 14px;
+        }
+
+        .pdf-container {
+            padding-top: 175%; /* taller ratio on small screens */
+        }
+    }
+</style>
+<style>
+    .share-links {
+        margin: 10px 0;
+    }
     .share-links a {
         text-decoration: none;
-        margin: 0 10px;
+        margin-right: 10px;
         font-size: 24px;
         color: #000;
     }
 </style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 {% endblock %}
 
 {% block content %}
@@ -76,26 +101,27 @@
     <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
 
     <!-- Social Share -->
-    <div class="share-links">
-        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank">
+    <div class="share-links mb-4 d-flex align-items-center">
+        <span class="me-3 fw-bold">Share:</span>
+        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank"
+           class="me-3 text-success fs-5">
             <i class="bi bi-whatsapp"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank">
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+           target="_blank" class="me-3 text-primary fs-5">
             <i class="bi bi-facebook"></i>
         </a>
-        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}" target="_blank">
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
+           target="_blank" class="text-info fs-5">
             <i class="bi bi-twitter-x"></i>
         </a>
     </div>
 </div>
 
+
 {% if pdf %}
-<!-- PDF.js Slider -->
-<div class="swiper mySwiper">
-    <div class="swiper-wrapper" id="pdf-pages"></div>
-    <div class="swiper-pagination"></div>
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
+<div class="pdf-container">
+    <iframe src="{{ pdf.pdf_file.url }}" allowfullscreen></iframe>
 </div>
 {% else %}
 <p style="text-align:center; margin-top:20px;">No PDF available for this date.</p>
@@ -104,55 +130,15 @@
 
 {% block js %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-
 <script>
-$(document).ready(function () {
-    // Redirect on calendar change
-    $('#calendar').on('change', function () {
-        let selectedDate = $(this).val();
-        if (selectedDate) {
-            window.location.href = "?date=" + selectedDate;
-        }
-    });
-
-    {% if pdf %}
-    // PDF.js worker
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
-
-    const url = "{{ pdf.pdf_file.url }}";
-    const loadingTask = pdfjsLib.getDocument(url);
-
-    loadingTask.promise.then(async function(pdf) {
-        const container = document.getElementById("pdf-pages");
-
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 1.5 });
-            const canvas = document.createElement("canvas");
-            const context = canvas.getContext("2d");
-            canvas.height = viewport.height;
-            canvas.width = viewport.width;
-
-            await page.render({ canvasContext: context, viewport: viewport }).promise;
-
-            const slide = document.createElement("div");
-            slide.classList.add("swiper-slide");
-            slide.appendChild(canvas);
-            container.appendChild(slide);
-        }
-
-        // Initialize Swiper
-        new Swiper(".mySwiper", {
-            loop: false,
-            centeredSlides: true, // Center the slides
-            spaceBetween: 20,
-            pagination: { el: ".swiper-pagination", clickable: true },
-            navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+    $(document).ready(function () {
+        // redirect when user selects date
+        $('#calendar').on('change', function () {
+            let selectedDate = $(this).val();
+            if (selectedDate) {
+                window.location.href = "?date=" + selectedDate;
+            }
         });
     });
-    {% endif %}
-});
 </script>
 {% endblock %}
