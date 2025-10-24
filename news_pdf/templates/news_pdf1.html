@@ -43,7 +43,8 @@ async function renderAllPages(url) {
 
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
         const page = await pdf.getPage(pageNum);
-        const viewport = page.getViewport({ scale: 2.5 });
+        const DPR = window.devicePixelRatio || 1;
+        const viewport = page.getViewport({ scale: 2.0 * DPR });
 
         const canvas = document.createElement("canvas");
         const context = canvas.getContext("2d");
