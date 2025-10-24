@@ -20,7 +20,7 @@ def news_pdf(request):
         'pdf': latest_pdf,
         'absolute_image_url': absolute_image_url,
     }
-    return render(request, 'news_pdf.html', context)
+    return render(request, 'pdf.html', context)
 
 
 def news_pdf1(request):
