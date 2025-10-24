@@ -1,96 +1,70 @@
 {% extends 'new_base.html' %}
 
 {% block css %}
-<style>
-    body, html {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        overflow-x: hidden;
-        font-family: Arial, sans-serif;
-    }
-
-    /* 📅 Calendar */
-    .calendar-container {
-        margin: 20px auto;
-        text-align: center;
-        padding: 10px;
-    }
-    .calendar-container label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 16px;
-        font-weight: 600;
-    }
-    .calendar-container input[type="date"] {
-        padding: 8px 12px;
-        font-size: 16px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        width: 100%;
-        max-width: 250px;
-    }
-
-    /* 📄 PDF Slider */
-    .swiper {
-        width: 95%;
-        max-width: 1000px;
-        height: auto;
-        margin: 30px auto;
-    }
-    .swiper-slide {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    .swiper-slide canvas {
-        width: 100%;
-        height: auto;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    /* Mobile adjustments */
-    @media (max-width: 768px) {
-        .calendar-container label { font-size: 14px; }
-        .calendar-container input[type="date"] { font-size: 14px; }
-        .swiper-slide canvas { max-width: 95%; }
-    }
-
-    /* Share links */
-    .share-links { margin: 10px 0; text-align: center; }
-    .share-links a {
-        text-decoration: none;
-        margin: 0 10px;
-        font-size: 24px;
-        color: #000;
-    }
-</style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<style>
+body, html { margin:0; padding:0; width:100%; font-family:Arial, sans-serif; }
+
+.calendar-container {
+    text-align:center;
+    margin:20px auto;
+}
+.calendar-container input[type="date"] {
+    padding:8px 12px;
+    font-size:16px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    width:200px;
+}
+
+.swiper {
+    width:95%;
+    max-width:1000px;
+    margin:30px auto;
+}
+.swiper-slide {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+}
+.swiper-slide canvas {
+    width:100%;
+    max-width:800px;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+    margin-bottom:10px;
+}
+.page-number {
+    font-weight:bold;
+    color:#333;
+}
+.swiper-slide img.thumbnail {
+    width:120px;
+    height:auto;
+    border-radius:5px;
+    margin-top:5px;
+    cursor:pointer;
+    border:2px solid transparent;
+}
+.swiper-slide img.thumbnail.active {
+    border-color:#007bff;
+}
+
+@media(max-width:768px){
+    .swiper-slide canvas { max-width:95%; }
+    .swiper-slide img.thumbnail { width:80px; }
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<!-- 📅 Calendar -->
 <div class="calendar-container">
     <label for="calendar">Select Date:</label>
-    <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
-
-    <!-- Social Share -->
-    <div class="share-links">
-        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank">
-            <i class="bi bi-whatsapp"></i>
-        </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank">
-            <i class="bi bi-facebook"></i>
-        </a>
-        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}" target="_blank">
-            <i class="bi bi-twitter-x"></i>
-        </a>
-    </div>
+    <input type="date" id="calendar" value="{{ selected_date }}">
 </div>
 
 {% if pdf %}
-<!-- PDF.js Slider -->
 <div class="swiper mySwiper">
     <div class="swiper-wrapper" id="pdf-pages"></div>
     <div class="swiper-pagination"></div>
@@ -98,7 +72,7 @@
     <div class="swiper-button-prev"></div>
 </div>
 {% else %}
-<p style="text-align:center; margin-top:20px;">No PDF available for this date.</p>
+<p style="text-align:center;margin-top:20px;">No PDF available for this date.</p>
 {% endif %}
 {% endblock %}
 
@@ -108,49 +82,68 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
 <script>
-$(document).ready(function () {
-    // Redirect on calendar change
-    $('#calendar').on('change', function () {
-        let selectedDate = $(this).val();
-        if (selectedDate) {
-            window.location.href = "?date=" + selectedDate;
-        }
+$(document).ready(function(){
+    // Redirect on date select
+    $('#calendar').on('change', function(){
+        let date = $(this).val();
+        if(date) window.location.href="?date="+date;
     });
 
     {% if pdf %}
-    // PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
-
     const url = "{{ pdf.pdf_file.url }}";
     const loadingTask = pdfjsLib.getDocument(url);
 
-    loadingTask.promise.then(async function(pdf) {
+    loadingTask.promise.then(async function(pdf){
         const container = document.getElementById("pdf-pages");
 
-        for (let i = 1; i <= pdf.numPages; i++) {
+        for(let i=1;i<=pdf.numPages;i++){
             const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 1.5 });
+            const viewport = page.getViewport({scale:1.5});
             const canvas = document.createElement("canvas");
             const context = canvas.getContext("2d");
             canvas.height = viewport.height;
             canvas.width = viewport.width;
 
-            await page.render({ canvasContext: context, viewport: viewport }).promise;
+            await page.render({canvasContext:context, viewport}).promise;
 
             const slide = document.createElement("div");
             slide.classList.add("swiper-slide");
+
+            // Add page number
+            const pageNum = document.createElement("div");
+            pageNum.classList.add("page-number");
+            pageNum.innerText = "Page " + i + " / " + pdf.numPages;
+
             slide.appendChild(canvas);
+            slide.appendChild(pageNum);
+
+            // Optional: Add thumbnail screenshot
+            const thumbnail = document.createElement("img");
+            thumbnail.src = canvas.toDataURL("image/jpeg");
+            thumbnail.classList.add("thumbnail");
+            thumbnail.addEventListener("click", ()=>swiper.slideTo(i-1));
+            slide.appendChild(thumbnail);
+
             container.appendChild(slide);
         }
 
-        // Initialize Swiper
-        new Swiper(".mySwiper", {
-            loop: false,
-            centeredSlides: true, // Center the slides
-            spaceBetween: 20,
-            pagination: { el: ".swiper-pagination", clickable: true },
-            navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+        const swiper = new Swiper(".mySwiper",{
+            loop:false,
+            centeredSlides:true,
+            spaceBetween:20,
+            pagination:{el:".swiper-pagination", clickable:true},
+            navigation:{nextEl:".swiper-button-next", prevEl:".swiper-button-prev"},
         });
+
+        // Highlight active thumbnail
+        swiper.on('slideChange', function(){
+            $('.thumbnail').removeClass('active');
+            $('.swiper-slide-active .thumbnail').addClass('active');
+        });
+
+        // First slide thumbnail active
+        $('.swiper-slide-active .thumbnail').addClass('active');
     });
     {% endif %}
 });
