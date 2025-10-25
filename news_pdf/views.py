@@ -12,7 +12,6 @@ def news_pdf(request):
         ).first()
         absolute_image_url = request.build_absolute_uri(latest_pdf.featured_image.url)
     else:
-        # fallback → latest PDF
         latest_pdf = NewsPDF.objects.last()
         absolute_image_url = request.build_absolute_uri(latest_pdf.featured_image.url)
 
@@ -21,4 +20,4 @@ def news_pdf(request):
         'news': latest_pdf,
         'absolute_image_url': absolute_image_url,
     }
-    return render(request, 'pdf.html', context)
+    return render(request, 'news_pdf.html', context)
