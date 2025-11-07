@@ -16,16 +16,6 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
         <!-- 🏛️ Column 1 -->
         <div class="col-md-2 col-sm-4 col-12 order-2 order-md-1">
             <h4 class="heading">अन्य खबरें</h4>
-            <amp-auto-ads type="adsense" data-ad-client="ca-pub-2694102409566246">
-            </amp-auto-ads>
-            <amp-ad width="100vw" height="320"
-                    type="adsense"
-                    data-ad-client="ca-pub-2694102409566246"
-                    data-ad-slot="9722593062"
-                    data-auto-format="rspv"
-                    data-full-width="">
-                <div overflow=""></div>
-            </amp-ad>
             <ul class="custom-list1">
                 {% for i in news_col1 %}
                 <li class="mb-3">
@@ -40,13 +30,28 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
         <div class="col-md-6 col-sm-6 col-12 order-1 order-md-2">
             <h4 class="heading">लाइव टीवी / लेटेस्ट खबरें</h4>
             <div class="mb-3" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+                <!--                <iframe-->
+                <!--                        src="https://www.youtube.com/embed/live_stream?channel=UC8eaQTAUBKj_OrNmXThrvbQ&autoplay=1&mute=1&playsinline=1"-->
+                <!--                        frameborder="0"-->
+                <!--                        allow="autoplay; encrypted-media"-->
+                <!--                        allowfullscreen-->
+                <!--                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">-->
+                <!--                </iframe>-->
+
                 <iframe
-                        src="https://www.youtube.com/embed/live_stream?channel=UC8eaQTAUBKj_OrNmXThrvbQ&autoplay=1&mute=1&playsinline=1"
+                        width="560"
+                        height="315"
+                        src="https://www.youtube.com/embed/z8y5f-u-57U?autoplay=1&mute=1&playsinline=1"
+                        title="YouTube video player"
                         frameborder="0"
-                        allow="autoplay; encrypted-media"
-                        allowfullscreen
-                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen>
                 </iframe>
+                <div id="player" class="video-container">
+                    <p>Loading stream...</p>
+                </div>
+
             </div>
 
             <hr>
@@ -94,7 +99,45 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 {% block js %}
 
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2694102409566246"
-     crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
+
+<!--<script>-->
+<!--  const channelId = "UC8eaQTAUBKj_OrNmXThrvbQ";-->
+<!--  const fallbackVideoId = "dQw4w9WgXcQ"; // or any YouTube video ID-->
+<!--  const apiKey = "AIzaSyAYzY1vH_A9fzixHx9GMZjJ6AoNl49Fi98";-->
+
+<!--  const player = document.getElementById("player");-->
+<!--  const status = document.getElementById("status");-->
+
+<!--  async function loadStream() {-->
+<!--    try {-->
+<!--      const res = await fetch(-->
+<!--        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`-->
+<!--      );-->
+<!--      const data = await res.json();-->
+
+<!--      if (data.items && data.items.length > 0) {-->
+<!--        const liveId = data.items[0].id.videoId;-->
+<!--        player.innerHTML = `-->
+<!--          <iframe src="https://www.youtube.com/embed/${liveId}?autoplay=1&mute=1&playsinline=1"-->
+<!--          allow="autoplay; encrypted-media"-->
+<!--          allowfullscreen></iframe>`;-->
+<!--        status.textContent = "✅ Live Now!";-->
+<!--      } else {-->
+<!--        player.innerHTML = `-->
+<!--          <iframe src="https://www.youtube.com/embed/${fallbackVideoId}?autoplay=0"-->
+<!--          allowfullscreen></iframe>`;-->
+<!--        status.textContent = "⚫ Channel is currently offline.";-->
+<!--      }-->
+<!--    } catch (err) {-->
+<!--      player.innerHTML = `<p style="color:red;">Error loading video. Please check your API key or network.</p>`;-->
+<!--      console.error(err);-->
+<!--    }-->
+<!--  }-->
+
+<!--  loadStream();-->
+<!--</script>-->
+
 <!-- square -->
 <ins class="adsbygoogle"
      style="display:block"
@@ -103,7 +146,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
      data-ad-format="auto"
      data-full-width-responsive="true"></ins>
 <script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
+    (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 
 {% endblock js %}
