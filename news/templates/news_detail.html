@@ -13,7 +13,7 @@ Latest News
 <!-- Optional: Twitter Card meta tags -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ news.title }}">
-<meta name="twitter:image" content="{{ news.featured_image.url }}">
+<meta name="twitter:image" content="{% if news.featured_image %}{{ news.featured_image.url }}{% endif %}">
 {% endblock metatags %}
 
 {% block css %}
