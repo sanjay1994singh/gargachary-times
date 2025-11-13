@@ -32,7 +32,7 @@
             <div class="p-3 bg-light rounded h-100 border">
                 <h4 class="heading">लेटेस्ट खबरें</h4>
                 {% if news_col2 %}
-                    <img src="{{news_col2.0.featured_image.url}}" class="img-fluid mb-3" alt=""/>
+                    <img src="{% if news_col2.0.featured_image %}{{news_col2.0.featured_image.url}}{% endif %}" class="img-fluid mb-3" alt=""/>
                     <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5" title="{{news_col2.0.title}}">
                         {{news_col2.0.title}}
                     </a>
@@ -40,7 +40,7 @@
                 <ul class="custom-list mt-3">
                     {% for i in news_col2|slice:"1:" %}
                     <li class="mb-3 d-flex align-items-center">
-                        <img src="{{i.featured_image.url}}" class="me-3 rounded" width="90" height="60" alt="">
+                        <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded" width="90" height="60" alt="">
                         <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                     </li>
                     {% endfor %}
@@ -55,7 +55,7 @@
                 <ul class="custom-list">
                     {% for i in news_col3 %}
                     <li class="mb-3 d-flex align-items-center">
-                        <img src="{{i.featured_image.url}}" class="me-3 rounded" width="90" height="60" alt="">
+                        <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded" width="90" height="60" alt="">
                         <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                     </li>
                     {% endfor %}
