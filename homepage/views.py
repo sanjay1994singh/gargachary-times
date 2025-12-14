@@ -11,7 +11,7 @@ from category.models import Category
 # Create your views here.
 import requests
 
-API_KEY = 'AIzaSyAYzY1vH_A9fzixHx9GMZjJ6AoNl49Fi98'
+API_KEY = 'AIzaSyCzsOJL0XQHTuSc7MgiR_HkJeeOrks4UhI'
 CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
 
 
