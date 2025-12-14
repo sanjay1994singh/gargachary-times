@@ -47,12 +47,6 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                         referrerpolicy="strict-origin-when-cross-origin"
                         allowfullscreen>
                 </iframe>
-
-
-                <div id="player" class="video-container">
-                    <p>Loading stream...</p>
-                </div>
-
             </div>
 
             <hr>
@@ -103,40 +97,40 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
         crossorigin="anonymous"></script>
 
 <!--<script>-->
-<!--  const channelId = "UC8eaQTAUBKj_OrNmXThrvbQ";-->
-<!--  const fallbackVideoId = "dQw4w9WgXcQ"; // or any YouTube video ID-->
-<!--  const apiKey = "AIzaSyAYzY1vH_A9fzixHx9GMZjJ6AoNl49Fi98";-->
+<!--    const channelId = "UC8eaQTAUBKj_OrNmXThrvbQ";-->
+<!--    const fallbackVideoId = "dQw4w9WgXcQ"; // or any YouTube video ID-->
+<!--    const apiKey = "AIzaSyCzsOJL0XQHTuSc7MgiR_HkJeeOrks4UhI";-->
 
-<!--  const player = document.getElementById("player");-->
-<!--  const status = document.getElementById("status");-->
+<!--    const player = document.getElementById("player");-->
+<!--    const status = document.getElementById("status");-->
 
-<!--  async function loadStream() {-->
-<!--    try {-->
-<!--      const res = await fetch(-->
-<!--        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`-->
-<!--      );-->
-<!--      const data = await res.json();-->
+<!--    async function loadStream() {-->
+<!--      try {-->
+<!--        const res = await fetch(-->
+<!--          `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`-->
+<!--        );-->
+<!--        const data = await res.json();-->
 
-<!--      if (data.items && data.items.length > 0) {-->
-<!--        const liveId = data.items[0].id.videoId;-->
-<!--        player.innerHTML = `-->
-<!--          <iframe src="https://www.youtube.com/embed/${liveId}?autoplay=1&mute=1&playsinline=1"-->
-<!--          allow="autoplay; encrypted-media"-->
-<!--          allowfullscreen></iframe>`;-->
-<!--        status.textContent = "✅ Live Now!";-->
-<!--      } else {-->
-<!--        player.innerHTML = `-->
-<!--          <iframe src="https://www.youtube.com/embed/${fallbackVideoId}?autoplay=0"-->
-<!--          allowfullscreen></iframe>`;-->
-<!--        status.textContent = "⚫ Channel is currently offline.";-->
+<!--        if (data.items && data.items.length > 0) {-->
+<!--          const liveId = data.items[0].id.videoId;-->
+<!--          player.innerHTML = `-->
+<!--            <iframe src="https://www.youtube.com/embed/${liveId}?autoplay=1&mute=1&playsinline=1"-->
+<!--            allow="autoplay; encrypted-media"-->
+<!--            allowfullscreen></iframe>`;-->
+<!--          status.textContent = "✅ Live Now!";-->
+<!--        } else {-->
+<!--          player.innerHTML = `-->
+<!--            <iframe src="https://www.youtube.com/embed/${fallbackVideoId}?autoplay=0"-->
+<!--            allowfullscreen></iframe>`;-->
+<!--          status.textContent = "⚫ Channel is currently offline.";-->
+<!--        }-->
+<!--      } catch (err) {-->
+<!--        player.innerHTML = `<p style="color:red;">Error loading video. Please check your API key or network.</p>`;-->
+<!--        console.error(err);-->
 <!--      }-->
-<!--    } catch (err) {-->
-<!--      player.innerHTML = `<p style="color:red;">Error loading video. Please check your API key or network.</p>`;-->
-<!--      console.error(err);-->
 <!--    }-->
-<!--  }-->
 
-<!--  loadStream();-->
+<!--    loadStream();-->
 <!--</script>-->
 
 <!-- square -->
