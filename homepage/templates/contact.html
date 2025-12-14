@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block metatags %}
+<meta name="description" content="Contact Gargachary News Network Pvt Ltd – Samachar 24 official contact details.">
+{% endblock metatags %}
+
+{% block css %}
+<style>
+    .contact-hero {
+      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+                  url('https://source.unsplash.com/1200x400/?news,contact') center/cover;
+      color: #fff;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .contact-hero h1 {
+      font-size: 2.5rem;
+      font-weight: bold;
+    }
+
+    .contact-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 30px;
+      max-width: 700px;
+      margin: auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .contact-info i {
+      font-size: 1.4rem;
+      color: #b30000;
+      margin-right: 10px;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<div class="contact-hero">
+    <div class="container">
+        <h1>Contact Us</h1>
+        <p>Gargachary Times</p>
+    </div>
+</div>
+
+<!-- Contact Details -->
+<div class="container my-5">
+    <div class="contact-card">
+        <h4 class="mb-4">📍 Official Contact Details</h4>
+
+        <p class="contact-info">
+            <i class="bi bi-building"></i>
+            <strong>Company:</strong> Gargachary Times
+        </p>
+
+        <p class="contact-info">
+            <i class="bi bi-geo-alt-fill"></i>
+            <strong>Head Office:</strong><br>
+            009, Shanti Apartments,<br>
+            Daimper Nagar, Mathura
+        </p>
+
+        <p class="contact-info">
+            <i class="bi bi-telephone-fill"></i>
+            <strong>Mathura:</strong> 0565-3569854
+        </p>
+
+        <p class="contact-info">
+            <i class="bi bi-telephone-fill"></i>
+            <strong>Lucknow Office:</strong> 0522-3163462
+        </p>
+
+        <p class="contact-info">
+            <i class="bi bi-whatsapp"></i>
+            <strong>WhatsApp:</strong>
+            <a href="https://wa.me/919045782250" target="_blank">9045782250</a>
+        </p>
+
+        <p class="contact-info">
+            <i class="bi bi-envelope-fill"></i>
+            <strong>Email:</strong>
+            <a href="mailto:samachar24news@gmail.com">samachar24news@gmail.com</a>
+        </p>
+    </div>
+</div>
+
+{% endblock content %}

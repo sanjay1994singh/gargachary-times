@@ -60,6 +60,10 @@ def homepage(request):
     return render(request, 'index.html', context)
 
 
+def contact(request):
+    return render(request, 'contact.html')
+
+
 def video(request):
     videos = get_youtube_videos()
     context = {
