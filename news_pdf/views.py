@@ -5,7 +5,6 @@ from .models import NewsPDF
 # Create your views here.
 def news_pdf(request):
     selected_date = request.GET.get("date")
-    print(selected_date, '=================q')
     if selected_date:
         latest_pdf = NewsPDF.objects.filter(
             uploaded_at__date=selected_date
