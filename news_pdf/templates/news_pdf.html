@@ -131,6 +131,12 @@
     }
 
 </style>
+
+<style>
+    #pdf-slider-container {
+        touch-action: pan-y;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -181,31 +187,6 @@ const url = "{{ pdf.pdf_file.url }}";
 const slider = document.getElementById("pdf-slider");
 let currentPageIndex = 0;
 let totalPages = 0;
-
-<!--async function renderAllPages(url) {-->
-<!--    const pdf = await pdfjsLib.getDocument(url).promise;-->
-<!--    totalPages = pdf.numPages;-->
-
-<!--    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {-->
-<!--        const page = await pdf.getPage(pageNum);-->
-<!--        const DPR = window.devicePixelRatio || 1;-->
-<!--        const viewport = page.getViewport({ scale: 2.0 * DPR });-->
-
-<!--        const canvas = document.createElement("canvas");-->
-<!--        const context = canvas.getContext("2d");-->
-<!--        canvas.height = viewport.height;-->
-<!--        canvas.width = viewport.width;-->
-
-<!--        await page.render({ canvasContext: context, viewport: viewport }).promise;-->
-
-<!--        const wrapper = document.createElement("div");-->
-<!--        wrapper.classList.add("pdf-page");-->
-<!--        wrapper.appendChild(canvas);-->
-
-<!--        slider.appendChild(wrapper);-->
-<!--    }-->
-<!--}-->
-
 
 async function renderAllPages(url) {
     document.getElementById("pdf-loader").style.display = "flex";
@@ -271,5 +252,47 @@ $(document).ready(function () {
         }
     });
 });
+
+</script>
+
+<script>
+    // ================== SWIPE SUPPORT ==================
+let touchStartX = 0;
+let touchEndX = 0;
+
+const sliderContainer = document.getElementById("pdf-slider-container");
+
+// Touch start
+sliderContainer.addEventListener("touchstart", function (e) {
+    touchStartX = e.changedTouches[0].screenX;
+}, { passive: true });
+
+// Touch end
+sliderContainer.addEventListener("touchend", function (e) {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+}, { passive: true });
+
+function handleSwipe() {
+    const swipeDistance = touchStartX - touchEndX;
+    const minSwipeDistance = 50; // px
+
+    // Swipe LEFT → NEXT
+    if (swipeDistance > minSwipeDistance) {
+        if (currentPageIndex < totalPages - 1) {
+            currentPageIndex++;
+            updateSlider();
+        }
+    }
+
+    // Swipe RIGHT → PREVIOUS
+    if (swipeDistance < -minSwipeDistance) {
+        if (currentPageIndex > 0) {
+            currentPageIndex--;
+            updateSlider();
+        }
+    }
+}
+
 </script>
 {% endblock %}
