@@ -10,11 +10,13 @@ def news_pdf(request):
         latest_pdf = NewsPDF.objects.filter(
             uploaded_at__date=selected_date
         ).first()
-        pdf = NewsPDF.objects.get(latest_pdf.id)
+        pdf = NewsPDF.objects.get(id=latest_pdf.id)
+
         absolute_image_url = request.build_absolute_uri(pdf.featured_image.url)
     else:
         latest_pdf = NewsPDF.objects.last()
-        pdf = NewsPDF.objects.get(latest_pdf.id)
+        pdf = NewsPDF.objects.get(id=latest_pdf.id)
+
         absolute_image_url = request.build_absolute_uri(pdf.featured_image.url)
 
     context = {
