@@ -12,11 +12,11 @@ def news_pdf(request):
         ).first()
         current_pdf = NewsPDF.objects.get(id=latest_pdf.id)
 
-        absolute_image_url = request.build_absolute_uri(pdf.featured_image.url)
+        absolute_image_url = request.build_absolute_uri(current_pdf.featured_image.url)
     else:
         latest_pdf = NewsPDF.objects.last()
         current_pdf = NewsPDF.objects.get(id=latest_pdf.id)
-        absolute_image_url = request.build_absolute_uri(pdf.featured_image.url)
+        absolute_image_url = request.build_absolute_uri(current_pdf.featured_image.url)
 
     context = {
         'pdf': latest_pdf,
