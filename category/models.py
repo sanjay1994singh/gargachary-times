@@ -3,6 +3,7 @@ from django.db import models
 
 # Create your models here.
 class Category(models.Model):
+    city = models.BooleanField(default=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     desc = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
