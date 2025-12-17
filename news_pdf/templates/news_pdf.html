@@ -137,7 +137,7 @@
         touch-action: pan-y;
     }
 </style>
-{% endblock %}
+{% endblock css %}
 
 {% block content %}
 
@@ -174,7 +174,8 @@
 {% else %}
 <p style="text-align:center; margin-top:20px;">No PDF available for this date.</p>
 {% endif %}
-{% endblock %}
+
+{% endblock content %}
 
 {% block js %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -295,4 +296,4 @@ function handleSwipe() {
 }
 
 </script>
-{% endblock %}
+{% endblock js %}
