@@ -1,8 +1,6 @@
 {% extends 'new_base.html' %}
 
-{% block title %}
-Latest News
-{% endblock title %}
+{% block title %}{{ news.title }} | Gargachary Times{% endblock %}
 
 {% block metatags %}
 <meta property="og:title" content="{{news.title}}">
