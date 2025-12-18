@@ -1,0 +1,184 @@
+{% extends 'new_base.html' %}
+
+{% block metatags %}
+<meta property="og:title" content="{{news.title}}">
+<meta property="og:description" content="{{ news.title|truncatewords:30 }}">
+<meta property="og:image" content="{{ absolute_image_url }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ news.title }}">
+<meta name="twitter:image" content="{{ news.featured_image.url }}">
+{% endblock metatags %}
+
+{% block css %}
+<style>
+    body { margin: 0; padding: 0; background: #f0f0f0; }
+
+    /* PDF Slider Layout */
+    #pdf-slider-container {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        max-width: 900px;
+        margin: 30px auto;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    #pdf-slider {
+        display: flex;
+        transition: transform 0.4s ease-in-out;
+        scroll-behavior: smooth;
+    }
+
+    .pdf-page {
+        min-width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f8f8f8;
+    }
+
+    .pdf-page canvas {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+
+    /* Navigation Buttons */
+    .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(0, 0, 0, 0.5);
+        color: #fff;
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        font-size: 22px;
+        cursor: pointer;
+        transition: background 0.3s;
+        z-index: 10;
+    }
+
+    .nav-btn:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+
+    #prev-btn { left: 10px; }
+    #next-btn { right: 10px; }
+
+    /* Calendar and Share */
+    .calendar-container {
+        margin: 15px auto;
+        text-align: center;
+        padding: 10px;
+    }
+    .calendar-container input[type="date"] {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 250px;
+        font-size: 16px;
+    }
+    .share-links {
+        margin: 10px 0;
+    }
+    .share-links a {
+        text-decoration: none;
+        margin-right: 10px;
+        font-size: 24px;
+        color: #000;
+    }
+
+    @media (max-width: 768px) {
+        .nav-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 18px;
+        }
+    }
+</style>
+
+<style>
+    /* PDF Loader */
+    #pdf-loader {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .spinner {
+        width: 55px;
+        height: 55px;
+        border: 6px solid #ddd;
+        border-top: 6px solid #000;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+</style>
+
+<style>
+    #pdf-slider-container {
+        touch-action: pan-y;
+    }
+</style>
+{% endblock css %}
+
+{% block content %}
+
+<div id="pdf-loader">
+    <div class="spinner"></div>
+    <p>Loading PDF, please wait…</p>
+</div>
+
+
+<div class="calendar-container">
+    <label for="calendar">Select Date:</label>
+    <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
+
+    <div class="share-links mb-4 d-flex align-items-center justify-content-center">
+        <span class="me-3 fw-bold">Share:</span>
+        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank">
+            <i class="bi bi-whatsapp text-success"></i>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank">
+            <i class="bi bi-facebook text-primary"></i>
+        </a>
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}" target="_blank">
+            <i class="bi bi-twitter-x text-info"></i>
+        </a>
+    </div>
+</div>
+
+{% if pdf %}
+<div id="pdf-slider-container">
+    <button class="nav-btn" id="prev-btn">&#8249;</button>
+    <div id="pdf-slider"></div>
+    <button class="nav-btn" id="next-btn">&#8250;</button>
+</div>
+{% else %}
+<p style="text-align:center; margin-top:20px;">No PDF available for this date.</p>
+{% endif %}
+
+{% endblock content %}
+
+{% block js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+{% endblock js %}
