@@ -118,13 +118,19 @@
 
         <div class="collapse navbar-collapse" id="navMenu">
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="/news_pdf/">E-paper</a>
+                </li>
                 {% for i in category %}
                 <li class="nav-item">
                     <a class="nav-link text-dark" href="/category_news/{{ i.id }}/">{{ i.name }}</a>
                 </li>
                 {% endfor %}
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="/">Contact</a>
+                    <a class="nav-link text-dark" href="/contact/">Contact</a>
                 </li>
             </ul>
         </div>
