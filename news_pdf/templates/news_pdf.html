@@ -151,16 +151,19 @@
     <label for="calendar">Select Date:</label>
     <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
 
-    <div class="share-links mb-4 d-flex align-items-center justify-content-center">
+    <div class="share-links mb-4 d-flex align-items-center">
         <span class="me-3 fw-bold">Share:</span>
-        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank">
-            <i class="bi bi-whatsapp text-success"></i>
+        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank"
+           class="me-3 text-success fs-5">
+            <i class="bi bi-whatsapp"></i>
         </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank">
-            <i class="bi bi-facebook text-primary"></i>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+           target="_blank" class="me-3 text-primary fs-5">
+            <i class="bi bi-facebook"></i>
         </a>
-        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}" target="_blank">
-            <i class="bi bi-twitter-x text-info"></i>
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
+           target="_blank" class="text-info fs-5">
+            <i class="bi bi-twitter-x"></i>
         </a>
     </div>
 </div>
@@ -181,78 +184,78 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-{% if pdf %}
-const url = "{{ pdf.pdf_file.url }}";
-const slider = document.getElementById("pdf-slider");
-let currentPageIndex = 0;
-let totalPages = 0;
+    {% if pdf %}
+    const url = "{{ pdf.pdf_file.url }}";
+    const slider = document.getElementById("pdf-slider");
+    let currentPageIndex = 0;
+    let totalPages = 0;
 
-async function renderAllPages(url) {
-    document.getElementById("pdf-loader").style.display = "flex";
+    async function renderAllPages(url) {
+        document.getElementById("pdf-loader").style.display = "flex";
 
-    const pdf = await pdfjsLib.getDocument(url).promise;
-    totalPages = pdf.numPages;
+        const pdf = await pdfjsLib.getDocument(url).promise;
+        totalPages = pdf.numPages;
 
-    for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
-        const page = await pdf.getPage(pageNum);
-        const DPR = window.devicePixelRatio || 1;
-        const viewport = page.getViewport({ scale: 2.0 * DPR });
+        for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const DPR = window.devicePixelRatio || 1;
+            const viewport = page.getViewport({ scale: 2.0 * DPR });
 
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
 
-        await page.render({
-            canvasContext: context,
-            viewport: viewport
-        }).promise;
+            await page.render({
+                canvasContext: context,
+                viewport: viewport
+            }).promise;
 
-        const wrapper = document.createElement("div");
-        wrapper.classList.add("pdf-page");
-        wrapper.appendChild(canvas);
-        slider.appendChild(wrapper);
+            const wrapper = document.createElement("div");
+            wrapper.classList.add("pdf-page");
+            wrapper.appendChild(canvas);
+            slider.appendChild(wrapper);
+        }
+
+        // ✅ Hide loader ONLY after complete rendering
+        document.getElementById("pdf-loader").style.display = "none";
     }
 
-    // ✅ Hide loader ONLY after complete rendering
-    document.getElementById("pdf-loader").style.display = "none";
-}
 
-
-// Navigation Buttons
-document.getElementById("prev-btn").addEventListener("click", () => {
-    if (currentPageIndex > 0) {
-        currentPageIndex--;
-        updateSlider();
-    }
-});
-
-document.getElementById("next-btn").addEventListener("click", () => {
-    if (currentPageIndex < totalPages - 1) {
-        currentPageIndex++;
-        updateSlider();
-    }
-});
-
-function updateSlider() {
-    const offset = -currentPageIndex * 100;
-    slider.style.transform = `translateX(${offset}%)`;
-}
-
-// Render
-renderAllPages(url);
-{% endif %}
-
-$(document).ready(function () {
-    $('#calendar').on('change', function () {
-        let selectedDate = $(this).val();
-        if (selectedDate) {
-            window.location.href = "?date=" + selectedDate;
+    // Navigation Buttons
+    document.getElementById("prev-btn").addEventListener("click", () => {
+        if (currentPageIndex > 0) {
+            currentPageIndex--;
+            updateSlider();
         }
     });
-});
+
+    document.getElementById("next-btn").addEventListener("click", () => {
+        if (currentPageIndex < totalPages - 1) {
+            currentPageIndex++;
+            updateSlider();
+        }
+    });
+
+    function updateSlider() {
+        const offset = -currentPageIndex * 100;
+        slider.style.transform = `translateX(${offset}%)`;
+    }
+
+    // Render
+    renderAllPages(url);
+    {% endif %}
+
+    $(document).ready(function () {
+        $('#calendar').on('change', function () {
+            let selectedDate = $(this).val();
+            if (selectedDate) {
+                window.location.href = "?date=" + selectedDate;
+            }
+        });
+    });
 
 </script>
 
