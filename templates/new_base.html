@@ -9,14 +9,20 @@
     </title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {% block metatags %}
-    {% endblock metatags %}
 
+    <!-- ✅ Primary SEO -->
     <meta name="description"
-          content="Gargachary Times is your trusted source for the latest news, updates, and insights from Vrindavan, Mathura, Brij region and across India. Stay informed with authentic, timely, and relevant reporting.">
+          content="{% block meta_description %}Latest Brij, Vrindavan, Mathura & India news in Hindi. Trusted, fast & authentic journalism by Gargachary Times.{% endblock %}">
     <meta name="keywords"
-          content="Gargachary Times, Brij News, Vrindavan News, Mathura Updates, Hindi News, Indian Politics, Local News, Dharam Sanskar, Rashtriya Samachar">
+          content="Gargachary Times, Brij News, Vrindavan News, Mathura News, Hindi News, Indian News, E-paper">
     <meta name="author" content="Gargachary Times">
+    <meta name="robots" content="index, follow">
+
+    <!-- ✅ Canonical -->
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+    <!-- ✅ Open Graph / Social -->
+    {% block metatags %}{% endblock metatags %}
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
