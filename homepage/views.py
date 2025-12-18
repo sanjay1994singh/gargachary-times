@@ -44,6 +44,14 @@ def get_youtube_videos(max_results=20):
     return videos
 
 
+def video(request):
+    videos = get_youtube_videos()
+    context = {
+        'videos': videos,
+    }
+    return render(request, 'video.html', context)
+
+
 def homepage(request):
     all_news = list(News.objects.all().order_by('-id')[:30])
 
@@ -62,14 +70,6 @@ def homepage(request):
 
 def contact(request):
     return render(request, 'contact.html')
-
-
-def video(request):
-    videos = get_youtube_videos()
-    context = {
-        'videos': videos,
-    }
-    return render(request, 'video.html', context)
 
 
 def category_news(request, id):
