@@ -28,7 +28,7 @@ from .models import NewsPDF
 
 def news_pdf(request):
     news = NewsPDF.objects.last()
-    absolute_image_url = request.build_absolute_uri(current_pdf.featured_image.url)
+    absolute_image_url = request.build_absolute_uri(news.featured_image.url)
 
     context = {
         'news': news,
