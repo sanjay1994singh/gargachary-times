@@ -101,7 +101,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
             <ul class="custom-list">
                 {% for i in news_col3 %}
                 <li class="mb-3 d-flex align-items-center">
-                    <img src="{% i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded" width="90" height="60" alt="">
+                    <img src="{% if.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded" width="90" height="60" alt="">
                     <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                 </li>
                 <h3><span class="text-danger">{{i.category}}</span></h3>
