@@ -61,7 +61,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                     <iframe
                             width="560"
                             height="315"
-                            src="https://www.youtube.com/embed/zkgYCr7tGTM?autoplay=1&mute=1&playsinline=1"
+                            src="https://www.youtube.com/embed/2s_MwS9e0aQ?autoplay=1&mute=1&playsinline=1"
                             title="YouTube video player"
                             frameborder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -75,7 +75,8 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 
             <hr>
             {% if news_col2 %}
-            <img src="{% if news_col2.0.featured_image %}{{news_col2.0.featured_image.url}}{% endif %}" class="img-fluid mb-3" alt=""/>
+            <img src="{% if news_col2.0.featured_image %}{{news_col2.0.featured_image.url}}{% endif %}"
+                 class="img-fluid mb-3" alt=""/>
             <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5"
                title="{{news_col2.0.title}}">
                 {{news_col2.0.title}}
@@ -85,7 +86,8 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
             <ul class="custom-list mt-3">
                 {% for i in news_col2|slice:"1:" %}
                 <li class="mb-3 d-flex align-items-center">
-                    <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded" width="90" height="60" alt="">
+                    <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded"
+                         width="90" height="60" alt="">
                     <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                 </li>
                 <h3><span class="text-danger">{{i.category}}</span></h3>
@@ -101,7 +103,8 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
             <ul class="custom-list">
                 {% for i in news_col3 %}
                 <li class="mb-3 d-flex align-items-center">
-                    <img src="{% if i.featured_image %} {{i.featured_image.url}} {% endif %}" class="me-3 rounded" width="90" height="60" alt="">
+                    <img src="{% if i.featured_image %} {{i.featured_image.url}} {% endif %}" class="me-3 rounded"
+                         width="90" height="60" alt="">
                     <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                 </li>
                 <h3><span class="text-danger">{{i.category}}</span></h3>
