@@ -4,6 +4,7 @@ from django.db import models
 class NewsPDF(models.Model):
     title = models.CharField(max_length=200)
     featured_image = models.ImageField(upload_to='news_pdf_image', null=True)
+    text = models.TextField(null=True, blank=True)
     pdf_file = models.FileField(upload_to='news_pdfs/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 

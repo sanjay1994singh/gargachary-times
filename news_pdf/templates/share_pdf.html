@@ -1,11 +1,10 @@
 {% extends 'new_base.html' %}
 
-{% block title %}
-Latest News
-{% endblock title %}
+{% block title %}{{ news.title }} | Gargachary Times{% endblock %}
 
 {% block metatags %}
 <meta property="og:title" content="{{news.title}}">
+<meta property="og:description" content="{{ news.text|truncatewords:30 }}">
 <meta property="og:image" content="{{ absolute_image_url }}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
 
@@ -14,6 +13,10 @@ Latest News
 <meta name="twitter:title" content="{{ news.title }}">
 <meta name="twitter:image" content="{% if news.featured_image %}{{ news.featured_image.url }}{% endif %}">
 {% endblock metatags %}
+
+{% block meta_description %}
+{{ news.title|truncatechars:155 }}
+{% endblock %}
 
 {% block css %}
 <style>
@@ -36,6 +39,7 @@ Latest News
             <div class="col-lg-9">
                 <!-- Title -->
                 <h1 class="display-5 fw-bold mb-3">{{ news.title }}</h1>
+
 
                 <!-- Image -->
                 {% if news.featured_image %}

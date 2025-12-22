@@ -24,3 +24,17 @@ def news_pdf(request):
     }
 
     return render(request, 'news_pdf.html', context)
+
+
+
+def new_news_pdf(request):
+    news = NewsPDF.objects.order_by('-uploaded_at').first()
+    try:
+        absolute_image_url = request.build_absolute_uri(news.featured_image.url)
+    except:
+        absolute_image_url = ''
+    context = {
+        'news': news,
+        'absolute_image_url': absolute_image_url,
+    }
+    return render(request, 'share_pdf.html', context)
