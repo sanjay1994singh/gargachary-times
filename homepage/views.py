@@ -57,8 +57,8 @@ def homepage(request):
 
     # Split into 3 parts
     column_2 = all_news[:10]  # latest 10
-    column_1 = all_news[10:20]  # next 10
-    column_3 = all_news[20:30]  # last 10
+    column_1 = all_news[10:22]  # next 10
+    column_3 = all_news[22:32]  # last 10
 
     context = {
         'news_col1': column_1,
