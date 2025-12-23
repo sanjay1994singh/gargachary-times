@@ -12,6 +12,7 @@
 
     <!-- ✅ Canonical -->
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- ✅ Open Graph / Social -->
     {% block metatags %}
@@ -150,6 +151,42 @@
             ]
         }
     </script>
+
+    <style>
+        <style>
+.social-follow {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    margin: 5px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 18px;
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.social-btn:hover {
+    transform: translateY(-4px);
+    opacity: 0.9;
+}
+
+/* Brand Colors */
+.facebook { background: #1877f2; }
+.twitter  { background: #000; }
+.linkedin { background: #0077b5; }
+.youtube  { background: #ff0000; }
+    </style>
+
+    </style>
 </head>
 
 <body>
@@ -195,6 +232,38 @@
 
 <main>
     {% block content %}{% endblock content %}
+
+    <div class="social-follow text-center my-4">
+        <h5 class="mb-3">Follow Samachar24</h5>
+
+        <a href="https://www.facebook.com/Samachar24" target="_blank" class="social-btn facebook">
+            <i class="fab fa-facebook-f"></i>
+        </a>
+
+        <a href="https://twitter.com/samachar24" target="_blank" class="social-btn twitter">
+            <i class="fab fa-x-twitter"></i>
+        </a>
+
+        <a href="https://in.linkedin.com/pub/samachar-24/60/562/874" target="_blank" class="social-btn linkedin">
+            <i class="fab fa-linkedin-in"></i>
+        </a>
+
+        <a href="https://youtube.com/@dharm24mathura" target="_blank" class="social-btn youtube">
+            <i class="fab fa-youtube"></i>
+        </a>
+
+        <a href="https://youtube.com/@samachar24rajasthantv" target="_blank" class="social-btn youtube">
+            <i class="fab fa-youtube"></i>
+        </a>
+
+        <a href="https://youtube.com/@samachar24podcast" target="_blank" class="social-btn youtube">
+            <i class="fas fa-podcast"></i>
+        </a>
+
+        <a href="https://m.facebook.com/groups/198749920308378/" target="_blank" class="social-btn facebook">
+            <i class="fas fa-users"></i>
+        </a>
+    </div>
 </main>
 
 <!-- Bootstrap JS -->
