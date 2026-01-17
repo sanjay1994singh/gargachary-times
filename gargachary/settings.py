@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'news',
     'video',
     'news_pdf',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [

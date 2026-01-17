@@ -8,8 +8,19 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from category.models import Category
 import random
-
+from .serializers import NewsSerializer
 # Create your views here.
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+
+@api_view(['GET'])
+def news_list(request):
+    news = News.objects.order_by('-created_at')
+    serializer = NewsSerializer(news, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
 def news_detail(request, id):
     news = News.objects.get(id=id)
     count = news.count
