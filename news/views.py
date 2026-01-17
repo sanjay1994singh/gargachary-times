@@ -16,7 +16,7 @@ from rest_framework.response import Response
 
 @api_view(['GET'])
 def news_list(request):
-    news = News.objects.order_by('-created_at')
+    news = News.objects.order_by('-created_at')[10]
     serializer = NewsSerializer(news, many=True, context={'request': request})
     return Response(serializer.data)
 
