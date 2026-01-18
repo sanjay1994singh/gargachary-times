@@ -209,11 +209,51 @@
                 <li class="nav-item">
                     <a class="nav-link text-dark" href="/news_pdf/">E-paper</a>
                 </li>
-                {% for i in category %}
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="/category_news/{{ i.id }}/">{{ i.name }}</a>
+
+                <!--                {% for i in state %}-->
+                <!--                <li class="nav-item">-->
+                <!--                    <a class="nav-link text-dark" href="/category_news/{{ i.id }}/">{{ i.name }}</a>-->
+                <!--                </li>-->
+                <!--                {% endfor %}-->
+
+                <!--                {% for i in category %}-->
+                <!--                <li class="nav-item">-->
+                <!--                    <a class="nav-link text-dark" href="/category_news/{{ i.id }}/">{{ i.name }}</a>-->
+                <!--                </li>-->
+                <!--                {% endfor %}-->
+
+                {% for state in states %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark"
+                       data-bs-toggle="dropdown">
+                        {{ state.name }}
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        {% for cat in state.category_set.all %}
+                        <li>
+                            <a class="dropdown-item"
+                               href="/category_news/{{ cat.id }}/">
+                                {{ cat.name }}
+                            </a>
+                        </li>
+                        {% empty %}
+                        <li class="dropdown-item text-muted">No City</li>
+                        {% endfor %}
+                    </ul>
                 </li>
                 {% endfor %}
+
+                {% for cat in other_categories %}
+                <li class="nav-item">
+                    <a class="nav-link text-dark"
+                       href="/category_news/{{ cat.id }}/">
+                        {{ cat.name }}
+                    </a>
+                </li>
+                {% endfor %}
+
+
                 <li class="nav-item">
                     <a class="nav-link text-dark" href="/contact/">Contact</a>
                 </li>
