@@ -173,16 +173,31 @@
     const cache = {};
 
     // INIT PDF
+<!--    (async function() {-->
+<!--        loader.style.display = "flex";-->
+
+<!--        pdfDoc = await pdfjsLib.getDocument(url).promise;-->
+<!--        totalPages = pdfDoc.numPages;-->
+
+<!--        await renderPage(currentPage);-->
+
+<!--        loader.style.display = "none";-->
+<!--    })();-->
+
     (async function() {
-        loader.style.display = "flex";
+        loader.style.display = "flex"; // show loader immediately
+
+        // Force browser to repaint so loader actually appears
+        await new Promise(requestAnimationFrame);
 
         pdfDoc = await pdfjsLib.getDocument(url).promise;
         totalPages = pdfDoc.numPages;
 
         await renderPage(currentPage);
 
-        loader.style.display = "none";
+        loader.style.display = "none"; // hide loader
     })();
+
 
     // RENDER PAGE (HD + FAST)
     async function renderPage(pageNum){
