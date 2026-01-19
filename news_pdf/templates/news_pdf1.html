@@ -2,81 +2,112 @@
 
 {% block css %}
 <style>
-body{background:#f2f2f2;margin:0}
+    body{background:#f2f2f2;margin:0}
 
-/* FULL LOADER */
-#pdf-loader{
-    position:fixed;inset:0;
-    background:#fff;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    z-index:9999;
-}
-.spinner{
-    width:45px;height:45px;
-    border:5px solid #ddd;
-    border-top:5px solid #000;
-    border-radius:50%;
-    animation:spin .8s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg)}}
+    /* FULL LOADER */
+    #pdf-loader{
+        position:fixed;inset:0;
+        background:#fff;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        z-index:9999;
+    }
+    .spinner{
+        width:45px;height:45px;
+        border:5px solid #ddd;
+        border-top:5px solid #000;
+        border-radius:50%;
+        animation:spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-/* PDF CONTAINER */
-#pdf-slider-container{
-    max-width:900px;
-    margin:20px auto;
-    background:#fff;
-    border-radius:10px;
-    position:relative;
-    box-shadow:0 2px 10px rgba(0,0,0,.2);
-    overflow:hidden;
-    padding:0 60px; /* space for arrow buttons */
-}
+    /* PDF CONTAINER */
+    #pdf-slider-container{
+        max-width:900px;
+        margin:20px auto;
+        background:#fff;
+        border-radius:10px;
+        position:relative;
+        box-shadow:0 2px 10px rgba(0,0,0,.2);
+        overflow:hidden;
+        padding:0 60px; /* space for arrow buttons */
+    }
 
-#pdf-slider{
-    width:100%;
-}
+    #pdf-slider{
+        width:100%;
+    }
 
-#pdf-slider canvas{
-    width:100%;
-    height:auto;
-    display:block;
-}
+    #pdf-slider canvas{
+        width:100%;
+        height:auto;
+        display:block;
+    }
 
-/* PAGE LOADER */
-#page-loader{
-    position:absolute;
-    inset:0;
-    background:rgba(255,255,255,.85);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:5;
-}
+    /* PAGE LOADER */
+    #page-loader{
+        position:absolute;
+        inset:0;
+        background:rgba(255,255,255,.85);
+        display:none;
+        align-items:center;
+        justify-content:center;
+        z-index:5;
+    }
 
-/* NAVIGATION BUTTONS */
-.nav-btn{
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    background:rgba(0,0,0,.6);
-    color:#fff;
-    border:none;
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    cursor:pointer;
-    z-index:6;
-}
-#prev-btn{left:15px;}
-#next-btn{right:15px;}
+    /* NAVIGATION BUTTONS */
+    .nav-btn{
+        position:absolute;
+        top:50%;
+        transform:translateY(-50%);
+        background:rgba(0,0,0,.6);
+        color:#fff;
+        border:none;
+        width:40px;
+        height:40px;
+        border-radius:50%;
+        cursor:pointer;
+        z-index:6;
+    }
+    #prev-btn{left:15px;}
+    #next-btn{right:15px;}
 
-/* MOBILE SIDE SPACE */
-@media (max-width:768px){
-    #pdf-slider-container{padding:0 45px;}
-}
+    /* MOBILE SIDE SPACE */
+    @media (max-width:768px){
+        #pdf-slider-container{padding:0 45px;}
+    }
+
+    /* Calendar and Share */
+    .calendar-container {
+        margin: 15px auto;
+        text-align: center;
+        padding: 10px;
+    }
+    .calendar-container input[type="date"] {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 250px;
+        font-size: 16px;
+    }
+    .share-links {
+        margin: 10px 0;
+    }
+    .share-links a {
+        text-decoration: none;
+        margin-right: 10px;
+        font-size: 24px;
+        color: #000;
+    }
+
+    @media (max-width: 768px) {
+        .nav-btn {
+            width: 38px;
+            height: 38px;
+            font-size: 18px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -85,6 +116,27 @@ body{background:#f2f2f2;margin:0}
 <div id="pdf-loader">
     <div class="spinner"></div>
     <p>Loading PDF…</p>
+</div>
+
+<div class="calendar-container">
+    <label for="calendar">Select Date:</label>
+    <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
+
+    <div class="share-links mb-4 d-flex align-items-center">
+        <span class="me-3 fw-bold">Share:</span>
+        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank"
+           class="me-3 text-success fs-5">
+            <i class="bi bi-whatsapp"></i>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+           target="_blank" class="me-3 text-primary fs-5">
+            <i class="bi bi-facebook"></i>
+        </a>
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
+           target="_blank" class="text-info fs-5">
+            <i class="bi bi-twitter-x"></i>
+        </a>
+    </div>
 </div>
 
 {% if pdf %}
@@ -109,88 +161,88 @@ body{background:#f2f2f2;margin:0}
 
 {% if pdf %}
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
 
-const url = "{{ pdf.pdf_file.url }}";
-const slider = document.getElementById("pdf-slider");
-const loader = document.getElementById("pdf-loader");
-const pageLoader = document.getElementById("page-loader");
+    const url = "{{ pdf.pdf_file.url }}";
+    const slider = document.getElementById("pdf-slider");
+    const loader = document.getElementById("pdf-loader");
+    const pageLoader = document.getElementById("page-loader");
 
-let pdfDoc, currentPage = 1, totalPages = 0;
-let rendering = false;
-const cache = {};
+    let pdfDoc, currentPage = 1, totalPages = 0;
+    let rendering = false;
+    const cache = {};
 
-// INIT PDF
-(async function() {
-    loader.style.display = "flex";
+    // INIT PDF
+    (async function() {
+        loader.style.display = "flex";
 
-    pdfDoc = await pdfjsLib.getDocument(url).promise;
-    totalPages = pdfDoc.numPages;
+        pdfDoc = await pdfjsLib.getDocument(url).promise;
+        totalPages = pdfDoc.numPages;
 
-    await renderPage(currentPage);
+        await renderPage(currentPage);
 
-    loader.style.display = "none";
-})();
+        loader.style.display = "none";
+    })();
 
-// RENDER PAGE (HD + FAST)
-async function renderPage(pageNum){
-    if(rendering) return;
-    rendering = true;
+    // RENDER PAGE (HD + FAST)
+    async function renderPage(pageNum){
+        if(rendering) return;
+        rendering = true;
 
-    pageLoader.style.display = "flex";
-    slider.innerHTML = "";
+        pageLoader.style.display = "flex";
+        slider.innerHTML = "";
 
-    // Let browser paint loader
-    await new Promise(requestAnimationFrame);
+        // Let browser paint loader
+        await new Promise(requestAnimationFrame);
 
-    // Use cached page if exists
-    if(cache[pageNum]){
-        slider.appendChild(cache[pageNum]);
+        // Use cached page if exists
+        if(cache[pageNum]){
+            slider.appendChild(cache[pageNum]);
+            pageLoader.style.display = "none";
+            rendering = false;
+            return;
+        }
+
+        const page = await pdfDoc.getPage(pageNum);
+
+        // HD scale
+        const scale = window.innerWidth < 768 ? 2.0 : 1.6;
+        const viewport = page.getViewport({scale});
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d", {alpha:false});
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({canvasContext:ctx, viewport}).promise;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "pdf-page";
+        wrapper.appendChild(canvas);
+
+        cache[pageNum] = wrapper;
+        slider.appendChild(wrapper);
+
         pageLoader.style.display = "none";
         rendering = false;
-        return;
     }
 
-    const page = await pdfDoc.getPage(pageNum);
+    // BUTTON NAVIGATION
+    document.getElementById("prev-btn").onclick = () => {
+        if(currentPage > 1){
+            currentPage--;
+            renderPage(currentPage);
+        }
+    };
+    document.getElementById("next-btn").onclick = () => {
+        if(currentPage < totalPages){
+            currentPage++;
+            renderPage(currentPage);
+        }
+    };
 
-    // HD scale
-    const scale = window.innerWidth < 768 ? 2.0 : 1.6;
-    const viewport = page.getViewport({scale});
-
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d", {alpha:false});
-
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-
-    await page.render({canvasContext:ctx, viewport}).promise;
-
-    const wrapper = document.createElement("div");
-    wrapper.className = "pdf-page";
-    wrapper.appendChild(canvas);
-
-    cache[pageNum] = wrapper;
-    slider.appendChild(wrapper);
-
-    pageLoader.style.display = "none";
-    rendering = false;
-}
-
-// BUTTON NAVIGATION
-document.getElementById("prev-btn").onclick = () => {
-    if(currentPage > 1){
-        currentPage--;
-        renderPage(currentPage);
-    }
-};
-document.getElementById("next-btn").onclick = () => {
-    if(currentPage < totalPages){
-        currentPage++;
-        renderPage(currentPage);
-    }
-};
-
-// SWIPE DISABLED (no touch handlers)
+    // SWIPE DISABLED (no touch handlers)
 </script>
 {% endif %}
 {% endblock %}
