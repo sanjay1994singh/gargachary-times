@@ -154,7 +154,7 @@ async function renderPage(pageNum){
     const page = await pdfDoc.getPage(pageNum);
 
     // HD scale
-    const scale = window.innerWidth < 768 ? 1.8 : 1.6;
+    const scale = window.innerWidth < 768 ? 2.0 : 1.6;
     const viewport = page.getViewport({scale});
 
     const canvas = document.createElement("canvas");
