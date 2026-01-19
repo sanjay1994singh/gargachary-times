@@ -176,22 +176,22 @@
     };
 
     // SWIPE
-    let startX = 0;
-    slider.addEventListener("touchstart", e => {
-        startX = e.changedTouches[0].screenX;
-    }, { passive: true });
+<!--    let startX = 0;-->
+<!--    slider.addEventListener("touchstart", e => {-->
+<!--        startX = e.changedTouches[0].screenX;-->
+<!--    }, { passive: true });-->
 
-    slider.addEventListener("touchend", e => {
-        const diff = startX - e.changedTouches[0].screenX;
-        if (diff > 60 && currentPage < totalPages) {
-            currentPage++;
-            renderPage(currentPage);
-        }
-        if (diff < -60 && currentPage > 1) {
-            currentPage--;
-            renderPage(currentPage);
-        }
-    }, { passive: true });
+<!--    slider.addEventListener("touchend", e => {-->
+<!--        const diff = startX - e.changedTouches[0].screenX;-->
+<!--        if (diff > 60 && currentPage < totalPages) {-->
+<!--            currentPage++;-->
+<!--            renderPage(currentPage);-->
+<!--        }-->
+<!--        if (diff < -60 && currentPage > 1) {-->
+<!--            currentPage&#45;&#45;;-->
+<!--            renderPage(currentPage);-->
+<!--        }-->
+<!--    }, { passive: true });-->
 </script>
 {% endif %}
 
