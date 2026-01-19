@@ -244,14 +244,25 @@
 
     // SWIPE DISABLED (no touch handlers)
 
+<!--    $(document).ready(function () {-->
+<!--        $('#calendar').on('change', function () {-->
+<!--            let selectedDate = $(this).val();-->
+<!--            if (selectedDate) {-->
+<!--                window.location.href = "?date=" + selectedDate;-->
+<!--            }-->
+<!--        });-->
+<!--    });-->
+
     $(document).ready(function () {
-        $('#calendar').on('change', function () {
-            let selectedDate = $(this).val();
-            if (selectedDate) {
-                window.location.href = "?date=" + selectedDate;
-            }
-        });
+    $('#calendar').on('change', function () {
+        let selectedDate = $(this).val(); // get the selected date
+        if (selectedDate) { // make sure a date is selected
+            // redirect to URL with date as query param
+            window.location.href = "?date=" + encodeURIComponent(selectedDate);
+        }
     });
+});
+
 </script>
 {% endif %}
 {% endblock %}
