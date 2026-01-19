@@ -1,0 +1,198 @@
+{% extends 'new_base.html' %}
+
+{% block css %}
+<style>
+    body{background:#f2f2f2;margin:0}
+
+    /* FULL LOADER */
+    #pdf-loader{
+        position:fixed;inset:0;
+        background:#fff;
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        z-index:9999;
+    }
+    .spinner{
+        width:45px;height:45px;
+        border:5px solid #ddd;
+        border-top:5px solid #000;
+        border-radius:50%;
+        animation:spin .8s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* PDF CONTAINER */
+    #pdf-slider-container{
+        max-width:900px;
+        margin:20px auto;
+        background:#fff;
+        border-radius:10px;
+        position:relative;
+        box-shadow:0 2px 10px rgba(0,0,0,.2);
+        overflow:hidden;
+    }
+    #pdf-slider canvas{width:100%;height:auto}
+
+    /* PAGE LOADER */
+    #page-loader{
+        position:absolute;
+        inset:0;
+        background:rgba(255,255,255,.85);
+        display:none;
+        align-items:center;
+        justify-content:center;
+        z-index:5;
+    }
+
+    /* NAV */
+    .nav-btn{
+        position:absolute;
+        top:50%;
+        transform:translateY(-50%);
+        background:rgba(0,0,0,.6);
+        color:#fff;
+        border:none;
+        width:40px;height:40px;
+        border-radius:50%;
+        cursor:pointer;
+        z-index:6;
+    }
+    #prev-btn{left:10px}
+    #next-btn{right:10px}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div id="pdf-loader">
+    <div class="spinner"></div>
+    <p>Loading PDF…</p>
+</div>
+
+{% if pdf %}
+<div id="pdf-slider-container">
+    <button id="prev-btn" class="nav-btn">&#8249;</button>
+    <div id="pdf-slider"></div>
+
+    <div id="page-loader">
+        <div class="spinner"></div>
+    </div>
+
+    <button id="next-btn" class="nav-btn">&#8250;</button>
+</div>
+{% else %}
+<p class="text-center mt-4">No PDF available</p>
+{% endif %}
+
+{% endblock %}
+
+{% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+{% if pdf %}
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+     "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+
+    const url = "{{ pdf.pdf_file.url }}";
+    const slider = document.getElementById("pdf-slider");
+    const loader = document.getElementById("pdf-loader");
+    const pageLoader = document.getElementById("page-loader");
+
+    let pdfDoc, currentPage = 1, totalPages = 0;
+    let rendering = false;
+    const cache = {};
+
+    // INIT PDF
+    (async function () {
+        loader.style.display = "flex";
+
+        pdfDoc = await pdfjsLib.getDocument(url).promise;
+        totalPages = pdfDoc.numPages;
+
+        await renderPage(currentPage);
+
+        loader.style.display = "none";
+    })();
+
+    // RENDER PAGE (OPTIMIZED)
+    async function renderPage(pageNum) {
+        if (rendering) return;
+        rendering = true;
+
+        // ✅ SHOW LOADER IMMEDIATELY
+        pageLoader.style.display = "flex";
+        slider.innerHTML = "";
+
+        // ✅ LET BROWSER PAINT LOADER
+        await new Promise(requestAnimationFrame);
+
+        // ✅ USE CACHE
+        if (cache[pageNum]) {
+            slider.appendChild(cache[pageNum]);
+            pageLoader.style.display = "none";
+            rendering = false;
+            return;
+        }
+
+        const page = await pdfDoc.getPage(pageNum);
+        const scale = window.innerWidth < 768 ? 1.15 : 1.4;
+        const viewport = page.getViewport({ scale });
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d", { alpha: false });
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        // ✅ RENDER PAGE
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "pdf-page";
+        wrapper.appendChild(canvas);
+
+        cache[pageNum] = wrapper;
+        slider.appendChild(wrapper);
+
+        pageLoader.style.display = "none";
+        rendering = false;
+    }
+
+    // BUTTON NAV
+    document.getElementById("prev-btn").onclick = () => {
+        if (currentPage > 1) {
+            currentPage--;
+            renderPage(currentPage);
+        }
+    };
+    document.getElementById("next-btn").onclick = () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            renderPage(currentPage);
+        }
+    };
+
+    // SWIPE
+    let startX = 0;
+    slider.addEventListener("touchstart", e => {
+        startX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    slider.addEventListener("touchend", e => {
+        const diff = startX - e.changedTouches[0].screenX;
+        if (diff > 60 && currentPage < totalPages) {
+            currentPage++;
+            renderPage(currentPage);
+        }
+        if (diff < -60 && currentPage > 1) {
+            currentPage--;
+            renderPage(currentPage);
+        }
+    }, { passive: true });
+</script>
+{% endif %}
+
+{% endblock %}
