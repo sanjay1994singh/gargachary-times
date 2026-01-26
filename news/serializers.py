@@ -3,7 +3,7 @@ from .models import News
 
 class NewsSerializer(serializers.ModelSerializer):
     featured_image = serializers.SerializerMethodField()
-    category_name = serializers.SerializerMethodField()
+    category_name = serializers.CharField(source='category.name', read_only=True)
 
     class Meta:
         model = News
