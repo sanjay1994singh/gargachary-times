@@ -19,7 +19,7 @@ def news_list(request):
     news = News.objects.order_by('-created_at')[:10]
     serializer = NewsSerializer(news, many=True, context={'request': request})
 
-    live_tv = '<iframe style="width:640px; height:480px;" allowfullscreen src="https://legitpro.co.in:9898/samachar24/samachar24/embed.html"></iframe>'
+    live_tv = 'https://legitpro.co.in:9898/samachar24/samachar24/embed.html'
 
     return Response({
         "live_tv": live_tv,

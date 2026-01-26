@@ -1,14 +1,3 @@
-# # news/context_processors.py
-#
-# from category.models import Category, State
-#
-# def category_context(request):
-#     return {
-#         'category': Category.objects.all().order_by('-id'),
-#         'state': State.objects.all().order_by('-id')
-#     }
-
-
 from category.models import Category, State
 from django.db.models import Prefetch
 
