@@ -8,6 +8,7 @@ class NewsSerializer(serializers.ModelSerializer):
         model = News
         fields = [
             'id',
+            'category',
             'title',
             'text',
             'featured_image',
