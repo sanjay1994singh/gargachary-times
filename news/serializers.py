@@ -3,12 +3,13 @@ from .models import News
 
 class NewsSerializer(serializers.ModelSerializer):
     featured_image = serializers.SerializerMethodField()
+    category_name = serializers.SerializerMethodField()
 
     class Meta:
         model = News
         fields = [
             'id',
-            'category',
+            'category_name',
             'title',
             'text',
             'featured_image',
