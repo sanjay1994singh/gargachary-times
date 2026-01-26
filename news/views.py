@@ -18,8 +18,13 @@ from rest_framework.response import Response
 def news_list(request):
     news = News.objects.order_by('-created_at')[:10]
     serializer = NewsSerializer(news, many=True, context={'request': request})
-    print(serializer.data, '======================serializer.data=========')
-    return Response(serializer.data)
+
+    live_tv = '<iframe style="width:640px; height:480px;" allowfullscreen src="https://legitpro.co.in:9898/samachar24/samachar24/embed.html"></iframe>'
+
+    return Response({
+        "live_tv": live_tv,
+        "news": serializer.data
+    })
 
 
 def news_detail(request, id):
