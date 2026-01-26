@@ -6,9 +6,11 @@ from django.db.models import Q
 from account.models import User
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from category.models import Category
+from category.models import Category, State
+from django.db.models import Prefetch
 import random
 from .serializers import NewsSerializer
+from category.serializers import CategorySerializer, StateSerializer
 # Create your views here.
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -21,9 +23,25 @@ def news_list(request):
 
     live_tv = 'https://legitpro.co.in:9898/samachar24/samachar24/embed.html'
 
+    # States with city categories
+    states = State.objects.prefetch_related(
+        Prefetch(
+            'category_set',
+            queryset=Category.objects.filter(city=True).order_by('name')
+        )
+    ).order_by('name')
+
+    states_serializer = StateSerializer(states, many=True)
+
+    # Other categories
+    other_categories = Category.objects.filter(city=False).order_by('name')
+    other_categories_serializer = CategorySerializer(other_categories, many=True)
+
     return Response({
         "live_tv": live_tv,
-        "news": serializer.data
+        "news": serializer.data,
+        "states": states_serializer.data,
+        "other_categories": other_categories_serializer.data
     })
 
 
