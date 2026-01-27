@@ -7,4 +7,5 @@ urlpatterns = [
     path('user-news-list/', views.user_news_list, name='user_news_list'),
     path('upload-news/', views.upload_news, name='upload_news'),
     path('api/news/', views.news_list, name='news-list'),
+    path('api/category/', views.cat_news_list, name='cat-news-list'),
 ]

@@ -18,9 +18,6 @@ from rest_framework.response import Response
 
 @api_view(['GET'])
 def news_list(request):
-    news = News.objects.order_by('-created_at')[:10]
-    serializer = NewsSerializer(news, many=True, context={'request': request})
-
     live_tv = 'https://legitpro.co.in:9898/samachar24/samachar24/embed.html'
 
     # States with city categories
@@ -38,9 +35,23 @@ def news_list(request):
     other_categories_serializer = CategorySerializer(other_categories, many=True)
     return Response({
         "live_tv": live_tv,
-        "news": serializer.data,
         "dropdown": states_serializer.data,
         "normal": other_categories_serializer.data
+    })
+
+
+@api_view(['GET'])
+def cat_news_list(request):
+    category_id = request.GET.get('category_id')  # from query params
+
+    if category_id:
+        news = News.objects.filter(category_id=category_id).order_by('-created_at')[:10]
+    else:
+        news = News.objects.all().order_by('-created_at')[:10]
+
+    serializer = NewsSerializer(news, many=True, context={'request': request})
+    return Response({
+        "news": serializer.data,
     })
 
 
