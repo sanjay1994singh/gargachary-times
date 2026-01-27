@@ -36,12 +36,13 @@ def news_list(request):
     # Other categories
     other_categories = Category.objects.filter(city=False).order_by('name')
     other_categories_serializer = CategorySerializer(other_categories, many=True)
-
+    print(states_serializer,'================states_serializer')
+    print(other_categories_serializer.data,'================other_categories_serializer.data')
     return Response({
         "live_tv": live_tv,
         "news": serializer.data,
-        "states": states_serializer.data,
-        "other_categories": other_categories_serializer.data
+        "dropdown": states_serializer.data,
+        "normal": other_categories_serializer.data
     })
 
 
