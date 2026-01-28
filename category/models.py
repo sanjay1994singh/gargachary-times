@@ -16,7 +16,7 @@ class State(models.Model):
 
 
 class Category(models.Model):
-    state = models.ForeignKey(State, on_delete=models.CASCADE, null=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, null=True, blank=True)
     city = models.BooleanField(default=False)
     name = models.CharField(max_length=100, null=True, blank=True)
     desc = models.TextField(null=True, blank=True)
