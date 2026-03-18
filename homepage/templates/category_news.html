@@ -73,7 +73,7 @@
 <script>
     let allNews = [];
     let currentPage = 1;
-    let perPage = 25;
+    let perPage = 24;
 
     // Collect all news
     $('.news-item').each(function(){
@@ -94,7 +94,7 @@
 
         let col2 = pageData.slice(0,5);
         let col1 = pageData.slice(5,15);
-        let col3 = pageData.slice(15,25);
+        let col3 = pageData.slice(15,24);
 
         // 🔥 Column 2 (Main Latest)
         if(col2.length > 0){
