@@ -92,9 +92,9 @@
         let start = (page - 1) * perPage;
         let pageData = allNews.slice(start, start + perPage);
 
-        let col2 = pageData.slice(0,10);
-        let col1 = pageData.slice(10,20);
-        let col3 = pageData.slice(20,30);
+        let col2 = pageData.slice(0,5);
+        let col1 = pageData.slice(5,15);
+        let col3 = pageData.slice(15,25);
 
         // 🔥 Column 2 (Main Latest)
         if(col2.length > 0){
