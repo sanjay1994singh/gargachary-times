@@ -9,42 +9,39 @@
 {% block css %}
 {% endblock css %}
 
+
 {% block content %}
 <div class="container-box">
     <div class="row g-4">
         <h3>{{category_name}}</h3>
+
+        <!-- Hidden Data -->
+        <div id="all-news" style="display:none;">
+            {% for i in all_news %}
+            <div class="news-item"
+                 data-id="{{i.id}}"
+                 data-title="{{i.title}}"
+                 data-img="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}">
+            </div>
+            {% endfor %}
+        </div>
+
         <!-- 🏛️ Column 1 -->
         <div class="col-md-4 col-sm-6 col-12 order-2 order-md-1">
             <div class="p-3 bg-light rounded h-100 border">
                 <h4 class="heading">अन्य खबरें</h4>
-                <ul class="custom-list1">
-                    {% for i in news_col1 %}
-                    <li class="mb-3">
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
+                <ul class="custom-list1" id="col1"></ul>
             </div>
         </div>
 
-        <!-- 💻 Column 2 (Latest) -->
+        <!-- 💻 Column 2 -->
         <div class="col-md-4 col-sm-6 col-12 order-1 order-md-2">
             <div class="p-3 bg-light rounded h-100 border">
                 <h4 class="heading">लेटेस्ट खबरें</h4>
-                {% if news_col2 %}
-                    <img src="{% if news_col2.0.featured_image %}{{news_col2.0.featured_image.url}}{% endif %}" class="img-fluid mb-3" alt=""/>
-                    <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5" title="{{news_col2.0.title}}">
-                        {{news_col2.0.title}}
-                    </a>
-                {% endif %}
-                <ul class="custom-list mt-3">
-                    {% for i in news_col2|slice:"1:" %}
-                    <li class="mb-3 d-flex align-items-center">
-                        <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded" width="90" height="60" alt="">
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
+
+                <div id="col2-main"></div>
+                <ul class="custom-list mt-3" id="col2-list"></ul>
+
             </div>
         </div>
 
@@ -52,23 +49,117 @@
         <div class="col-md-4 col-sm-6 col-12 order-3 order-md-3">
             <div class="p-3 bg-light rounded h-100 border">
                 <h4 class="heading text-danger">खबरें और भी</h4>
-                <ul class="custom-list">
-                    {% for i in news_col3 %}
-                    <li class="mb-3 d-flex align-items-center">
-                        <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded" width="90" height="60" alt="">
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
+                <ul class="custom-list" id="col3"></ul>
             </div>
         </div>
 
     </div>
 </div>
 
+<!-- Pagination Buttons -->
+<div class="text-center mt-4">
+    <button id="prev" class="btn btn-secondary">Previous</button>
+    <span id="page-info" class="mx-3"></span>
+    <button id="next" class="btn btn-primary">Next</button>
+</div>
+
 {% endblock content %}
 
+
 {% block js %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    let allNews = [];
+    let currentPage = 1;
+    let perPage = 30;
+
+    // Collect all news
+    $('.news-item').each(function(){
+        allNews.push({
+            id: $(this).data('id'),
+            title: $(this).data('title'),
+            img: $(this).data('img')
+        });
+    });
+
+    let totalPages = Math.ceil(allNews.length / perPage);
+
+    function renderPage(page){
+        $('#col1, #col2-main, #col2-list, #col3').html('');
+
+        let start = (page - 1) * perPage;
+        let pageData = allNews.slice(start, start + perPage);
+
+        let col2 = pageData.slice(0,10);
+        let col1 = pageData.slice(10,20);
+        let col3 = pageData.slice(20,30);
+
+        // 🔥 Column 2 (Main Latest)
+        if(col2.length > 0){
+            let first = col2[0];
+
+            $('#col2-main').append(`
+                <img src="${first.img}" class="img-fluid mb-3"/>
+                <a href="/news/news-detail/${first.id}/" class="custom-link fw-bold fs-5">
+                    ${first.title}
+                </a>
+            `);
+
+            col2.slice(1).forEach(item=>{
+                $('#col2-list').append(`
+                    <li class="mb-3 d-flex align-items-center">
+                        <img src="${item.img}" class="me-3 rounded" width="90" height="60">
+                        <a href="/news/news-detail/${item.id}/" class="custom-link">${item.title}</a>
+                    </li>
+                `);
+            });
+        }
+
+        // 🏛️ Column 1
+        col1.forEach(item=>{
+            $('#col1').append(`
+                <li class="mb-3">
+                    <a href="/news/news-detail/${item.id}/" class="custom-link">${item.title}</a>
+                </li>
+            `);
+        });
+
+        // ⚽ Column 3
+        col3.forEach(item=>{
+            $('#col3').append(`
+                <li class="mb-3 d-flex align-items-center">
+                    <img src="${item.img}" class="me-3 rounded" width="90" height="60">
+                    <a href="/news/news-detail/${item.id}/" class="custom-link">${item.title}</a>
+                </li>
+            `);
+        });
+
+        $('#page-info').text(`Page ${page} of ${totalPages}`);
+    }
+
+    // Next
+    $('#next').click(function(){
+        if(currentPage < totalPages){
+            currentPage++;
+            renderPage(currentPage);
+        }
+    });
+
+    // Prev
+    $('#prev').click(function(){
+        if(currentPage > 1){
+            currentPage--;
+            renderPage(currentPage);
+        }
+    });
+
+    // Initial load
+    renderPage(currentPage);
+
+</script>
+
 {% endblock js %}
 
 
