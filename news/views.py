@@ -54,7 +54,7 @@ def cat_news_list(request):
     })
 
 
-def news_detail(request, id, slug):
+def news_detail(request, id, slug=None):
     news = get_object_or_404(
         News,
         id=id,
