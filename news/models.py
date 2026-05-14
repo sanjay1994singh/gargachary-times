@@ -3,7 +3,7 @@ from django.db import models
 from category.models import Category
 
 from account.models import User
-
+from django.urls import reverse
 
 # Create your models here.
 class News(models.Model):
@@ -19,6 +19,12 @@ class News(models.Model):
 
     def __str__(self):
         return str(self.title)
+
+    def get_absolute_url(self):
+        return reverse(
+            'news_detail',
+            kwargs={'id': self.id}
+        )
 
     class Meta:
         db_table = 'news'

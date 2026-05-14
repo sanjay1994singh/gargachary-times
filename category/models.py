@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.urls import reverse
 
 # Create your models here.
 class State(models.Model):
@@ -25,6 +25,12 @@ class Category(models.Model):
 
     def __str__(self):
         return str(self.name)
+
+    def get_absolute_url(self):
+        return reverse(
+            'category_news',
+            kwargs={'id': self.id}
+        )
 
     class Meta:
         db_table = 'category'
