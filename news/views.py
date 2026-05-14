@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
 from news.models import News
@@ -14,7 +13,7 @@ from category.serializers import CategorySerializer, StateSerializer
 # Create your views here.
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from django.shortcuts import render, get_object_or_404
 
 @api_view(['GET'])
 def news_list(request):
@@ -56,7 +55,11 @@ def cat_news_list(request):
 
 
 def news_detail(request, id, slug):
-    news = News.objects.get(id=id)
+    news = get_object_or_404(
+        News,
+        id=id,
+        slug=slug
+    )
     count = news.count
     number = random.randint(1, 5)
     total_count = int(number + count)
