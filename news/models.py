@@ -4,6 +4,19 @@ from category.models import Category
 from slugify import slugify
 from account.models import User
 from django.urls import reverse
+import re
+
+
+def hindi_slug(text):
+    text = text.strip().lower()
+
+    # remove special characters
+    text = re.sub(r'[^\w\s-]', '', text)
+
+    # replace spaces with -
+    text = re.sub(r'[-\s]+', '-', text)
+
+    return text
 
 
 # Create your models here.
@@ -22,11 +35,7 @@ class News(models.Model):
     def save(self, *args, **kwargs):
 
         if not self.slug:
-
-            base_slug = slugify(
-                self.title,
-                allow_unicode=True
-            )
+            base_slug = hindi_slug(self.title)
 
             if not base_slug:
                 base_slug = f'news-{self.id}'
