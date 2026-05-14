@@ -1,7 +1,7 @@
 from django.db import models
 
 from category.models import Category
-
+from django.utils.text import slugify
 from account.models import User
 from django.urls import reverse
 
@@ -16,15 +16,27 @@ class News(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, null=True)
 
-    def __str__(self):
-        return str(self.title)
+
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse(
             'news_detail',
-            kwargs={'id': self.id}
+            kwargs={
+                'id': self.id,
+                'slug': self.slug
+            }
         )
+
+    def __str__(self):
+        return str(self.title)
 
     class Meta:
         db_table = 'news'

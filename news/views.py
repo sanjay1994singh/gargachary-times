@@ -55,7 +55,7 @@ def cat_news_list(request):
     })
 
 
-def news_detail(request, id):
+def news_detail(request, id, slug):
     news = News.objects.get(id=id)
     count = news.count
     number = random.randint(1, 5)
