@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('news-detail/<int:id>/', views.news_detail, name='news_detail'),
@@ -8,4 +9,16 @@ urlpatterns = [
     path('upload-news/', views.upload_news, name='upload_news'),
     path('api/news/', views.news_list, name='news-list'),
     path('api/category/', views.cat_news_list, name='cat-news-list'),
+]
+
+urlpatterns += [
+
+    path(
+        'robots.txt',
+        TemplateView.as_view(
+            template_name='robots.txt',
+            content_type='text/plain'
+        )
+    ),
+
 ]

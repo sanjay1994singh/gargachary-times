@@ -2,6 +2,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from news.sitemap import NewsSitemap, CategorySitemap
+from django.views.generic import TemplateView
+from django.contrib.sitemaps.views import sitemap
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -10,6 +13,32 @@ urlpatterns = [
     path('news/', include('news.urls')),
     path('account/', include('account.urls')),
     path('news_pdf/', include('news_pdf.urls')),
+]
+
+sitemaps = {
+
+    'news': NewsSitemap,
+
+    'categories': CategorySitemap,
+
+}
+
+urlpatterns += [
+
+    path(
+        'sitemap.xml',
+        sitemap,
+        {'sitemaps': sitemaps},
+        name='sitemap'
+    ),
+
+    path(
+        'robots.txt',
+        TemplateView.as_view(
+            template_name='robots.txt',
+            content_type='text/plain'
+        )
+    ),
 ]
 
 if settings.DEBUG:
