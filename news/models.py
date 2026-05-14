@@ -8,15 +8,22 @@ import re
 
 
 def hindi_slug(text):
-    text = text.strip().lower()
+    text = str(text).strip().lower()
 
-    # remove special characters
-    text = re.sub(r'[^\w\s-]', '', text)
+    # keep Hindi + English + numbers + spaces
+    text = re.sub(
+        r'[^ऀ-ॿa-zA-Z0-9\s-]',
+        '',
+        text
+    )
 
-    # replace spaces with -
-    text = re.sub(r'[-\s]+', '-', text)
+    # replace spaces with hyphen
+    text = re.sub(r'[\s]+', '-', text)
 
-    return text
+    # remove duplicate hyphens
+    text = re.sub(r'-+', '-', text)
+
+    return text.strip('-')
 
 
 # Create your models here.
