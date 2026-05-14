@@ -54,11 +54,10 @@ def cat_news_list(request):
     })
 
 
-def news_detail(request, id, slug=None):
+def news_detail(request, id):
     news = get_object_or_404(
         News,
-        id=id,
-        slug=slug
+        id=id
     )
     count = news.count
     number = random.randint(1, 5)
