@@ -9,12 +9,10 @@ class NewsSitemap(Sitemap):
     priority = 0.9
 
     def items(self):
-
-        return News.objects.all()
+        return News.objects.all().order_by('-created_at')
 
     def lastmod(self, obj):
-
-        return obj.created_at
+        return obj.updated_at or obj.created_at
 
 
 
@@ -25,9 +23,7 @@ class CategorySitemap(Sitemap):
     priority = 0.7
 
     def items(self):
-
-        return Category.objects.all()
+        return Category.objects.all().order_by('-created_at')
 
     def lastmod(self, obj):
-
         return obj.created_at
