@@ -15,6 +15,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import render, get_object_or_404
 
+
 @api_view(['GET'])
 def news_list(request):
     live_tv = 'https://legitpro.co.in:9898/samachar24/samachar24/embed.html'
@@ -54,27 +55,70 @@ def cat_news_list(request):
     })
 
 
-def news_detail(request, id):
+# def news_detail(request, id, slug=None):
+#     news = get_object_or_404(
+#         News,
+#         id=id,
+#         slug=slug
+#     )
+#     count = news.count
+#     number = random.randint(1, 5)
+#     total_count = int(number + count)
+#     news.count = total_count
+#     news.save()
+#     try:
+#         absolute_image_url = request.build_absolute_uri(news.featured_image.url)
+#     except:
+#         absolute_image_url = ''
+#     category = Category.objects.all().order_by('-id')
+#     context = {
+#         'news': news,
+#         'absolute_image_url': absolute_image_url,
+#         'category': category,
+#     }
+#     return render(request, 'news_detail.html', context)
+
+
+def news_detail(request, id, slug=None):
     news = get_object_or_404(
         News,
         id=id
     )
+
+    # optional SEO redirect check
+    if slug != news.slug:
+        return redirect(
+            news.get_absolute_url(),
+            permanent=True
+        )
+
     count = news.count
     number = random.randint(1, 5)
-    total_count = int(number + count)
-    news.count = total_count
-    news.save()
+
+    news.count = count + number
+
+    news.save(update_fields=['count'])
+
     try:
-        absolute_image_url = request.build_absolute_uri(news.featured_image.url)
+        absolute_image_url = request.build_absolute_uri(
+            news.featured_image.url
+        )
     except:
         absolute_image_url = ''
+
     category = Category.objects.all().order_by('-id')
+
     context = {
         'news': news,
         'absolute_image_url': absolute_image_url,
         'category': category,
     }
-    return render(request, 'news_detail.html', context)
+
+    return render(
+        request,
+        'news_detail.html',
+        context
+    )
 
 
 def news_panel(request):
