@@ -5,7 +5,9 @@ from video.models import Video
 from news.models import News, Visitor
 
 from account.models import User
+from django.http import HttpResponse
 
+import csv
 from category.models import Category
 import requests
 from django.utils import timezone
@@ -65,6 +67,37 @@ def dashboard(request):
     }
 
     return render(request, 'dashboard.html', context)
+
+
+def download_visitors_data(request):
+    response = HttpResponse(
+        content_type='text/csv'
+    )
+
+    response[
+        'Content-Disposition'
+    ] = 'attachment; filename="visitors_data.csv"'
+
+    writer = csv.writer(response)
+
+    writer.writerow([
+        'ID',
+        'IP Address',
+        'Visited At'
+    ])
+
+    visitors = Visitor.objects.all().order_by('-visited_at')
+
+    for visitor in visitors:
+        writer.writerow([
+
+            visitor.id,
+            visitor.ip_address,
+            visitor.visited_at
+
+        ])
+
+    return response
 
 
 API_KEY = 'AIzaSyCzsOJL0XQHTuSc7MgiR_HkJeeOrks4UhI'
