@@ -55,30 +55,6 @@ def cat_news_list(request):
     })
 
 
-# def news_detail(request, id, slug=None):
-#     news = get_object_or_404(
-#         News,
-#         id=id,
-#         slug=slug
-#     )
-#     count = news.count
-#     number = random.randint(1, 5)
-#     total_count = int(number + count)
-#     news.count = total_count
-#     news.save()
-#     try:
-#         absolute_image_url = request.build_absolute_uri(news.featured_image.url)
-#     except:
-#         absolute_image_url = ''
-#     category = Category.objects.all().order_by('-id')
-#     context = {
-#         'news': news,
-#         'absolute_image_url': absolute_image_url,
-#         'category': category,
-#     }
-#     return render(request, 'news_detail.html', context)
-
-
 def news_detail(request, id, slug=None):
     news = get_object_or_404(
         News,
@@ -98,6 +74,8 @@ def news_detail(request, id, slug=None):
     news.count = count + number
 
     news.save(update_fields=['count'])
+
+    news.refresh_from_db()
 
     try:
         absolute_image_url = request.build_absolute_uri(

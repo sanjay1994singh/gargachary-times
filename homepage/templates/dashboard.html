@@ -663,16 +663,38 @@
                 </a>
             </li>
 
-
             <li>
-                <a href="{% url 'download_visitors_data' %}"
-                   class="download-btn">
+                <div class="download-buttons">
 
-                    <i class="fa-solid fa-download"></i>
+                    <a href="{% url 'download_visitors_data' 'today' %}"
+                       class="report-btn">
 
-                    Download Visitors
+                        Today Report
 
-                </a>
+                    </a>
+
+                    <a href="{% url 'download_visitors_data' 'yesterday' %}"
+                       class="report-btn">
+
+                        Yesterday Report
+
+                    </a>
+
+                    <a href="{% url 'download_visitors_data' 'weekly' %}"
+                       class="report-btn">
+
+                        Weekly Report
+
+                    </a>
+
+                    <a href="{% url 'download_visitors_data' 'monthly' %}"
+                       class="report-btn">
+
+                        Monthly Report
+
+                    </a>
+
+                </div>
             </li>
 
             <li>

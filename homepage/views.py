@@ -69,31 +69,76 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 
-def download_visitors_data(request):
+def download_visitors_data(request, report_type):
     response = HttpResponse(
         content_type='text/csv'
     )
 
     response[
         'Content-Disposition'
-    ] = 'attachment; filename="visitors_data.csv"'
+    ] = f'attachment; filename="{report_type}_visitors_report.csv"'
 
     writer = csv.writer(response)
 
     writer.writerow([
+
         'ID',
         'IP Address',
-        'Visited At'
+        'City',
+        'State',
+        'Country',
+        'Visited Date'
+
     ])
 
-    visitors = Visitor.objects.all().order_by('-visited_at')
+    today = timezone.now()
+
+    if report_type == 'today':
+
+        visitors = Visitor.objects.filter(
+            visited_at__date=today.date()
+        )
+
+    elif report_type == 'yesterday':
+
+        yesterday = today - timedelta(days=1)
+
+        visitors = Visitor.objects.filter(
+            visited_at__date=yesterday.date()
+        )
+
+    elif report_type == 'weekly':
+
+        visitors = Visitor.objects.filter(
+            visited_at__gte=today - timedelta(days=7)
+        )
+
+    elif report_type == 'monthly':
+
+        visitors = Visitor.objects.filter(
+            visited_at__gte=today - timedelta(days=30)
+        )
+
+    else:
+
+        visitors = Visitor.objects.all()
 
     for visitor in visitors:
         writer.writerow([
 
             visitor.id,
+
             visitor.ip_address,
-            visitor.visited_at
+
+            visitor.city,
+
+            visitor.state,
+
+            visitor.country,
+
+            visitor.visited_at.strftime(
+                "%d-%m-%Y %H:%M"
+            )
 
         ])
 
