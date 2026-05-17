@@ -66,8 +66,7 @@ class VisitorMiddleware:
         try:
 
             response = requests.get(
-
-                f'https://ipapi.co/{ip}/json/',
+                f'http://ip-api.com/json/{ip}',
 
                 timeout=3
 
@@ -78,6 +77,7 @@ class VisitorMiddleware:
             state = response.get('region')
 
             country = response.get('country_name')
+
 
         except Exception:
 
