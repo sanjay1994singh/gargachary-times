@@ -32,7 +32,7 @@ def dashboard(request):
         visited_at__gte=timezone.now() - timedelta(days=365)
     ).count()
 
-    top_news = News.objects.order_by('-views')[:10]
+    top_news = News.objects.order_by('-count')[:10]
 
     context = {
         'daily_visitors': daily_visitors,
