@@ -79,6 +79,11 @@ class News(models.Model):
         db_table = 'news'
 
 
+class Visitor(models.Model):
+    ip_address = models.GenericIPAddressField()
+    visited_at = models.DateTimeField(auto_now_add=True)
+
+
 class OtherNewsImage(models.Model):
     news = models.ForeignKey(News, on_delete=models.CASCADE, null=True, blank=True)
     other_image = models.ImageField(upload_to='other_news_image', null=True, blank=True)

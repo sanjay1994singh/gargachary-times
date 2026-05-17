@@ -1,0 +1,16 @@
+<h2>Analytics Dashboard</h2>
+
+<div>
+    <h3>Daily Visitors: {{ daily_visitors }}</h3>
+    <h3>Weekly Visitors: {{ weekly_visitors }}</h3>
+    <h3>Monthly Visitors: {{ monthly_visitors }}</h3>
+    <h3>Yearly Visitors: {{ yearly_visitors }}</h3>
+</div>
+
+<h2>Top News</h2>
+
+{% for news in top_news %}
+    <p>
+        {{ news.title }} - {{ news.views }} Views
+    </p>
+{% endfor %}

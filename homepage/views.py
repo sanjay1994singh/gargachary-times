@@ -2,14 +2,48 @@ from django.shortcuts import render
 
 from video.models import Video
 
-from news.models import News
+from news.models import News, Visitor
 
 from account.models import User
 
 from category.models import Category
+import requests
+from django.utils import timezone
+from datetime import timedelta
+
 
 # Create your views here.
-import requests
+def dashboard(request):
+    today = timezone.now().date()
+
+    daily_visitors = Visitor.objects.filter(
+        visited_at__date=today
+    ).count()
+
+    weekly_visitors = Visitor.objects.filter(
+        visited_at__gte=timezone.now() - timedelta(days=7)
+    ).count()
+
+    monthly_visitors = Visitor.objects.filter(
+        visited_at__gte=timezone.now() - timedelta(days=30)
+    ).count()
+
+    yearly_visitors = Visitor.objects.filter(
+        visited_at__gte=timezone.now() - timedelta(days=365)
+    ).count()
+
+    top_news = News.objects.order_by('-views')[:10]
+
+    context = {
+        'daily_visitors': daily_visitors,
+        'weekly_visitors': weekly_visitors,
+        'monthly_visitors': monthly_visitors,
+        'yearly_visitors': yearly_visitors,
+        'top_news': top_news,
+    }
+
+    return render(request, 'dashboard.html', context)
+
 
 API_KEY = 'AIzaSyCzsOJL0XQHTuSc7MgiR_HkJeeOrks4UhI'
 CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
