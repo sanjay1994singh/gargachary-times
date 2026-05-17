@@ -376,235 +376,608 @@
 }
     </style>
 
+    <style>
+        .dashboard-wrapper{
+
+    display:flex;
+
+    min-height:100vh;
+}
+
+/* Sidebar */
+
+.sidebar{
+
+    width:280px;
+
+    background:
+    linear-gradient(
+        180deg,
+        #0f172a,
+        #111827
+    );
+
+    padding:30px 20px;
+
+    border-right:
+    1px solid rgba(255,255,255,0.05);
+
+    position:fixed;
+
+    height:100vh;
+
+    overflow-y:auto;
+}
+
+.logo-area{
+
+    margin-bottom:40px;
+}
+
+.logo-area h2{
+
+    color:white;
+
+    font-weight:700;
+
+    font-size:28px;
+}
+
+.sidebar-menu{
+
+    list-style:none;
+
+    padding:0;
+}
+
+.sidebar-menu li{
+
+    margin-bottom:12px;
+}
+
+.sidebar-menu li a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:14px 18px;
+
+    border-radius:16px;
+
+    text-decoration:none;
+
+    color:rgba(255,255,255,0.75);
+
+    transition:0.3s;
+
+    font-weight:500;
+}
+
+.sidebar-menu li a:hover{
+
+    background:
+    linear-gradient(
+        135deg,
+        #00c6ff,
+        #0072ff
+    );
+
+    color:white;
+
+    transform:translateX(5px);
+}
+
+.sidebar-menu li.active a{
+
+    background:
+    linear-gradient(
+        135deg,
+        #8e2de2,
+        #4a00e0
+    );
+
+    color:white;
+}
+
+/* Main Content */
+
+.main-content{
+
+    margin-left:280px;
+
+    width:100%;
+
+    padding:30px;
+}
+
+/* Topbar */
+
+.topbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:40px;
+
+    gap:20px;
+
+    flex-wrap:wrap;
+}
+
+.topbar-title{
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:white;
+}
+
+.topbar-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+}
+
+.search-box{
+
+    background:rgba(255,255,255,0.08);
+
+    padding:12px 18px;
+
+    border-radius:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:white;
+}
+
+.search-box input{
+
+    background:none;
+
+    border:none;
+
+    outline:none;
+
+    color:white;
+}
+
+.search-box input::placeholder{
+
+    color:rgba(255,255,255,0.5);
+}
+
+.profile-box{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    background:rgba(255,255,255,0.08);
+
+    padding:10px 15px;
+
+    border-radius:16px;
+
+    color:white;
+}
+
+.profile-box img{
+
+    width:45px;
+
+    height:45px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+}
+
+/* Responsive */
+
+@media(max-width:992px){
+
+    .sidebar{
+
+        width:90px;
+    }
+
+    .sidebar .logo-area h2{
+
+        display:none;
+    }
+
+    .sidebar-menu li a span{
+
+        display:none;
+    }
+
+    .main-content{
+
+        margin-left:90px;
+    }
+}
+
+@media(max-width:768px){
+
+    .sidebar{
+
+        display:none;
+    }
+
+    .main-content{
+
+        margin-left:0;
+
+        padding:20px;
+    }
+
+    .topbar{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+    }
+}
+    </style>
+
 </head>
 
 <body>
+<div class="dashboard-wrapper">
 
-<div class="container py-5">
+    <!-- Sidebar -->
 
-    <div class="d-flex
+    <aside class="sidebar">
+
+        <div class="logo-area">
+
+            <h2>
+                NewsPanel
+            </h2>
+
+        </div>
+
+        <ul class="sidebar-menu">
+
+            <li class="active">
+                <a href="#">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="fa-solid fa-newspaper"></i>
+                    News
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="fa-solid fa-users"></i>
+                    Visitors
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="fa-solid fa-chart-line"></i>
+                    Analytics
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="fa-solid fa-layer-group"></i>
+                    Categories
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <i class="fa-solid fa-gear"></i>
+                    Settings
+                </a>
+            </li>
+
+        </ul>
+
+    </aside>
+
+    <!-- Main Content -->
+
+    <main class="main-content">
+
+        <!-- Topbar -->
+
+        <div class="topbar">
+
+            <div>
+
+                <h3 class="topbar-title">
+                    Analytics Overview
+                </h3>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="search-box">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input type="text"
+                           placeholder="Search...">
+
+                </div>
+
+                <div class="profile-box">
+
+                    <img src="https://i.pravatar.cc/100"
+                         alt="profile">
+
+                    <div>
+
+                        <h6 class="mb-0">
+                            Admin
+                        </h6>
+
+                        <small>
+                            Super Admin
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="container py-5">
+
+            <div class="d-flex
                 justify-content-between
                 align-items-center
                 flex-wrap
                 mb-4">
 
-        <div>
+                <div>
 
-            <h1 class="dashboard-title">
-                News Analytics Dashboard
-            </h1>
+                    <h1 class="dashboard-title">
+                        News Analytics Dashboard
+                    </h1>
 
-            <span class="badge-custom">
+                    <span class="badge-custom">
                 Live Analytics
             </span>
 
-        </div>
-
-    </div>
-
-    <!-- Stats Cards -->
-
-    <div class="row g-4">
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="glass-card stats-card gradient-1">
-
-                <div class="stats-icon">
-                    <i class="fa-solid fa-users"></i>
-                </div>
-
-                <div class="stats-value">
-                    {{ daily_visitors }}
-                </div>
-
-                <div class="stats-label">
-                    Daily Visitors
                 </div>
 
             </div>
 
-        </div>
+            <!-- Stats Cards -->
 
-        <div class="col-lg-3 col-md-6">
+            <div class="row g-4">
 
-            <div class="glass-card stats-card gradient-2">
+                <div class="col-lg-3 col-md-6">
 
-                <div class="stats-icon">
-                    <i class="fa-solid fa-chart-line"></i>
-                </div>
+                    <div class="glass-card stats-card gradient-1">
 
-                <div class="stats-value">
-                    {{ weekly_visitors }}
-                </div>
+                        <div class="stats-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
 
-                <div class="stats-label">
-                    Weekly Visitors
-                </div>
+                        <div class="stats-value">
+                            {{ daily_visitors }}
+                        </div>
 
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="glass-card stats-card gradient-3">
-
-                <div class="stats-icon">
-                    <i class="fa-solid fa-earth-asia"></i>
-                </div>
-
-                <div class="stats-value">
-                    {{ monthly_visitors }}
-                </div>
-
-                <div class="stats-label">
-                    Monthly Visitors
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-3 col-md-6">
-
-            <div class="glass-card stats-card gradient-4">
-
-                <div class="stats-icon">
-                    <i class="fa-solid fa-newspaper"></i>
-                </div>
-
-                <div class="stats-value">
-                    {{ total_news }}
-                </div>
-
-                <div class="stats-label">
-                    Total News
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <!-- Chart + Top News -->
-
-    <div class="row mt-5 g-4">
-
-        <div class="col-lg-8">
-
-            <div class="glass-card">
-
-                <h3 class="section-title">
-                    Visitors Analytics
-                </h3>
-
-                <canvas id="visitorChart"></canvas>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-4">
-
-            <div class="glass-card">
-
-                <h3 class="section-title">
-                    Top Viewed News
-                </h3>
-
-                {% for news in top_news %}
-
-                <div class="news-item">
-
-                    <a href="{{ news.get_absolute_url }}">
-
-                        {{ news.title }}
-
-                    </a>
-
-                    <div class="mt-2 text-info">
-
-                        <i class="fa-solid fa-eye"></i>
-
-                        {{ news.count }} Views
+                        <div class="stats-label">
+                            Daily Visitors
+                        </div>
 
                     </div>
 
                 </div>
 
-                {% endfor %}
+                <div class="col-lg-3 col-md-6">
+
+                    <div class="glass-card stats-card gradient-2">
+
+                        <div class="stats-icon">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+
+                        <div class="stats-value">
+                            {{ weekly_visitors }}
+                        </div>
+
+                        <div class="stats-label">
+                            Weekly Visitors
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+
+                    <div class="glass-card stats-card gradient-3">
+
+                        <div class="stats-icon">
+                            <i class="fa-solid fa-earth-asia"></i>
+                        </div>
+
+                        <div class="stats-value">
+                            {{ monthly_visitors }}
+                        </div>
+
+                        <div class="stats-label">
+                            Monthly Visitors
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+
+                    <div class="glass-card stats-card gradient-4">
+
+                        <div class="stats-icon">
+                            <i class="fa-solid fa-newspaper"></i>
+                        </div>
+
+                        <div class="stats-value">
+                            {{ total_news }}
+                        </div>
+
+                        <div class="stats-label">
+                            Total News
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        </div>
+            <!-- Chart + Top News -->
 
-    </div>
+            <div class="row mt-5 g-4">
 
-    <!-- Latest News Table -->
+                <div class="col-lg-8">
 
-    <div class="row mt-5">
+                    <div class="glass-card">
 
-        <div class="col-12">
+                        <h3 class="section-title">
+                            Visitors Analytics
+                        </h3>
 
-            <div class="glass-card latest-news-section">
+                        <canvas id="visitorChart"></canvas>
 
-                <div class="d-flex
+                    </div>
+
+                </div>
+
+                <div class="col-lg-4">
+
+                    <div class="glass-card">
+
+                        <h3 class="section-title">
+                            Top Viewed News
+                        </h3>
+
+                        {% for news in top_news %}
+
+                        <div class="news-item">
+
+                            <a href="{{ news.get_absolute_url }}">
+
+                                {{ news.title }}
+
+                            </a>
+
+                            <div class="mt-2 text-info">
+
+                                <i class="fa-solid fa-eye"></i>
+
+                                {{ news.count }} Views
+
+                            </div>
+
+                        </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Latest News Table -->
+
+            <div class="row mt-5">
+
+                <div class="col-12">
+
+                    <div class="glass-card latest-news-section">
+
+                        <div class="d-flex
                         justify-content-between
                         align-items-center
                         flex-wrap
                         mb-4">
 
-                    <div>
+                            <div>
 
-                        <h3 class="section-title mb-1">
-                            Latest Published News
-                        </h3>
+                                <h3 class="section-title mb-1">
+                                    Latest Published News
+                                </h3>
 
-                        <p class="text-light opacity-75 mb-0">
-                            Recently published articles overview
-                        </p>
+                                <p class="text-light opacity-75 mb-0">
+                                    Recently published articles overview
+                                </p>
 
-                    </div>
+                            </div>
 
-                    <div>
+                            <div>
 
                     <span class="latest-badge">
                         {{ latest_news|length }} Articles
                     </span>
 
-                    </div>
-
-                </div>
-
-                <div class="row g-4">
-
-                    {% for news in latest_news %}
-
-                    <div class="col-lg-6">
-
-                        <div class="latest-news-card">
-
-                            <div class="news-left">
-
-                                {% if news.featured_image %}
-
-                                <img src="{{ news.featured_image.url }}"
-                                     alt="{{ news.title }}">
-
-                                {% else %}
-
-                                <img src="https://via.placeholder.com/120x100"
-                                     alt="news">
-
-                                {% endif %}
-
                             </div>
 
-                            <div class="news-right">
+                        </div>
 
-                                <div class="news-meta">
+                        <div class="row g-4">
+
+                            {% for news in latest_news %}
+
+                            <div class="col-lg-6">
+
+                                <div class="latest-news-card">
+
+                                    <div class="news-left">
+
+                                        {% if news.featured_image %}
+
+                                        <img src="{{ news.featured_image.url }}"
+                                             alt="{{ news.title }}">
+
+                                        {% else %}
+
+                                        <img src="https://via.placeholder.com/120x100"
+                                             alt="news">
+
+                                        {% endif %}
+
+                                    </div>
+
+                                    <div class="news-right">
+
+                                        <div class="news-meta">
 
                                 <span class="views-badge">
 
@@ -614,50 +987,52 @@
 
                                 </span>
 
-                                    <span class="reporter-badge">
+                                            <span class="reporter-badge">
 
                                     {{ news.reporter }}
 
                                 </span>
 
-                                </div>
+                                        </div>
 
-                                <h4 class="news-title">
+                                        <h4 class="news-title">
 
-                                    <a href="{{ news.get_absolute_url }}">
+                                            <a href="{{ news.get_absolute_url }}">
 
-                                        {{ news.title|truncatechars:80 }}
+                                                {{ news.title|truncatechars:80 }}
 
-                                    </a>
+                                            </a>
 
-                                </h4>
+                                        </h4>
 
-                                <div class="news-date">
+                                        <div class="news-date">
 
-                                    <i class="fa-regular fa-calendar"></i>
+                                            <i class="fa-regular fa-calendar"></i>
 
-                                    {{ news.created_at|date:"d M Y" }}
+                                            {{ news.created_at|date:"d M Y" }}
+
+                                        </div>
+
+                                    </div>
 
                                 </div>
 
                             </div>
 
+                            {% endfor %}
+
                         </div>
 
                     </div>
-
-                    {% endfor %}
 
                 </div>
 
             </div>
 
         </div>
-
-    </div>
+    </main>
 
 </div>
-
 <script>
 
     const ctx = document.getElementById('visitorChart');
