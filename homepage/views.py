@@ -32,14 +32,36 @@ def dashboard(request):
         visited_at__gte=timezone.now() - timedelta(days=365)
     ).count()
 
+    total_news = News.objects.count()
+
     top_news = News.objects.order_by('-count')[:10]
+
+    latest_news = News.objects.order_by('-created_at')[:5]
+
+    # Last 7 days visitor chart
+    chart_labels = []
+    chart_data = []
+
+    for i in range(6, -1, -1):
+        day = timezone.now().date() - timedelta(days=i)
+
+        visitors = Visitor.objects.filter(
+            visited_at__date=day
+        ).count()
+
+        chart_labels.append(day.strftime("%d %b"))
+        chart_data.append(visitors)
 
     context = {
         'daily_visitors': daily_visitors,
         'weekly_visitors': weekly_visitors,
         'monthly_visitors': monthly_visitors,
         'yearly_visitors': yearly_visitors,
+        'total_news': total_news,
         'top_news': top_news,
+        'latest_news': latest_news,
+        'chart_labels': chart_labels,
+        'chart_data': chart_data,
     }
 
     return render(request, 'dashboard.html', context)
