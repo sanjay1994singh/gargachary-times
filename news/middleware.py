@@ -1,4 +1,5 @@
 from .models import Visitor
+import requests
 
 class VisitorMiddleware:
 
@@ -27,3 +28,37 @@ class VisitorMiddleware:
             ip = request.META.get('REMOTE_ADDR')
 
         return ip
+
+    def save_visitor(request):
+
+        ip = get_client_ip(request)
+
+        try:
+
+            response = requests.get(
+                f'https://ipapi.co/{ip}/json/'
+            ).json()
+
+            city = response.get('city')
+
+            state = response.get('region')
+
+            country = response.get('country_name')
+
+        except:
+
+            city = None
+            state = None
+            country = None
+
+        Visitor.objects.create(
+
+            ip_address=ip,
+
+            city=city,
+
+            state=state,
+
+            country=country
+
+        )
