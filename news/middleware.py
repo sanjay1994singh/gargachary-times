@@ -74,7 +74,7 @@ class VisitorMiddleware:
 
             city = response.get('city')
 
-            state = response.get('regionName')
+            state = response.get('region')
 
             country = response.get('country')
 
