@@ -7,13 +7,14 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from category.models import Category, State
 from django.db.models import Prefetch
-import random
 from .serializers import NewsSerializer
 from category.serializers import CategorySerializer, StateSerializer
 # Create your views here.
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import render, get_object_or_404
+
+from django.db.models import F
 
 
 @api_view(['GET'])
@@ -55,47 +56,113 @@ def cat_news_list(request):
     })
 
 
+# def news_detail(request, id, slug=None):
+#     news = get_object_or_404(
+#         News,
+#         id=id
+#     )
+#
+#     # optional SEO redirect check
+#     if slug != news.slug:
+#         return redirect(
+#             news.get_absolute_url(),
+#             permanent=True
+#         )
+#
+#     count = news.count
+#
+#     news.count = count + 1
+#
+#     news.save(update_fields=['count'])
+#
+#     news.refresh_from_db()
+#
+#     try:
+#         absolute_image_url = request.build_absolute_uri(
+#             news.featured_image.url
+#         )
+#     except:
+#         absolute_image_url = ''
+#
+#     category = Category.objects.all().order_by('-id')
+#
+#     context = {
+#         'news': news,
+#         'absolute_image_url': absolute_image_url,
+#         'category': category,
+#     }
+#
+#     return render(
+#         request,
+#         'news_detail.html',
+#         context
+#     )
+
+
 def news_detail(request, id, slug=None):
     news = get_object_or_404(
-        News,
+        News.objects.select_related(
+            'category',
+            'user'
+        ),
         id=id
     )
 
-    # optional SEO redirect check
+    # SEO Redirect
+
     if slug != news.slug:
         return redirect(
             news.get_absolute_url(),
             permanent=True
         )
 
-    count = news.count
-    number = random.randint(1, 5)
+    # Fast View Count Increment
 
-    news.count = count + number
+    News.objects.filter(
+        id=news.id
+    ).update(
+        count=F('count') + 1
+    )
 
-    news.save(update_fields=['count'])
+    news.refresh_from_db(
+        fields=['count']
+    )
 
-    news.refresh_from_db()
+    # Featured Image URL
 
-    try:
+    absolute_image_url = ''
+
+    if news.featured_image:
         absolute_image_url = request.build_absolute_uri(
             news.featured_image.url
         )
-    except:
-        absolute_image_url = ''
 
-    category = Category.objects.all().order_by('-id')
+    # Categories
+
+    category = Category.objects.only(
+        'id',
+        'name',
+        'slug'
+    ).order_by('-id')
 
     context = {
+
         'news': news,
+
         'absolute_image_url': absolute_image_url,
+
         'category': category,
+
     }
 
     return render(
+
         request,
+
         'news_detail.html',
+
         context
+
     )
 
 
