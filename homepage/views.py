@@ -36,9 +36,9 @@ def dashboard(request):
 
     total_news = News.objects.count()
 
-    top_news = News.objects.order_by('-count')[:10]
+    top_news = News.objects.order_by('-count')[:5]
 
-    latest_news = News.objects.order_by('-created_at')[:5]
+    latest_news = News.objects.order_by('-created_at')[:10]
 
     # Last 7 days visitor chart
     chart_labels = []
@@ -210,15 +210,7 @@ def category_news(request, id):
     category_name = Category.objects.get(id=id)
     all_news = list(News.objects.filter(category_id=id).order_by('-id'))
 
-    # Split into 3 parts
-    # column_2 = all_news[:10]  # latest 10
-    # column_1 = all_news[10:20]  # next 10
-    # column_3 = all_news[20:30]  # last 10
-
     context = {
-        # 'news_col1': column_1,
-        # 'news_col2': column_2,
-        # 'news_col3': column_3,
         'all_news': all_news,
         'category_name': category_name,
     }
