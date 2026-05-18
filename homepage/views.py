@@ -38,7 +38,7 @@ def dashboard(request):
 
     top_news = News.objects.order_by('-count')[:3]
 
-    latest_news = News.objects.order_by('-created_at')[:10]
+    latest_news = News.objects.order_by('-created_at')[:6]
 
     # Last 7 days visitor chart
     chart_labels = []
