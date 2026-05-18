@@ -36,7 +36,7 @@ def dashboard(request):
 
     total_news = News.objects.count()
 
-    top_news = News.objects.order_by('-count')[:5]
+    top_news = News.objects.order_by('-count')[:3]
 
     latest_news = News.objects.order_by('-created_at')[:10]
 
