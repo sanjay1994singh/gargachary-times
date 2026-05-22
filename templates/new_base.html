@@ -219,8 +219,51 @@
                 <li class="nav-item">
                     <a class="nav-link text-dark" href="/">Home</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="/news_pdf/">E-paper</a>
+
+                <!-- Footer Menu -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="policyDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Policies
+                    </a>
+
+                    <ul class="dropdown-menu" aria-labelledby="policyDropdown">
+                        <li>
+                            <a class="dropdown-item" href="{% url 'privacy_policy' %}">
+                                Privacy Policy
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="{% url 'disclaimer' %}">
+                                Disclaimer
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="{% url 'refund_policy' %}">
+                                Refund & Cancellation Policy
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="{% url 'terms_conditions' %}">
+                                Terms & Conditions
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="{% url 'shipping_policy' %}">
+                                Shipping & Delivery Policy
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item" href="{% url 'contact_us' %}">
+                                Contact Us
+                            </a>
+                        </li>
+                    </ul>
                 </li>
 
                 {% for state in states %}

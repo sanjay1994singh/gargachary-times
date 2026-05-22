@@ -215,3 +215,45 @@ def category_news(request, id):
         'category_name': category_name,
     }
     return render(request, 'category_news.html', context)
+
+
+def privacy_policy(request):
+    return render(
+        request,
+        'pages/privacy_policy.html'
+    )
+
+
+def disclaimer(request):
+    return render(
+        request,
+        'pages/disclaimer.html'
+    )
+
+
+def refund_policy(request):
+    return render(
+        request,
+        'pages/refund_policy.html'
+    )
+
+
+def terms_conditions(request):
+    return render(
+        request,
+        'pages/terms_conditions.html'
+    )
+
+
+def shipping_policy(request):
+    return render(
+        request,
+        'pages/shipping_policy.html'
+    )
+
+
+def contact_us(request):
+    return render(
+        request,
+        'pages/contact_us.html'
+    )
