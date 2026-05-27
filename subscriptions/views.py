@@ -30,8 +30,9 @@ from .models import (
 
 # SUBSCRIPTION PLANS PAGE
 
+
 def plans(request):
-    plans = (SubscriptionPlan.objects.filter(is_active=True).order_by('price'))
+    plans = SubscriptionPlan.objects.filter(is_active=True).order_by('subscription_type','price')
 
     context = {
         'plans': plans
