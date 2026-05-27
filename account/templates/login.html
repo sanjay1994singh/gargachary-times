@@ -177,18 +177,30 @@ Login | Gargachary Times
 
                                     {% csrf_token %}
 
+                                    {% if error %}
+
+                                    <div class="alert alert-danger rounded-4 mb-4">
+
+                                        <i class="bi bi-exclamation-triangle-fill"></i>
+
+                                        {{ error }}
+
+                                    </div>
+
+                                    {% endif %}
+
                                     <div class="mb-4">
 
                                         <label class="form-label fw-bold">
 
-                                            Username
+                                            Username / Email / Mobile
 
                                         </label>
 
                                         <input type="text"
                                                name="username"
                                                class="form-control login-input"
-                                               placeholder="Enter username"
+                                               placeholder="Enter Username, Email or Mobile"
                                                required>
 
                                     </div>

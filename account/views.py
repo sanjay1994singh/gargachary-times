@@ -1,10 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import Q
 from account.models import User
-from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.contrib.auth import logout
 from django.contrib import messages
 
 
@@ -94,7 +91,7 @@ def register(request):
 def login_view(request):
     if request.method == 'POST':
 
-        username = request.POST.get(
+        username_input = request.POST.get(
             'username'
         )
 
@@ -102,22 +99,56 @@ def login_view(request):
             'password'
         )
 
-        user = authenticate(
+        user_obj = User.objects.filter(
+
+            mobile=username_input
+
+        ).first()
+
+        if not user_obj:
+            user_obj = User.objects.filter(
+
+                email=username_input
+
+            ).first()
+
+        if not user_obj:
+            user_obj = User.objects.filter(
+
+                username=username_input
+
+            ).first()
+
+        if user_obj:
+
+            user = authenticate(
+
+                request,
+
+                username=user_obj.username,
+
+                password=password
+            )
+
+            if user:
+                login(
+                    request,
+                    user
+                )
+
+                return redirect('profile')
+
+        return render(
 
             request,
 
-            username=username,
+            'login.html',
 
-            password=password
+            {
+                'error':
+                    'Invalid login credentials'
+            }
         )
-
-        if user:
-            login(
-                request,
-                user
-            )
-
-            return redirect('profile')
 
     return render(
         request,
