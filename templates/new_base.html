@@ -300,14 +300,26 @@
                 </li>
                 {% endfor %}
 
-                {% for cat in other_categories %}
-                <li class="nav-item">
-                    <a class="nav-link text-dark"
-                       href="/category_news/{{ cat.id }}/">
-                        {{ cat.name }}
+
+
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-dark"
+                       data-bs-toggle="dropdown">
+                        Other
                     </a>
+
+                    <ul class="dropdown-menu">
+                        {% for cat in other_categories %}
+                        <li>
+                            <a class="dropdown-item"
+                               href="/category_news/{{ cat.id }}/">
+                                {{ cat.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </li>
-                {% endfor %}
 
 
                 <li class="nav-item">
@@ -396,7 +408,6 @@
                 </li>
 
                 {% endif %}
-
             </ul>
         </div>
     </div>
