@@ -1,10 +1,266 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'new_base.html' %}
+
+{% block title %}
+My Subscription | Gargachary Times
+{% endblock %}
+
+{% block css %}
+
+<style>
+
+.subscription-card {
+
+    border: none;
+
+    border-radius: 25px;
+
+    overflow: hidden;
+
+    transition: 0.3s;
+}
+
+.subscription-card:hover {
+
+    transform: translateY(-5px);
+
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.status-active {
+
+    background: #16a34a;
+}
+
+.status-expired {
+
+    background: #dc2626;
+}
+
+.subscription-header {
+
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b
+    );
+
+    color: white;
+
+    padding: 50px 0;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="subscription-header">
+
+    <div class="container text-center">
+
+        <h1 class="display-5 fw-bold">
+
+            My Subscriptions
+
+        </h1>
+
+        <p class="lead">
+
+            Manage your premium memberships
+            and E-Paper access.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+<div class="container py-5">
+
+    {% if subscriptions %}
+
+    <div class="row g-4">
+
+        {% for subscription in subscriptions %}
+
+        <div class="col-lg-6">
+
+            <div class="card shadow-lg subscription-card">
+
+                <div class="card-body p-5">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+
+                        <h3 class="fw-bold mb-0">
+
+                            {{ subscription.plan.name }}
+
+                        </h3>
+
+                        {% if subscription.is_active %}
+
+                        <span class="badge status-active px-4 py-2">
+
+                            Active
+
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge status-expired px-4 py-2">
+
+                            Expired
+
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong>
+
+                            Plan Type:
+
+                        </strong>
+
+                        {{ subscription.plan.subscription_type }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong>
+
+                            Amount Paid:
+
+                        </strong>
+
+                        ₹{{ subscription.amount }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong>
+
+                            Payment Status:
+
+                        </strong>
+
+                        {{ subscription.payment_status }}
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong>
+
+                            Transaction ID:
+
+                        </strong>
+
+                        <small>
+
+                            {{ subscription.transaction_id }}
+
+                        </small>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <strong>
+
+                            Start Date:
+
+                        </strong>
+
+                        {{ subscription.start_date }}
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <strong>
+
+                            Expiry Date:
+
+                        </strong>
+
+                        {{ subscription.end_date }}
+
+                    </div>
+
+                    {% if subscription.is_active %}
+
+                    <a href="{% url 'epaper' %}"
+                       class="btn btn-success rounded-pill px-4">
+
+                        <i class="bi bi-newspaper"></i>
+
+                        Read E-Paper
+
+                    </a>
+
+                    {% else %}
+
+                    <a href="{% url 'plans' %}"
+                       class="btn btn-danger rounded-pill px-4">
+
+                        Renew Subscription
+
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="card border-0 shadow-lg rounded-4">
+
+        <div class="card-body p-5 text-center">
+
+            <i class="bi bi-credit-card display-1 text-danger"></i>
+
+            <h2 class="fw-bold mt-4">
+
+                No Subscription Found
+
+            </h2>
+
+            <p class="text-muted mt-3">
+
+                You do not have any active
+                subscription plans yet.
+
+            </p>
+
+            <a href="{% url 'plans' %}"
+               class="btn btn-danger btn-lg rounded-pill px-5 mt-3">
+
+                Buy Subscription
+
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
