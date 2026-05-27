@@ -1,0 +1,273 @@
+{% extends 'new_base.html' %}
+
+{% block title %}
+Subscribe {{ plan.name }} | Gargachary Times
+{% endblock %}
+
+{% block css %}
+
+<style>
+
+.subscribe-section {
+
+    background: linear-gradient(
+        135deg,
+        #0f172a,
+        #1e293b
+    );
+
+    min-height: 100vh;
+
+    padding: 80px 0;
+}
+
+.subscribe-card {
+
+    border: none;
+
+    border-radius: 30px;
+
+    overflow: hidden;
+
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+}
+
+.plan-header {
+
+    background: linear-gradient(
+        135deg,
+        #dc2626,
+        #991b1b
+    );
+
+    color: white;
+
+    padding: 40px;
+}
+
+.price {
+
+    font-size: 70px;
+
+    font-weight: 700;
+}
+
+.feature-item {
+
+    padding: 15px 0;
+
+    border-bottom: 1px solid #eee;
+}
+
+.pay-btn {
+
+    background: linear-gradient(
+        135deg,
+        #16a34a,
+        #15803d
+    );
+
+    color: white;
+
+    border: none;
+
+    height: 60px;
+
+    border-radius: 50px;
+
+    font-size: 20px;
+
+    font-weight: 600;
+
+    transition: 0.3s;
+}
+
+.pay-btn:hover {
+
+    color: white;
+
+    transform: translateY(-2px);
+
+    opacity: 0.95;
+}
+
+.secure-box {
+
+    background: #f8fafc;
+
+    border-radius: 20px;
+
+    padding: 20px;
+}
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="subscribe-section">
+
+    <div class="container">
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-8">
+
+                <div class="card subscribe-card">
+
+                    <div class="plan-header text-center">
+
+                        {% if plan.subscription_type == 'news' %}
+
+                        <i class="bi bi-newspaper display-1"></i>
+
+                        {% else %}
+
+                        <i class="bi bi-journal-richtext display-1"></i>
+
+                        {% endif %}
+
+                        <h1 class="fw-bold mt-3">
+
+                            {{ plan.name }}
+
+                        </h1>
+
+                        <div class="price">
+
+                            ₹{{ plan.price }}
+
+                        </div>
+
+                        <p class="lead mb-0">
+
+                            {{ plan.duration }}
+
+                            {{ plan.duration_type }}
+
+                            Premium Access
+
+                        </p>
+
+                    </div>
+
+                    <div class="card-body p-5">
+
+                        <h3 class="fw-bold mb-4">
+
+                            Plan Benefits
+
+                        </h3>
+
+                        <div class="feature-item">
+
+                            <i class="bi bi-check-circle-fill text-success"></i>
+
+                            Unlimited Premium News Access
+
+                        </div>
+
+                        <div class="feature-item">
+
+                            <i class="bi bi-check-circle-fill text-success"></i>
+
+                            Daily E-Paper Access
+
+                        </div>
+
+                        <div class="feature-item">
+
+                            <i class="bi bi-check-circle-fill text-success"></i>
+
+                            Exclusive Reports & Interviews
+
+                        </div>
+
+                        <div class="feature-item">
+
+                            <i class="bi bi-check-circle-fill text-success"></i>
+
+                            Mobile & Desktop Reading
+
+                        </div>
+
+                        <div class="feature-item">
+
+                            <i class="bi bi-check-circle-fill text-success"></i>
+
+                            Priority Subscriber Benefits
+
+                        </div>
+
+                        <div class="secure-box mt-5 mb-4">
+
+                            <div class="d-flex align-items-center">
+
+                                <i class="bi bi-shield-lock-fill
+                                          text-success
+                                          display-6
+                                          me-3"></i>
+
+                                <div>
+
+                                    <h5 class="fw-bold mb-1">
+
+                                        Secure Payment
+
+                                    </h5>
+
+                                    <p class="mb-0 text-muted">
+
+                                        100% secure payment powered by
+                                        PhonePe Payment Gateway.
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <form action="{% url 'phonepe_payment' plan.id %}"
+                              method="POST">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn pay-btn w-100">
+
+                                <i class="bi bi-phone"></i>
+
+                                Pay ₹{{ plan.price }} with PhonePe
+
+                            </button>
+
+                        </form>
+
+                        <div class="text-center mt-4">
+
+                            <small class="text-muted">
+
+                                By continuing you agree to our
+                                Terms & Conditions and
+                                Refund Policy.
+
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
