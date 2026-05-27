@@ -87,7 +87,7 @@ def register(request):
 
     return render(
         request,
-        'account/register.html'
+        'register.html'
     )
 
 
