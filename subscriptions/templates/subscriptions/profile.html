@@ -1,0 +1,207 @@
+{% extends 'new_base.html' %}
+
+{% block title %}
+My Profile | Gargachary Times
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row">
+
+        <div class="col-lg-4 mb-4">
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                <div class="bg-dark text-white text-center p-5">
+
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=dc3545&color=fff&size=120"
+                         class="rounded-circle mb-3">
+
+                    <h3 class="fw-bold">
+
+                        {{ request.user.username }}
+
+                    </h3>
+
+                    <p class="mb-1">
+
+                        {{ request.user.email }}
+
+                    </p>
+
+                    <p>
+
+                        {{ request.user.mobile }}
+
+                    </p>
+
+                </div>
+
+                <div class="card-body p-4">
+
+                    <p>
+
+                        <strong>City:</strong>
+
+                        {{ request.user.city }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>District:</strong>
+
+                        {{ request.user.district }}
+
+                    </p>
+
+                    <p>
+
+                        <strong>State:</strong>
+
+                        {{ request.user.state }}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-8">
+
+            <div class="card border-0 shadow-lg rounded-4">
+
+                <div class="card-body p-5">
+
+                    <h2 class="fw-bold mb-4">
+
+                        My Subscription
+
+                    </h2>
+
+                    {% if subscription %}
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <div class="bg-light rounded-4 p-4">
+
+                                <small class="text-muted">
+
+                                    Current Plan
+
+                                </small>
+
+                                <h4 class="fw-bold text-danger">
+
+                                    {{ subscription.plan.name }}
+
+                                </h4>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="bg-light rounded-4 p-4">
+
+                                <small class="text-muted">
+
+                                    Status
+
+                                </small>
+
+                                <h4>
+
+                                    <span class="badge bg-success">
+
+                                        Active
+
+                                    </span>
+
+                                </h4>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="bg-light rounded-4 p-4">
+
+                                <small class="text-muted">
+
+                                    Start Date
+
+                                </small>
+
+                                <h5>
+
+                                    {{ subscription.start_date }}
+
+                                </h5>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="bg-light rounded-4 p-4">
+
+                                <small class="text-muted">
+
+                                    Expiry Date
+
+                                </small>
+
+                                <h5>
+
+                                    {{ subscription.end_date }}
+
+                                </h5>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="text-center py-5">
+
+                        <h4 class="mb-4">
+
+                            No Active Subscription
+
+                        </h4>
+
+                        <a href="{% url 'plans' %}"
+                           class="btn btn-danger btn-lg rounded-pill px-5">
+
+                            Buy Subscription
+
+                        </a>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

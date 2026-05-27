@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'video',
     'news_pdf',
     'rest_framework',
+    'subscriptions',
 ]
 
 MIDDLEWARE = [
@@ -149,3 +150,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "account.User"
+
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/subscriptions/profile/'
+LOGIN_URL = '/login/'

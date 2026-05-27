@@ -221,6 +221,14 @@
                 </li>
 
                 <li class="nav-item">
+                    <a class="nav-link text-dark fw-bold"
+                       href="{% url 'plans' %}">
+                        <i class="bi bi-stars"></i>
+                        Premium Plans
+                    </a>
+                </li>
+
+                <li class="nav-item">
                     <a class="nav-link text-dark" href="news_pdf/new_news_pdf">E-paper</a>
                 </li>
 
@@ -305,6 +313,90 @@
                 <li class="nav-item">
                     <a class="nav-link text-dark" href="/contact/">Contact</a>
                 </li>
+
+                {% if request.user.is_authenticated %}
+
+                <li class="nav-item dropdown">
+
+                    <a class="nav-link dropdown-toggle text-dark fw-bold"
+                       href="#"
+                       data-bs-toggle="dropdown">
+
+                        <i class="bi bi-person-circle"></i>
+
+                        {{ request.user.username }}
+
+                    </a>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'profile' %}">
+
+                                <i class="bi bi-person"></i>
+
+                                My Profile
+
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'my_subscription' %}">
+
+                                <i class="bi bi-credit-card"></i>
+
+                                My Subscription
+
+                            </a>
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'new_news_pdf' %}">
+
+                                <i class="bi bi-newspaper"></i>
+
+                                E-Paper
+
+                            </a>
+                        </li>
+
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+
+                        <li>
+                            <a class="dropdown-item text-danger"
+                               href="{% url 'logout' %}">
+
+                                <i class="bi bi-box-arrow-right"></i>
+
+                                Logout
+
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </li>
+
+                {% else %}
+
+                <li class="nav-item">
+                    <a class="nav-link text-dark fw-bold"
+                       href="{% url 'login' %}">
+
+                        <i class="bi bi-box-arrow-in-right"></i>
+
+                        Login
+
+                    </a>
+                </li>
+
+                {% endif %}
+
             </ul>
         </div>
     </div>

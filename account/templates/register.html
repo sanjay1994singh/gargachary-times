@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Register | Gargachary Times
+{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+
+                <div class="bg-danger text-white text-center p-4">
+
+                    <h2 class="fw-bold">
+
+                        Create Account
+
+                    </h2>
+
+                </div>
+
+                <div class="card-body p-5">
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="fw-bold mb-2">
+
+                                    Username
+
+                                </label>
+
+                                <input type="text"
+                                       name="username"
+                                       class="form-control form-control-lg rounded-4"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="fw-bold mb-2">
+
+                                    Email
+
+                                </label>
+
+                                <input type="email"
+                                       name="email"
+                                       class="form-control form-control-lg rounded-4"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="fw-bold mb-2">
+
+                                    Mobile
+
+                                </label>
+
+                                <input type="text"
+                                       name="mobile"
+                                       class="form-control form-control-lg rounded-4">
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="fw-bold mb-2">
+
+                                    City
+
+                                </label>
+
+                                <input type="text"
+                                       name="city"
+                                       class="form-control form-control-lg rounded-4">
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="fw-bold mb-2">
+
+                                    District
+
+                                </label>
+
+                                <input type="text"
+                                       name="district"
+                                       class="form-control form-control-lg rounded-4">
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="fw-bold mb-2">
+
+                                    State
+
+                                </label>
+
+                                <input type="text"
+                                       name="state"
+                                       class="form-control form-control-lg rounded-4">
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="fw-bold mb-2">
+
+                                    Password
+
+                                </label>
+
+                                <input type="password"
+                                       name="password"
+                                       class="form-control form-control-lg rounded-4"
+                                       required>
+
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+
+                                <label class="fw-bold mb-2">
+
+                                    Confirm Password
+
+                                </label>
+
+                                <input type="password"
+                                       name="confirm_password"
+                                       class="form-control form-control-lg rounded-4"
+                                       required>
+
+                            </div>
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-danger btn-lg w-100 rounded-pill mt-3">
+
+                            Create Account
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

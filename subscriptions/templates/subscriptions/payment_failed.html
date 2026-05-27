@@ -1,0 +1,40 @@
+{% extends 'new_base.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+
+    <div class="card border-0 shadow-lg text-center p-5 rounded-4">
+
+        <div class="mb-4">
+
+            <i class="bi bi-x-circle-fill text-danger"
+               style="font-size:80px;"></i>
+
+        </div>
+
+        <h1 class="fw-bold text-danger">
+
+            Payment Failed
+
+        </h1>
+
+        <p class="lead mt-3">
+
+            Something went wrong.
+            Please try again.
+
+        </p>
+
+        <a href="{% url 'plans' %}"
+           class="btn btn-danger btn-lg rounded-pill px-5 mt-4">
+
+            Retry Payment
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

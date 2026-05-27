@@ -1,0 +1,414 @@
+{% extends 'new_base.html' %}
+
+{% block title %}
+Premium Subscription Plans | Gargachary Times
+{% endblock %}
+
+{% block css %}
+
+<style>
+
+    .hero-section {
+
+        background: linear-gradient(
+            135deg,
+            #0f172a,
+            #1e293b
+        );
+
+        color: white;
+
+        padding: 100px 0;
+
+        position: relative;
+
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+
+        content: '';
+
+        position: absolute;
+
+        width: 300px;
+
+        height: 300px;
+
+        background: rgba(255,255,255,0.05);
+
+        border-radius: 50%;
+
+        top: -100px;
+
+        right: -100px;
+    }
+
+    .plan-card {
+
+        border: none;
+
+        border-radius: 25px;
+
+        overflow: hidden;
+
+        transition: 0.4s;
+
+        height: 100%;
+
+        background: white;
+    }
+
+    .plan-card:hover {
+
+        transform: translateY(-10px);
+
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+
+    .plan-top {
+
+        padding: 18px;
+
+        font-weight: bold;
+
+        text-align: center;
+
+        color: white;
+    }
+
+    .news-plan {
+
+        background: linear-gradient(
+            135deg,
+            #dc2626,
+            #b91c1c
+        );
+    }
+
+    .magazine-plan {
+
+        background: linear-gradient(
+            135deg,
+            #2563eb,
+            #1d4ed8
+        );
+    }
+
+    .price {
+
+        font-size: 55px;
+
+        font-weight: 700;
+
+        color: #dc2626;
+    }
+
+    .subscribe-btn {
+
+        background: linear-gradient(
+            135deg,
+            #dc2626,
+            #b91c1c
+        );
+
+        border: none;
+
+        color: white;
+
+        padding: 14px 25px;
+
+        border-radius: 50px;
+
+        font-weight: 600;
+
+        width: 100%;
+
+        transition: 0.3s;
+    }
+
+    .subscribe-btn:hover {
+
+        opacity: 0.9;
+
+        color: white;
+    }
+
+    .feature-box {
+
+        background: white;
+
+        border-radius: 20px;
+
+        padding: 30px;
+
+        transition: 0.3s;
+    }
+
+    .feature-box:hover {
+
+        transform: translateY(-5px);
+
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<section class="hero-section">
+
+    <div class="container text-center">
+
+        <h1 class="display-3 fw-bold mb-4">
+
+            Premium Membership
+
+        </h1>
+
+        <p class="lead mb-5">
+
+            Unlock premium Hindi journalism,
+            E-Paper access, exclusive reports,
+            and magazine subscriptions.
+
+        </p>
+
+        <a href="#plans"
+           class="btn btn-danger btn-lg px-5 py-3 rounded-pill">
+
+            View Plans
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<section class="py-5 bg-light" id="plans">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <h2 class="fw-bold display-5">
+
+                Choose Your Plan
+
+            </h2>
+
+            <p class="text-muted">
+
+                Flexible plans designed for every reader.
+
+            </p>
+
+        </div>
+
+        <div class="row g-4">
+
+            {% for plan in plans %}
+
+            <div class="col-lg-4 col-md-6">
+
+                <div class="card shadow-lg plan-card">
+
+                    {% if plan.subscription_type == 'news' %}
+
+                    <div class="plan-top news-plan">
+
+                        <i class="bi bi-newspaper"></i>
+
+                        PREMIUM NEWS
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="plan-top magazine-plan">
+
+                        <i class="bi bi-journal-richtext"></i>
+
+                        MAGAZINE MEMBERSHIP
+
+                    </div>
+
+                    {% endif %}
+
+                    <div class="card-body p-5 text-center">
+
+                        <h3 class="fw-bold mb-3">
+
+                            {{ plan.name }}
+
+                        </h3>
+
+                        <div class="price mb-3">
+
+                            ₹{{ plan.price }}
+
+                        </div>
+
+                        <p class="text-muted mb-4">
+
+                            {{ plan.duration }}
+                            {{ plan.duration_type }}
+
+                            Access
+
+                        </p>
+
+                        <ul class="list-unstyled text-start mb-4">
+
+                            <li class="mb-3">
+
+                                <i class="bi bi-check-circle-fill text-success"></i>
+
+                                Unlimited Premium Articles
+
+                            </li>
+
+                            <li class="mb-3">
+
+                                <i class="bi bi-check-circle-fill text-success"></i>
+
+                                Daily E-Paper Access
+
+                            </li>
+
+                            <li class="mb-3">
+
+                                <i class="bi bi-check-circle-fill text-success"></i>
+
+                                Exclusive Reports
+
+                            </li>
+
+                            <li class="mb-3">
+
+                                <i class="bi bi-check-circle-fill text-success"></i>
+
+                                Subscriber Benefits
+
+                            </li>
+
+                        </ul>
+
+                        <a href="{% url 'subscribe' plan.id %}"
+                           class="subscribe-btn text-decoration-none d-inline-block">
+
+                            Subscribe Now
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <h2 class="fw-bold">
+
+                Why Subscribe?
+
+            </h2>
+
+        </div>
+
+        <div class="row g-4">
+
+            <div class="col-md-4">
+
+                <div class="feature-box text-center">
+
+                    <i class="bi bi-lightning-charge-fill text-danger display-4"></i>
+
+                    <h4 class="fw-bold mt-4">
+
+                        Breaking News
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        Fast and reliable updates
+                        from Brij, Mathura, Vrindavan
+                        and across India.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="feature-box text-center">
+
+                    <i class="bi bi-newspaper text-danger display-4"></i>
+
+                    <h4 class="fw-bold mt-4">
+
+                        Daily E-Paper
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        Read newspaper editions
+                        anytime on mobile and desktop.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="feature-box text-center">
+
+                    <i class="bi bi-award-fill text-danger display-4"></i>
+
+                    <h4 class="fw-bold mt-4">
+
+                        Premium Journalism
+
+                    </h4>
+
+                    <p class="text-muted">
+
+                        Exclusive investigations,
+                        interviews and special reports.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
