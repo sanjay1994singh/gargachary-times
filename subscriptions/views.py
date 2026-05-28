@@ -27,6 +27,8 @@ from .models import (
     EPaper
 )
 
+merchant_id = settings.PHONEPE_MERCHANT_ID
+
 
 # SUBSCRIPTION PLANS PAGE
 
