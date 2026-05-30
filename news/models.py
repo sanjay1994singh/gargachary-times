@@ -1,7 +1,6 @@
 from django.db import models
 
 from category.models import Category
-from slugify import slugify
 from account.models import User
 from django.urls import reverse
 import re

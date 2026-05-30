@@ -1,7 +1,5 @@
 from django.shortcuts import redirect
-from django.contrib.auth import authenticate, login, logout
 from news.models import News
-from django.db.models import Q
 from account.models import User
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required

@@ -5,7 +5,6 @@ from django.conf.urls.static import static
 from news.sitemap import NewsSitemap, CategorySitemap
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
-from django.contrib.auth import views as auth_views
 from account import views
 
 urlpatterns = [
@@ -16,6 +15,7 @@ urlpatterns = [
     path('account/', include('account.urls')),
     path('news_pdf/', include('news_pdf.urls')),
     path('subscriptions/', include('subscriptions.urls')),
+    path('auth/', include('social_django.urls', namespace='social')),
 
     path(
         'logout/',
