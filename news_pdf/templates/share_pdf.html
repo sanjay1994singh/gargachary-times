@@ -13,38 +13,7 @@
 <meta name="twitter:title" content="{{ news.title }}">
 <meta name="twitter:image" content="{{ absolute_image_url }}">
 
-<script type="application/ld+json">
-{
- "@context":"https://schema.org",
- "@type":"NewsArticle",
- "headline":"{{ news.title|escapejs }}",
- "image":["{{ absolute_image_url }}"],
- "datePublished":"{{ news.created_at|date:'c' }}",
- "dateModified":"{{ news.updated_at|date:'c' }}",
- "author":{
-   "@type":"Organization",
-   "name":"Gargachary Times"
- },
- "publisher":{
-   "@type":"Organization",
-   "name":"Gargachary Times",
-   "logo":{
-      "@type":"ImageObject",
-      "url":"https://gargacharytimes.com/static/garga1.png"
-   }
- },
- "mainEntityOfPage":{
-   "@type":"WebPage",
-   "@id":"{{ request.build_absolute_uri }}"
- }
-}
-</script>
-
 {% endblock metatags %}
-
-{% block meta_description %}
-{{ news.title|truncatechars:155 }}
-{% endblock %}
 
 {% block css %}
 <style>
