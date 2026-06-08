@@ -3,12 +3,15 @@
 {% block title %}{{ news.title }} | Gargachary Times{% endblock %}
 
 {% block metatags %}
-<meta property="og:title" content="{{ news.title }}">
-<meta property="og:description" content="Read today's digital edition of Gargachary Times.">
+<meta property="og:title" content="{{news.title}}">
+<meta property="og:description" content="{{ news.text|truncatewords:30 }}">
 <meta property="og:image" content="{{ absolute_image_url }}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
-<meta property="og:type" content="article">
-{% endblock %}
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ news.title }}">
+<meta name="twitter:image" content="{% if news.featured_image %}{{ news.featured_image.url }}{% endif %}">
+{% endblock metatags %}
 
 {% block css %}
 <style>
