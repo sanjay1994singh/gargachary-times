@@ -141,37 +141,32 @@
 
             <div class="col-lg-10">
 
-                <h1 class="fw-bold mb-4">
-                    {{ news.title }}
-                </h1>
-
-                <div class="share-links d-flex align-items-center">
+                <div class="pdf-viewer">
+                    <div class="share-links d-flex align-items-center">
 
                     <span class="fw-bold me-3">
                         Share:
                     </span>
 
-                    <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}"
-                       target="_blank"
-                       class="text-success">
-                        <i class="bi bi-whatsapp"></i>
-                    </a>
+                        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}"
+                           target="_blank"
+                           class="text-success">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
 
-                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
-                       target="_blank"
-                       class="text-primary">
-                        <i class="bi bi-facebook"></i>
-                    </a>
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+                           target="_blank"
+                           class="text-primary">
+                            <i class="bi bi-facebook"></i>
+                        </a>
 
-                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
-                       target="_blank"
-                       class="text-dark">
-                        <i class="bi bi-twitter-x"></i>
-                    </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
+                           target="_blank"
+                           class="text-dark">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
 
-                </div>
-
-                <div class="pdf-viewer">
+                    </div>
 
                     <div class="pdf-toolbar">
 
