@@ -1,5 +1,18 @@
 {% extends 'base.html' %}
 
+{% block metatags %}
+<meta property="og:title" content="Today's E-Paper | Gargachary Times">
+<meta property="og:description" content="Read today's digital edition of Gargachary Times.">
+<meta property="og:image" content="{{ absolute_image_url }}">
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
+<meta property="og:type" content="website">
+<!-- Optional: Twitter Card meta tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ news.title }}">
+<meta name="twitter:image" content="{{ absolute_image_url }}">
+
+{% endblock metatags %}
+
 {% block css %}
 <style>
     body{background:#f2f2f2;margin:0}
