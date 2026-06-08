@@ -3,15 +3,43 @@
 {% block title %}{{ news.title }} | Gargachary Times{% endblock %}
 
 {% block metatags %}
-<meta property="og:title" content="{{news.title}}">
-<meta property="og:description" content="{{ news.text|truncatewords:30 }}">
+<meta property="og:title" content="Today's E-Paper | Gargachary Times">
+<meta property="og:description" content="Read today's digital edition of Gargachary Times.">
 <meta property="og:image" content="{{ absolute_image_url }}">
 <meta property="og:url" content="{{ request.build_absolute_uri }}">
-
+<meta property="og:type" content="website">
 <!-- Optional: Twitter Card meta tags -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{{ news.title }}">
-<meta name="twitter:image" content="{% if news.featured_image %}{{ news.featured_image.url }}{% endif %}">
+<meta name="twitter:image" content="{{ absolute_image_url }}">
+
+<script type="application/ld+json">
+{
+ "@context":"https://schema.org",
+ "@type":"NewsArticle",
+ "headline":"{{ news.title|escapejs }}",
+ "image":["{{ absolute_image_url }}"],
+ "datePublished":"{{ news.created_at|date:'c' }}",
+ "dateModified":"{{ news.updated_at|date:'c' }}",
+ "author":{
+   "@type":"Organization",
+   "name":"Gargachary Times"
+ },
+ "publisher":{
+   "@type":"Organization",
+   "name":"Gargachary Times",
+   "logo":{
+      "@type":"ImageObject",
+      "url":"https://gargacharytimes.com/static/garga1.png"
+   }
+ },
+ "mainEntityOfPage":{
+   "@type":"WebPage",
+   "@id":"{{ request.build_absolute_uri }}"
+ }
+}
+</script>
+
 {% endblock metatags %}
 
 {% block meta_description %}
