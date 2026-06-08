@@ -130,7 +130,11 @@
     <p>Loading PDF…</p>
 </div>
 
-<div class="calendar-container">
+
+
+{% if pdf %}
+<div id="pdf-slider-container">
+    <div class="calendar-container">
     <label for="calendar">Select Date:</label>
     <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
 
@@ -150,9 +154,6 @@
         </a>
     </div>
 </div>
-
-{% if pdf %}
-<div id="pdf-slider-container">
     <button id="prev-btn" class="nav-btn">&#8249;</button>
     <div id="pdf-slider"></div>
 
