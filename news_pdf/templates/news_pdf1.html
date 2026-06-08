@@ -131,29 +131,28 @@
 </div>
 
 
-
 {% if pdf %}
 <div id="pdf-slider-container">
     <div class="calendar-container">
-    <label for="calendar">Select Date:</label>
-    <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
+        <label for="calendar">Select Date:</label>
+        <input type="date" id="calendar" name="calendar" value="{{ selected_date }}">
 
-    <div class="share-links mb-4 d-flex align-items-center">
-        <span class="me-3 fw-bold">Share:</span>
-        <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank"
-           class="me-3 text-success fs-5">
-            <i class="bi bi-whatsapp"></i>
-        </a>
-        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
-           target="_blank" class="me-3 text-primary fs-5">
-            <i class="bi bi-facebook"></i>
-        </a>
-        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
-           target="_blank" class="text-info fs-5">
-            <i class="bi bi-twitter-x"></i>
-        </a>
+        <div class="share-links mb-4 d-flex align-items-center">
+            <span class="me-3 fw-bold">Share:</span>
+            <a href="https://wa.me/?text={{ news.title }} - {{ request.build_absolute_uri }}" target="_blank"
+               class="me-3 text-success fs-5">
+                <i class="bi bi-whatsapp"></i>
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}"
+               target="_blank" class="me-3 text-primary fs-5">
+                <i class="bi bi-facebook"></i>
+            </a>
+            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ news.title }}"
+               target="_blank" class="text-info fs-5">
+                <i class="bi bi-twitter-x"></i>
+            </a>
+        </div>
     </div>
-</div>
     <button id="prev-btn" class="nav-btn">&#8249;</button>
     <div id="pdf-slider"></div>
 
@@ -193,7 +192,13 @@
         // Force browser to repaint so loader actually appears
         await new Promise(requestAnimationFrame);
 
-        pdfDoc = await pdfjsLib.getDocument(url).promise;
+<!--        pdfDoc = await pdfjsLib.getDocument(url).promise;-->
+        pdfDoc = await pdfjsLib.getDocument({
+            url: url,
+            disableAutoFetch: false,
+            disableStream: false
+        }).promise;
+
         totalPages = pdfDoc.numPages;
 
         await renderPage(currentPage);
@@ -224,7 +229,8 @@
         const page = await pdfDoc.getPage(pageNum);
 
         // HD scale
-        const scale = window.innerWidth < 768 ? 2.0 : 1.6;
+<!--        const scale = window.innerWidth < 768 ? 2.0 : 1.6;-->
+        const scale = window.innerWidth < 768 ? 1.3 : 1.2;
         const viewport = page.getViewport({scale});
 
         const canvas = document.createElement("canvas");
