@@ -71,5 +71,4 @@ def new_news_pdf(request):
         'news': news,
         'absolute_image_url': absolute_image_url,
     }
-    return render(request, 'news_pdf.html', context)
-    # return render(request, 'share_pdf.html', context)
+    return render(request, 'share_pdf.html', context)
