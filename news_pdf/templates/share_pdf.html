@@ -56,17 +56,11 @@
                     <img src="{{ news.featured_image.url }}" alt="{{ news.title }}" class="img-fluid rounded shadow-sm">
                 </div>
                 {% endif %}
-
-                <!-- Content -->
-                <article class="mb-5 fs-5 lh-base text-dark" style="text-align: justify;">
-                    {{ news.text|safe }}
-                </article>
             </div>
         </div>
     </div>
 </section>
 {% endblock content %}
-
 
 {% block js %}
 {% endblock js %}
