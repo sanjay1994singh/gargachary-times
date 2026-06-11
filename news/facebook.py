@@ -10,10 +10,14 @@ def post_to_facebook(news):
 
     message = f"{news.title}\n\n{article_url}"
 
-    requests.post(
+    response = requests.post(
         f"https://graph.facebook.com/{settings.FACEBOOK_PAGE_ID}/feed",
         data={
             "message": message,
             "access_token": settings.FACEBOOK_ACCESS_TOKEN
         }
     )
+
+    print("FACEBOOK RESPONSE:")
+    print(response.status_code)
+    print(response.text)
