@@ -9,7 +9,6 @@ def post_to_facebook(news):
     article_url = (
         f"{settings.SITE_URL}{news.get_absolute_url()}"
     )
-
     data = {
         "message": news.title,
         "link": article_url,
