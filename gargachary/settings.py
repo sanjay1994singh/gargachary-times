@@ -30,15 +30,17 @@ INSTALLED_APPS = [
 
     'category',
     'homepage',
-    'news',
+    #'news',
     'video',
     'news_pdf',
     'rest_framework',
     'subscriptions',
+
+    'news.apps.NewsConfig',
 ]
 
 SITE_ID = 1
-
+SITE_URL = "https://gargacharytimes.com"
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("GOOGLE_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
@@ -49,6 +51,9 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
+
+FACEBOOK_PAGE_ID = "61590469224237"
+FACEBOOK_ACCESS_TOKEN = "EAAV9waZB1AJQBRrH00TZCVdmQtsl4YIW8YfbzRG5DZCi0HM7YyKeBNTX7KrVCCuvqIlm0xplSXLpqjQGVRRFNTeLSZBEgUVKJCNi1JACy6VzUFDZCRZArPOsVcaX5DJofsEnVB3zZCH89BLNYfnBkU71mn68TLPexZCGGOzLvj45bri1e09i0zDPV7kZBuk23k5rCmDTQ4WIlCYwfwN68dZCi48V6g1KRYC3f1KncFGBAHoV2rU7hNCyXP6zsSqI4niQu0gaqPgIJU71AE7AzI"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -37,7 +37,7 @@ class News(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     slug = models.SlugField(unique=True, blank=True, null=True, max_length=700)
-
+    facebook_posted = models.BooleanField(default=False)
     def save(self, *args, **kwargs):
 
         if not self.slug:
