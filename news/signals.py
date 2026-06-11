@@ -12,6 +12,9 @@ def auto_post_news(sender, instance, created, **kwargs):
         try:
             post_to_facebook(instance)
             print("Facebook post successful")
-
+            instance.facebook_posted = True
+            News.objects.filter(pk=instance.pk).update(
+                facebook_posted=True
+            )
         except Exception as e:
             print("Facebook post failed:", e)
