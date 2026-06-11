@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_URL = 'https://gargacharytimes.in'
+app_id = '1545645713588372'
+App_secret = '951603534d3c1038285458ea39530346'
 load_dotenv(BASE_DIR / ".env")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -52,7 +54,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 FACEBOOK_PAGE_ID = "1098385996695880"
-FACEBOOK_ACCESS_TOKEN = "EAAV9waZB1AJQBRh1f76mtzx9f0qttaGFb3ZAUhrxiq5XoQCaDjqGYqZArJoAc9VVJtORruywprqrXdrYGTSsnJaKKIyHxv7Rl6ggeNE7caHDv8QVkBpSscuk88DTxBs45Q7ij1IhwdCOWZCm78opZCPYsK3D71DZANmwg1R7D67T2WVRxCxiOv1xSw8W1yFnmYLIcKtpplg1Onoc2fPyfUe5alL6kVmOmaOATIbOwZD"
+FACEBOOK_ACCESS_TOKEN = "EAAV9waZB1AJQBRqYbkyWRzlx1tgRFl0twZBZBivVuDdw7ZCEMOpJaYlLiVx6lBuWZATZBGuckje6ZBaWGHabb3ZCzbd5XeZAx88WSkKVtjy8UsRNejdGBqM4aKYB1piLXjS0lm1WZBp0OTZA0x4Yfnszi1FI5KkAX0YxvArrNStoZBdrGdbSQx3Iu5T4ODWViQfULvw1y6U31jMjb2nvr5Bhoy0Atx37mmzF7vCdAAupZCwTKxHIZD"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
