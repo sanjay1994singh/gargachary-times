@@ -40,7 +40,7 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
-SITE_URL = "https://gargacharytimes.com"
+SITE_URL = "https://gargacharytimes.in"
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("GOOGLE_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
