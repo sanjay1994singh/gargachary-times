@@ -4,9 +4,8 @@ from django.conf import settings
 
 def post_to_facebook(news):
     url = f"https://graph.facebook.com/{settings.FACEBOOK_PAGE_ID}/feed"
-    site_url = "https://gargacharytimes.in"
     article_url = (
-        f"{site_url}{news.get_absolute_url()}"
+        f"{settings.SITE_URL}{news.get_absolute_url()}"
     )
     data = {
         "message": news.title,
