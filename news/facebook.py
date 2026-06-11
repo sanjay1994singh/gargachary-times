@@ -3,22 +3,29 @@ from django.conf import settings
 
 
 def post_to_facebook(news):
-
-    url = f"https://graph.facebook.com/{settings.FACEBOOK_PAGE_ID}/feed"
+    url = (
+        f"https://graph.facebook.com/"
+        f"{settings.FACEBOOK_PAGE_ID}/feed"
+    )
 
     article_url = (
         f"https://gargacharytimes.in"
         f"{news.get_absolute_url()}"
     )
+
     data = {
         "message": news.title,
         "link": article_url,
         "access_token": settings.FACEBOOK_ACCESS_TOKEN
     }
 
-    response = requests.post(url, data=data)
+    response = requests.post(
+        url,
+        data=data
+    )
 
-    print(response.status_code)
+    print("URL:", article_url)
+    print("FB:", response.status_code)
     print(response.text)
 
     return response

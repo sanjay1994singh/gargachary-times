@@ -11,11 +11,13 @@ load_dotenv(BASE_DIR / ".env")
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+# https://graph.facebook.com/v23.0/oauth/access_token?client_id=1545645713588372&client_secret=951603534d3c1038285458ea39530346&grant_type=fb_exchange_token&fb_exchange_token=EAAV9waZB1AJQBRt4RE369UZAvRYXIaty5PdGJe1UEIov8ZAmSgC1wMGLT9hmbhjQI3dNvdEDqZCiq0aeCvSDexq8JhpjFCiNcNjEm4cCICbmZC4prLq9g8DPt1nMaQZAuXPT2Ru42vYSBvrLHL2Q1KvdQYyuHXtVTZBT6WLb3JqGW1BGPxUacJlKG6nDRH4MfQfGg9ZC6m0Kj65F410UApi8TKGJfSNGZCOsMArwZBVS5AA2E7nuG2NpDjCrDTNmYZD
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
-SITE_URL = os.getenv("SITE_URL","http://localhost:8000")
+SITE_URL = os.getenv("SITE_URL", "http://localhost:8000")
 # Application definition
 
 INSTALLED_APPS = [
@@ -33,7 +35,7 @@ INSTALLED_APPS = [
 
     'category',
     'homepage',
-    #'news',
+    # 'news',
     'video',
     'news_pdf',
     'rest_framework',
@@ -54,7 +56,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 FACEBOOK_PAGE_ID = "1098385996695880"
-FACEBOOK_ACCESS_TOKEN = "EAAV9waZB1AJQBRqYbkyWRzlx1tgRFl0twZBZBivVuDdw7ZCEMOpJaYlLiVx6lBuWZATZBGuckje6ZBaWGHabb3ZCzbd5XeZAx88WSkKVtjy8UsRNejdGBqM4aKYB1piLXjS0lm1WZBp0OTZA0x4Yfnszi1FI5KkAX0YxvArrNStoZBdrGdbSQx3Iu5T4ODWViQfULvw1y6U31jMjb2nvr5Bhoy0Atx37mmzF7vCdAAupZCwTKxHIZD"
+FACEBOOK_ACCESS_TOKEN = "EAAV9waZB1AJQBRitp63ZBTzydk7xQhfY7gZAQOFAWimLChPXv3LraZBtjuxIc1ySX8KZBScykak4jQmtmibw5tp5eXWLwZBkqYVInK2lZBwQVjgaCrXg7GqF9iRNDs5ZB8s5X97hI3FzoqTDZC6ZBeIRXzvyb2UVPAm1uoXwuS8etVVfMZBoNj26gZBp3FV9SDKR8ETsKskEfXPkrErxRGhfuSaf"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
