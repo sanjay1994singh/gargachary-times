@@ -7,7 +7,7 @@ def post_to_facebook(news):
     url = f"https://graph.facebook.com/{settings.FACEBOOK_PAGE_ID}/feed"
 
     article_url = (
-        f"{settings.SITE_URL}/{news.get_absolute_url()}"
+        f"{settings.BASE_URL}/{news.get_absolute_url()}"
     )
     data = {
         "message": news.title,
