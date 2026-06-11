@@ -36,7 +36,7 @@ class News(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
-    slug = models.SlugField(unique=True, blank=True, null=True, max_length=700)
+    slug = models.CharField(unique=True, blank=True, null=True, max_length=700)
     facebook_posted = models.BooleanField(default=False)
     def save(self, *args, **kwargs):
 

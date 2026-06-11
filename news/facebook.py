@@ -13,6 +13,8 @@ def post_to_facebook(news):
         f"{news.get_absolute_url()}"
     )
 
+    print(article_url, '=========article_url')
+
     data = {
         "message": news.title,
         "link": article_url,
