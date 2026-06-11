@@ -10,7 +10,7 @@ def auto_post_news(sender, instance, created, **kwargs):
 
     if created:
         try:
-            # post_to_facebook(instance)
+            post_to_facebook(instance)
             print("Facebook post successful")
             instance.facebook_posted = True
             News.objects.filter(pk=instance.pk).update(
