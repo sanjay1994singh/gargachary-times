@@ -7,44 +7,209 @@ Videos | Gargachary Times
 
 
 {% block css %}
+
+<style>
+
+    .video-page{
+        padding:30px 15px;
+    }
+
+
+    .video-title{
+        font-size:32px;
+        font-weight:700;
+        margin-bottom:25px;
+    }
+
+
+    .video-card{
+        background:#fff;
+        border-radius:15px;
+        overflow:hidden;
+        box-shadow:0 5px 20px rgba(0,0,0,.12);
+        transition:.3s;
+        height:100%;
+    }
+
+
+    .video-card:hover{
+        transform:translateY(-5px);
+    }
+
+
+    .video-thumb{
+        width:100%;
+        aspect-ratio:16/9;
+        object-fit:cover;
+    }
+
+
+    .video-content{
+        padding:15px;
+    }
+
+
+    .video-content h3{
+
+        font-size:16px;
+        font-weight:700;
+        line-height:1.4;
+
+    }
+
+
+    .video-date{
+        color:#777;
+        font-size:13px;
+    }
+
+
+    .play-btn{
+
+        display:inline-block;
+        margin-top:10px;
+        background:#ff0000;
+        color:#fff;
+        padding:7px 15px;
+        border-radius:30px;
+        text-decoration:none;
+        font-size:14px;
+
+    }
+
+
+    .play-btn:hover{
+
+        background:#cc0000;
+        color:#fff;
+
+    }
+
+
+
+    /* Mobile */
+
+    @media(max-width:576px){
+
+
+    .video-page{
+        padding:20px 10px;
+    }
+
+
+    .video-title{
+
+        font-size:24px;
+
+    }
+
+
+    .video-content h3{
+
+        font-size:15px;
+
+    }
+
+
+    }
+
+
+</style>
+
+
 {% endblock css %}
+
 
 {% block content %}
 
-<div class="container-box">
+
+<div class="container video-page">
+
+
+    <h1 class="video-title">
+        Latest Videos
+    </h1>
+
+
     <div class="row g-4">
-        <div id="video-section">
-            <div class="container-box">
-                <div class="row g-4">
-                    <section class="py-6 px-4 bg-gray-100">
-                        <h2 class="text-2xl font-bold mb-4">Videos</h2>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {% for video in videos %}
-                            <div class="bg-white rounded shadow-md overflow-hidden">
-                                <a href="{{ video.url }}" target="_blank" rel="noopener noreferrer">
-                                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}" class="w-full h-auto">
-                                    <div class="p-2">
-                                        <h3 class="text-sm font-semibold">{{ video.title }}</h3>
-                                        <p class="text-xs text-gray-500">{{ video.publishedAt|date:"F j, Y" }}</p>
-                                    </div>
-                                </a>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </section>
+
+
+        {% for video in videos %}
+
+
+        <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+
+
+            <div class="video-card">
+
+
+                <a href="{{ video.url }}"
+                   target="_blank"
+                   rel="noopener">
+
+
+                    <img
+                            src="{{ video.thumbnail }}"
+                            class="video-thumb"
+                            alt="{{ video.title }}">
+
+
+                </a>
+
+
+                <div class="video-content">
+
+
+                    <h3>
+                        {{ video.title }}
+                    </h3>
+
+
+                    <p class="video-date">
+
+                        {{ video.publishedAt|date:"d M Y" }}
+
+                    </p>
+
+
+                    <a href="{{ video.url }}"
+                       target="_blank"
+                       rel="noopener"
+                       class="play-btn">
+
+                        ▶ Watch Video
+
+                    </a>
+
+
                 </div>
+
+
             </div>
+
+
         </div>
 
+
+        {% empty %}
+
+
+        <div class="text-center">
+
+            <h4>
+                No Videos Available
+            </h4>
+
+        </div>
+
+
+        {% endfor %}
+
+
     </div>
+
+
 </div>
 
+
 {% endblock content %}
-
-{% block js %}
-{% endblock js %}
-
-
-
-
-

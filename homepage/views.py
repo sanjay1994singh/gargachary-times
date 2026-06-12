@@ -145,7 +145,7 @@ def download_visitors_data(request, report_type):
     return response
 
 
-API_KEY = 'AIzaSyCzsOJL0XQHTuSc7MgiR_HkJeeOrks4UhI'
+API_KEY = 'AIzaSyCJQ2WoCt9gMmdKlkaRS_NqEyNeNyxDm9k'
 CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
 
 
