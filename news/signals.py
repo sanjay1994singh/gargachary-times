@@ -12,7 +12,7 @@ def delayed_facebook_post(news_id):
 
         post_to_facebook(news)
 
-        print("Facebook post successful")
+        # print("Facebook post successful")
 
         News.objects.filter(
             pk=news.pk
