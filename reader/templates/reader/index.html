@@ -4,7 +4,82 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-4">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-5">
+    <style>
+        @media (max-width: 991px) {
+            .reader-toolbar {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                min-height: 54px !important;
+            }
+
+            .reader-toolbar .menu-button,
+            .reader-toolbar > .select-block,
+            .reader-toolbar .share-actions,
+            .toolbar-group .icon-button,
+            .toolbar-group .tool-button,
+            .reader-shell .side-nav,
+            .bottom-pager .pager-icon,
+            .bottom-pager [data-action="first"],
+            .bottom-pager [data-action="previous"],
+            .bottom-pager [data-action="next"],
+            .bottom-pager [data-action="last"] {
+                display: none !important;
+            }
+
+            .reader-toolbar .date-button,
+            .toolbar-group [data-action="zoom-in"],
+            .toolbar-group [data-action="clip"] {
+                display: inline-flex !important;
+                min-width: 0 !important;
+                width: 100% !important;
+                min-height: 54px !important;
+                padding: 0 !important;
+            }
+
+            .reader-toolbar .toolbar-group {
+                display: contents !important;
+            }
+
+            .reader-toolbar .date-button {
+                order: 1 !important;
+            }
+
+            .toolbar-group [data-action="zoom-in"] {
+                order: 2 !important;
+            }
+
+            .toolbar-group [data-action="clip"] {
+                order: 3 !important;
+            }
+
+            .tool-button span:last-child,
+            .pager-command span:last-child {
+                display: none !important;
+            }
+
+            .page-stage {
+                width: 100vw !important;
+                padding: 0 10px !important;
+                overflow-x: hidden !important;
+                touch-action: pan-y !important;
+            }
+
+            .paper-frame,
+            .paper-frame img {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .bottom-pager {
+                position: static !important;
+                left: auto !important;
+                width: calc(100vw - 16px) !important;
+                margin: 12px auto 0 !important;
+                transform: none !important;
+            }
+        }
+    </style>
 {% endblock css %}
 
 {% block content %}
@@ -175,5 +250,5 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-4"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-5"></script>
 {% endblock js %}
