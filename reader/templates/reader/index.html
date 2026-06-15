@@ -155,6 +155,19 @@
         </div>
     </aside>
 
+    <aside class="crop-result" id="cropResult" aria-label="Cropped page" hidden>
+        <div class="drawer-header">
+            <h2>Cropped Page</h2>
+            <button type="button" class="icon-button" data-action="close-crop" aria-label="Close crop">x</button>
+        </div>
+        <img id="cropPreview" alt="Cropped newspaper page">
+        <div class="crop-actions">
+            <button type="button" data-action="download-crop">Download</button>
+            <button type="button" data-action="share-crop">Share</button>
+            <button type="button" data-action="new-crop">Crop Again</button>
+        </div>
+    </aside>
+
     <div class="reader-toast" id="readerToast" role="status" aria-live="polite" hidden></div>
 
     {{ pages|json_script:"pagesData" }}

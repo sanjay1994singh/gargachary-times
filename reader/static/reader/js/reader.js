@@ -10,6 +10,8 @@
     const toast = document.getElementById("readerToast");
     const clipBox = document.getElementById("clipBox");
     const bookmarkList = document.getElementById("bookmarkList");
+    const cropResult = document.getElementById("cropResult");
+    const cropPreview = document.getElementById("cropPreview");
     const thumbnails = Array.from(document.querySelectorAll(".thumbnail"));
 
     const bookmarkKey = "epaper-bookmarks";
@@ -17,6 +19,8 @@
     let zoom = 1;
     let clipMode = false;
     let clipStart = null;
+    let swipeStart = null;
+    let croppedImageUrl = "";
 
     function showToast(message) {
         toast.textContent = message;
@@ -67,6 +71,7 @@
             thumb.classList.toggle("is-active", index === pageIndex);
         });
         hideClipBox();
+        closeCropResult();
     }
 
     function setPage(nextIndex) {
@@ -108,9 +113,20 @@
     function toggleClipMode(button) {
         clipMode = !clipMode;
         document.body.classList.toggle("clip-mode", clipMode);
-        button.classList.toggle("is-active-tool", clipMode);
+        button?.classList.toggle("is-active-tool", clipMode);
         hideClipBox();
-        showToast(clipMode ? "Drag over the page to clip an area" : "Clip mode off");
+        showToast(clipMode ? "Drag on the page to crop" : "Crop mode off");
+    }
+
+    function setClipMode(nextMode) {
+        clipMode = nextMode;
+        document.body.classList.toggle("clip-mode", clipMode);
+        document.querySelectorAll('[data-action="clip"]').forEach((button) => {
+            button.classList.toggle("is-active-tool", clipMode);
+        });
+        if (!clipMode) {
+            hideClipBox();
+        }
     }
 
     function hideClipBox() {
@@ -142,7 +158,7 @@
         };
     }
 
-    function downloadClip(start, end) {
+    function makeClip(start, end) {
         const left = Math.min(start.x, end.x);
         const top = Math.min(start.y, end.y);
         const width = Math.abs(end.x - start.x);
@@ -173,12 +189,68 @@
             canvas.height
         );
 
+        return canvas.toDataURL("image/png");
+    }
+
+    function showCropResult(imageUrl) {
+        croppedImageUrl = imageUrl;
+        if (cropPreview) {
+            cropPreview.src = imageUrl;
+        }
+        if (cropResult) {
+            cropResult.hidden = false;
+        }
+        setClipMode(false);
+        showToast("Crop ready");
+    }
+
+    function closeCropResult() {
+        if (cropResult) {
+            cropResult.hidden = true;
+        }
+    }
+
+    function downloadCurrentCrop() {
+        if (!croppedImageUrl) {
+            showToast("Please crop a page first");
+            return;
+        }
+
         const link = document.createElement("a");
         link.download = `epaper-page-${pageIndex + 1}-clip.png`;
-        link.href = canvas.toDataURL("image/png");
+        link.href = croppedImageUrl;
         link.click();
-        hideClipBox();
-        showToast("Clip downloaded");
+    }
+
+    async function shareCurrentCrop() {
+        if (!croppedImageUrl) {
+            showToast("Please crop a page first");
+            return;
+        }
+
+        try {
+            const response = await fetch(croppedImageUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `epaper-page-${pageIndex + 1}-clip.png`, { type: "image/png" });
+
+            if (navigator.canShare?.({ files: [file] })) {
+                await navigator.share({
+                    title: document.title,
+                    text: "Cropped e-paper page",
+                    files: [file],
+                });
+                return;
+            }
+        } catch (error) {
+            // Fall back to opening the cropped image when native sharing is unavailable.
+        }
+
+        const imageWindow = window.open("", "_blank", "noopener,noreferrer");
+        if (imageWindow) {
+            imageWindow.document.write(`<img src="${croppedImageUrl}" alt="Cropped page" style="max-width:100%">`);
+        } else {
+            showToast("Share not available on this browser");
+        }
     }
 
     function shareTo(platform) {
@@ -261,6 +333,16 @@
             toggleBookmark();
         } else if (action === "clip") {
             toggleClipMode(actionButton);
+        } else if (action === "download-crop") {
+            downloadCurrentCrop();
+        } else if (action === "share-crop") {
+            shareCurrentCrop();
+        } else if (action === "new-crop") {
+            closeCropResult();
+            setClipMode(true);
+            showToast("Drag on the page to crop");
+        } else if (action === "close-crop") {
+            closeCropResult();
         } else if (action === "pages") {
             pagesDrawer.hidden = false;
         } else if (action === "close-pages") {
@@ -327,9 +409,51 @@
                 return;
             }
             const clipEnd = pointOnImage(event);
-            downloadClip(clipStart, clipEnd);
+            const imageUrl = makeClip(clipStart, clipEnd);
             clipStart = null;
+            if (imageUrl) {
+                showCropResult(imageUrl);
+            }
         });
+    }
+
+    const pageStage = document.querySelector(".page-stage");
+    if (pageStage) {
+        pageStage.addEventListener("touchstart", (event) => {
+            if (clipMode || event.touches.length !== 1) {
+                swipeStart = null;
+                return;
+            }
+
+            const touch = event.touches[0];
+            swipeStart = {
+                x: touch.clientX,
+                y: touch.clientY,
+                time: Date.now(),
+            };
+        }, { passive: true });
+
+        pageStage.addEventListener("touchend", (event) => {
+            if (!swipeStart || clipMode || event.changedTouches.length !== 1) {
+                return;
+            }
+
+            const touch = event.changedTouches[0];
+            const deltaX = touch.clientX - swipeStart.x;
+            const deltaY = touch.clientY - swipeStart.y;
+            const elapsed = Date.now() - swipeStart.time;
+            swipeStart = null;
+
+            if (Math.abs(deltaX) < 56 || Math.abs(deltaX) < Math.abs(deltaY) * 1.35 || elapsed > 900) {
+                return;
+            }
+
+            if (deltaX < 0) {
+                setPage(pageIndex + 1);
+            } else {
+                setPage(pageIndex - 1);
+            }
+        }, { passive: true });
     }
 
     document.addEventListener("keydown", (event) => {
@@ -344,10 +468,8 @@
         } else if (event.key === "Escape") {
             pagesDrawer.hidden = true;
             utilityDrawer.hidden = true;
-            clipMode = false;
-            document.body.classList.remove("clip-mode");
-            document.querySelector('[data-action="clip"]')?.classList.remove("is-active-tool");
-            hideClipBox();
+            closeCropResult();
+            setClipMode(false);
         }
     });
 
