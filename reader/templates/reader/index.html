@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-33">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-34">
     <style>
         .social-follow {
             display: none !important;
@@ -73,12 +73,11 @@
             .toolbar-group .icon-button,
             .toolbar-group [data-action="zoom-in"],
             .toolbar-group [data-action="clip"],
-            .reader-toolbar .share-actions,
             .reader-toolbar .share-actions .social-button {
                 display: inline-flex !important;
-                flex: 0 0 42px !important;
+                flex: 0 0 36px !important;
                 min-width: 0 !important;
-                width: 42px !important;
+                width: 36px !important;
                 min-height: 42px !important;
                 padding: 0 !important;
             }
@@ -89,7 +88,27 @@
             }
 
             .reader-toolbar .share-actions {
+                display: contents !important;
                 width: auto !important;
+                margin: 0 !important;
+            }
+
+            .reader-toolbar .social-button {
+                align-self: stretch !important;
+                min-height: 42px !important;
+                height: 42px !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                font-size: 15px !important;
+            }
+
+            .reader-toolbar .facebook,
+            .reader-toolbar .x,
+            .reader-toolbar .profile {
+                width: 36px !important;
+                min-width: 36px !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
             }
 
             .tool-button span:last-child,
@@ -387,7 +406,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-33"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-34"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {

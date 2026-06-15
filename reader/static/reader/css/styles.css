@@ -1054,12 +1054,11 @@ body.is-reader-mobile .reader-toolbar .date-button,
 body.is-reader-mobile .toolbar-group .icon-button,
 body.is-reader-mobile .toolbar-group [data-action="zoom-in"],
 body.is-reader-mobile .toolbar-group [data-action="clip"],
-body.is-reader-mobile .reader-toolbar .share-actions,
 body.is-reader-mobile .reader-toolbar .share-actions .social-button {
     display: inline-flex !important;
-    flex: 0 0 42px;
+    flex: 0 0 36px;
     min-width: 0;
-    width: 42px;
+    width: 36px;
     min-height: 42px;
     padding: 0;
 }
@@ -1070,7 +1069,27 @@ body.is-reader-mobile .reader-toolbar .toolbar-group {
 }
 
 body.is-reader-mobile .reader-toolbar .share-actions {
+    display: contents !important;
     width: auto;
+    margin: 0;
+}
+
+body.is-reader-mobile .reader-toolbar .social-button {
+    align-self: stretch;
+    min-height: 42px;
+    height: 42px;
+    margin: 0;
+    border-radius: 0;
+    font-size: 15px;
+}
+
+body.is-reader-mobile .reader-toolbar .facebook,
+body.is-reader-mobile .reader-toolbar .x,
+body.is-reader-mobile .reader-toolbar .profile {
+    width: 36px;
+    min-width: 36px;
+    margin: 0;
+    border-radius: 0;
 }
 
 body.is-reader-mobile .tool-button span:last-child {
