@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-27">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-28">
     <style>
         .social-follow {
             display: none !important;
@@ -102,7 +102,7 @@
                 padding: 0 6px !important;
                 overflow-x: hidden !important;
                 overflow-y: visible !important;
-                touch-action: pan-y !important;
+                touch-action: none !important;
             }
 
             .paper-frame {
@@ -359,7 +359,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-27"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-28"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {

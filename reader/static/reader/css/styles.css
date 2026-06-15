@@ -1082,7 +1082,7 @@ body.is-reader-mobile .page-stage {
     padding: 0 6px;
     overflow-x: hidden;
     overflow-y: visible;
-    touch-action: pan-y;
+    touch-action: none;
 }
 
 body.is-reader-mobile .paper-frame {

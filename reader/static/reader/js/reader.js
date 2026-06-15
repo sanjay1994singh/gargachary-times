@@ -20,6 +20,9 @@
     let clipMode = false;
     let clipStart = null;
     let swipeStart = null;
+    let pinchStartDistance = 0;
+    let pinchStartZoom = 1;
+    let isPinching = false;
     let croppedImageUrl = "";
 
     function syncReaderMobileMode() {
@@ -123,10 +126,12 @@
         renderPage();
     }
 
-    function setZoom(nextZoom) {
+    function setZoom(nextZoom, announce = true) {
         zoom = Math.max(0.65, Math.min(2.2, nextZoom));
         paperFrame.style.transform = `scale(${zoom})`;
-        showToast(`Zoom ${Math.round(zoom * 100)}%`);
+        if (announce) {
+            showToast(`Zoom ${Math.round(zoom * 100)}%`);
+        }
     }
 
     function fitPage() {
@@ -488,12 +493,18 @@
         return Boolean(target.closest("button, select, input, label, .pages-drawer, .utility-drawer, .crop-result"));
     }
 
+    function touchDistance(touches) {
+        const first = touches[0];
+        const second = touches[1];
+        return Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
+    }
+
     const pageStage = document.querySelector(".page-stage");
     const readerShell = document.querySelector(".reader-shell");
     const swipeArea = readerShell || pageStage;
     if (swipeArea) {
         swipeArea.addEventListener("pointerdown", (event) => {
-            if (clipMode || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
+            if (clipMode || isPinching || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
                 return;
             }
 
@@ -505,7 +516,7 @@
         });
 
         swipeArea.addEventListener("pointerup", (event) => {
-            if (event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
+            if (isPinching || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
                 return;
             }
 
@@ -517,7 +528,21 @@
         });
 
         swipeArea.addEventListener("touchstart", (event) => {
-            if (clipMode || event.touches.length !== 1 || shouldIgnoreSwipeTarget(event.target)) {
+            if (clipMode || shouldIgnoreSwipeTarget(event.target)) {
+                swipeStart = null;
+                return;
+            }
+
+            if (event.touches.length === 2) {
+                event.preventDefault();
+                isPinching = true;
+                swipeStart = null;
+                pinchStartDistance = touchDistance(event.touches);
+                pinchStartZoom = zoom;
+                return;
+            }
+
+            if (event.touches.length !== 1) {
                 swipeStart = null;
                 return;
             }
@@ -528,16 +553,36 @@
                 y: touch.clientY,
                 time: Date.now(),
             };
-        }, { passive: true });
+        }, { passive: false });
+
+        swipeArea.addEventListener("touchmove", (event) => {
+            if (!isPinching || event.touches.length !== 2 || pinchStartDistance <= 0) {
+                return;
+            }
+
+            event.preventDefault();
+            const nextZoom = pinchStartZoom * (touchDistance(event.touches) / pinchStartDistance);
+            setZoom(nextZoom, false);
+        }, { passive: false });
 
         swipeArea.addEventListener("touchend", (event) => {
+            if (isPinching) {
+                if (event.touches.length < 2) {
+                    isPinching = false;
+                    pinchStartDistance = 0;
+                    swipeStart = null;
+                    showToast(`Zoom ${Math.round(zoom * 100)}%`);
+                }
+                return;
+            }
+
             if (!swipeStart || clipMode || event.changedTouches.length !== 1 || shouldIgnoreSwipeTarget(event.target)) {
                 return;
             }
 
             const touch = event.changedTouches[0];
             handleSwipe(touch.clientX, touch.clientY, Date.now() - swipeStart.time);
-        }, { passive: true });
+        }, { passive: false });
 
         window.readerSwipeReady = true;
     }
