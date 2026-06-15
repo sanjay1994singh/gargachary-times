@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-35">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-36">
     <style>
         .social-follow {
             display: none !important;
@@ -158,17 +158,18 @@
             }
 
             .bottom-pager {
-                display: flex !important;
+                display: grid !important;
+                grid-template-columns: 36px 30px 80px 30px !important;
                 align-items: stretch !important;
+                justify-content: center !important;
                 position: static !important;
                 left: auto !important;
-                width: calc(100vw - 10px) !important;
+                width: min(260px, calc(100vw - 48px)) !important;
                 height: 36px !important;
                 min-height: 36px !important;
                 margin: 3px auto 0 !important;
-                overflow-x: auto !important;
+                overflow-x: hidden !important;
                 overflow-y: hidden !important;
-                scrollbar-width: none !important;
                 transform: none !important;
             }
 
@@ -178,7 +179,6 @@
 
             .bottom-pager button,
             .bottom-pager .page-select {
-                flex: 0 0 auto !important;
                 height: 36px !important;
                 min-height: 36px !important;
                 line-height: 1 !important;
@@ -205,11 +205,11 @@
             }
 
             .bottom-pager button.pager-icon[data-action="previous"] {
-                order: 2 !important;
+                grid-column: 2 !important;
             }
 
             .bottom-pager button.pager-icon[data-action="next"] {
-                order: 4 !important;
+                grid-column: 4 !important;
             }
 
             .calendar-icon,
@@ -220,19 +220,19 @@
             }
 
             .page-select {
-                order: 3 !important;
-                flex: 0 0 auto !important;
-                min-width: 76px !important;
+                grid-column: 3 !important;
+                min-width: 80px !important;
                 padding: 0 4px !important;
                 font-size: 12px !important;
                 gap: 4px !important;
             }
 
             .pager-command {
-                order: 1 !important;
+                grid-column: 1 !important;
                 position: static !important;
+                width: 36px !important;
                 min-width: 36px !important;
-                padding: 0 7px !important;
+                padding: 0 !important;
             }
 
             .pager-crop {
@@ -413,7 +413,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-35"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-36"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
