@@ -923,7 +923,8 @@ button {
     .page-stage {
         width: 100vw;
         padding: 0 10px;
-        overflow-x: auto;
+        overflow-x: hidden;
+        touch-action: pan-y;
     }
 
     .paper-frame {
@@ -937,8 +938,8 @@ button {
         border-width: 5px;
     }
 
-    .side-nav {
-        display: none;
+    .reader-shell .side-nav {
+        display: none !important;
     }
 
     .bottom-pager {
@@ -964,8 +965,8 @@ button {
         font-size: 14px;
     }
 
-    .pager-icon {
-        display: none;
+    .bottom-pager .pager-icon {
+        display: none !important;
     }
 
     .pages-drawer {
@@ -994,5 +995,12 @@ button {
 
     .thumbnail-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 900px) {
+    .reader-shell .side-nav,
+    .bottom-pager .pager-icon {
+        display: none !important;
     }
 }

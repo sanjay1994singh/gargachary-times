@@ -210,6 +210,27 @@
         }
     }
 
+    function handleSwipe(endX, endY, elapsed) {
+        if (!swipeStart || clipMode) {
+            swipeStart = null;
+            return;
+        }
+
+        const deltaX = endX - swipeStart.x;
+        const deltaY = endY - swipeStart.y;
+        swipeStart = null;
+
+        if (Math.abs(deltaX) < 44 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2 || elapsed > 1100) {
+            return;
+        }
+
+        if (deltaX < 0) {
+            setPage(pageIndex + 1);
+        } else {
+            setPage(pageIndex - 1);
+        }
+    }
+
     function downloadCurrentCrop() {
         if (!croppedImageUrl) {
             showToast("Please crop a page first");
@@ -424,6 +445,30 @@
 
     const pageStage = document.querySelector(".page-stage");
     if (pageStage) {
+        pageStage.addEventListener("pointerdown", (event) => {
+            if (clipMode || event.pointerType !== "touch") {
+                return;
+            }
+
+            swipeStart = {
+                x: event.clientX,
+                y: event.clientY,
+                time: Date.now(),
+            };
+        });
+
+        pageStage.addEventListener("pointerup", (event) => {
+            if (event.pointerType !== "touch") {
+                return;
+            }
+
+            handleSwipe(event.clientX, event.clientY, Date.now() - (swipeStart?.time || Date.now()));
+        });
+
+        pageStage.addEventListener("pointercancel", () => {
+            swipeStart = null;
+        });
+
         pageStage.addEventListener("touchstart", (event) => {
             if (clipMode || event.touches.length !== 1) {
                 swipeStart = null;
@@ -444,20 +489,7 @@
             }
 
             const touch = event.changedTouches[0];
-            const deltaX = touch.clientX - swipeStart.x;
-            const deltaY = touch.clientY - swipeStart.y;
-            const elapsed = Date.now() - swipeStart.time;
-            swipeStart = null;
-
-            if (Math.abs(deltaX) < 56 || Math.abs(deltaX) < Math.abs(deltaY) * 1.35 || elapsed > 900) {
-                return;
-            }
-
-            if (deltaX < 0) {
-                setPage(pageIndex + 1);
-            } else {
-                setPage(pageIndex - 1);
-            }
+            handleSwipe(touch.clientX, touch.clientY, Date.now() - swipeStart.time);
         }, { passive: true });
     }
 
