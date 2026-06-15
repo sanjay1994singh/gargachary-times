@@ -1082,21 +1082,24 @@ body.is-reader-mobile .reader-toolbar .share-actions {
 }
 
 body.is-reader-mobile .reader-toolbar .social-button {
-    align-self: stretch;
-    min-height: 42px;
-    height: 42px;
-    margin: 0;
-    border-radius: 0;
-    font-size: 15px;
+    align-self: center;
+    flex: 0 0 34px;
+    width: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    height: 28px;
+    margin: 7px 3px;
+    border-radius: 50%;
+    font-size: 14px;
 }
 
 body.is-reader-mobile .reader-toolbar .facebook,
 body.is-reader-mobile .reader-toolbar .x,
 body.is-reader-mobile .reader-toolbar .profile {
-    width: 36px;
-    min-width: 36px;
-    margin: 0;
-    border-radius: 0;
+    width: 28px;
+    min-width: 28px;
+    margin: 7px 3px;
+    border-radius: 50%;
 }
 
 body.is-reader-mobile .tool-button span:last-child {
@@ -1135,12 +1138,12 @@ body.is-reader-mobile .paper-frame img {
 
 body.is-reader-mobile .bottom-pager {
     display: grid;
-    grid-template-columns: 36px 30px 80px 30px;
+    grid-template-columns: 36px 30px 108px 30px;
     align-items: stretch;
     justify-content: center;
     position: static;
     left: auto;
-    width: min(260px, calc(100vw - 48px));
+    width: min(288px, calc(100vw - 48px));
     height: 36px;
     min-height: 36px;
     margin: 3px auto 0;
@@ -1197,10 +1200,11 @@ body.is-reader-mobile .grid-icon {
 
 body.is-reader-mobile .page-select {
     grid-column: 3;
-    min-width: 80px;
-    padding: 0 4px;
+    min-width: 108px;
+    padding: 0 6px;
     font-size: 12px;
-    gap: 4px;
+    gap: 5px;
+    white-space: nowrap;
 }
 
 body.is-reader-mobile .pager-command {

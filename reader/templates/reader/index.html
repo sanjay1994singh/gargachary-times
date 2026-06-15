@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-36">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-37">
     <style>
         .social-follow {
             display: none !important;
@@ -101,21 +101,24 @@
             }
 
             .reader-toolbar .social-button {
-                align-self: stretch !important;
-                min-height: 42px !important;
-                height: 42px !important;
-                margin: 0 !important;
-                border-radius: 0 !important;
-                font-size: 15px !important;
+                align-self: center !important;
+                flex: 0 0 34px !important;
+                width: 28px !important;
+                min-width: 28px !important;
+                min-height: 28px !important;
+                height: 28px !important;
+                margin: 7px 3px !important;
+                border-radius: 50% !important;
+                font-size: 14px !important;
             }
 
             .reader-toolbar .facebook,
             .reader-toolbar .x,
             .reader-toolbar .profile {
-                width: 36px !important;
-                min-width: 36px !important;
-                margin: 0 !important;
-                border-radius: 0 !important;
+                width: 28px !important;
+                min-width: 28px !important;
+                margin: 7px 3px !important;
+                border-radius: 50% !important;
             }
 
             .tool-button span:last-child,
@@ -159,12 +162,12 @@
 
             .bottom-pager {
                 display: grid !important;
-                grid-template-columns: 36px 30px 80px 30px !important;
+                grid-template-columns: 36px 30px 108px 30px !important;
                 align-items: stretch !important;
                 justify-content: center !important;
                 position: static !important;
                 left: auto !important;
-                width: min(260px, calc(100vw - 48px)) !important;
+                width: min(288px, calc(100vw - 48px)) !important;
                 height: 36px !important;
                 min-height: 36px !important;
                 margin: 3px auto 0 !important;
@@ -221,10 +224,11 @@
 
             .page-select {
                 grid-column: 3 !important;
-                min-width: 80px !important;
-                padding: 0 4px !important;
+                min-width: 108px !important;
+                padding: 0 6px !important;
                 font-size: 12px !important;
-                gap: 4px !important;
+                gap: 5px !important;
+                white-space: nowrap !important;
             }
 
             .pager-command {
@@ -413,7 +417,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-36"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-37"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
