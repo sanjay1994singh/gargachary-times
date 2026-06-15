@@ -1119,6 +1119,13 @@ body.is-reader-mobile .bottom-pager .page-select {
     line-height: 1;
 }
 
+body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"],
+body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
+    display: block !important;
+    width: 34px;
+    flex: 0 0 34px;
+}
+
 body.is-reader-mobile .calendar-icon,
 body.is-reader-mobile .magnifier,
 body.is-reader-mobile .clip-icon,

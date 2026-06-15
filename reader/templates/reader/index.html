@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-21">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-22">
     <style>
         .social-follow {
             display: none !important;
@@ -145,6 +145,13 @@
                 height: 36px !important;
                 min-height: 36px !important;
                 line-height: 1 !important;
+            }
+
+            .bottom-pager button.pager-icon[data-action="previous"],
+            .bottom-pager button.pager-icon[data-action="next"] {
+                display: block !important;
+                width: 34px !important;
+                flex: 0 0 34px !important;
             }
 
             .calendar-icon,
@@ -337,7 +344,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-21"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-22"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
