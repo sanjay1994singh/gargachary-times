@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-12">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-13">
     <style>
         .social-follow {
             display: none !important;
@@ -63,14 +63,12 @@
             }
 
             .page-stage {
-                flex: 1 1 auto !important;
                 display: grid !important;
                 place-items: center !important;
                 width: 100vw !important;
-                min-height: 0 !important;
                 padding: 0 10px !important;
                 overflow-x: hidden !important;
-                overflow-y: hidden !important;
+                overflow-y: visible !important;
                 touch-action: pan-y !important;
             }
 
@@ -78,30 +76,27 @@
                 display: grid !important;
                 place-items: center !important;
                 width: 100% !important;
-                height: 100% !important;
+                height: auto !important;
                 min-width: 0 !important;
             }
 
             .paper-frame img {
-                width: auto !important;
+                width: 100% !important;
                 max-width: 100% !important;
-                height: 100% !important;
-                max-height: 100% !important;
+                height: auto !important;
+                max-height: none !important;
                 min-width: 0 !important;
-                object-fit: contain !important;
             }
 
             .reader-shell {
-                display: flex !important;
-                flex-direction: column !important;
-                height: var(--reader-mobile-shell-height, calc(100dvh - 170px)) !important;
+                display: block !important;
+                height: auto !important;
                 min-height: 0 !important;
                 padding: 8px 0 0 !important;
-                overflow: hidden !important;
+                overflow: visible !important;
             }
 
             .bottom-pager {
-                flex: 0 0 58px !important;
                 position: static !important;
                 left: auto !important;
                 width: calc(100vw - 16px) !important;
@@ -280,7 +275,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-12"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-13"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {

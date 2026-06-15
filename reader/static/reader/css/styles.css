@@ -1037,12 +1037,11 @@ body.is-reader-mobile .bottom-pager [data-action="last"] {
 }
 
 body.is-reader-mobile .reader-shell {
-    display: flex;
-    flex-direction: column;
-    height: var(--reader-mobile-shell-height, calc(100dvh - 170px));
+    display: block;
+    height: auto;
     min-height: 0;
     padding: 8px 0 0;
-    overflow: hidden;
+    overflow: visible;
 }
 
 body.is-reader-mobile .reader-toolbar .date-button,
@@ -1076,14 +1075,12 @@ body.is-reader-mobile .tool-button span:last-child {
 }
 
 body.is-reader-mobile .page-stage {
-    flex: 1 1 auto;
     display: grid;
     place-items: center;
     width: 100vw;
-    min-height: 0;
     padding: 0 10px;
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: visible;
     touch-action: pan-y;
 }
 
@@ -1091,21 +1088,19 @@ body.is-reader-mobile .paper-frame {
     display: grid;
     place-items: center;
     width: 100%;
-    height: 100%;
+    height: auto;
     min-width: 0;
 }
 
 body.is-reader-mobile .paper-frame img {
-    width: auto;
+    width: 100%;
     max-width: 100%;
-    height: 100%;
-    max-height: 100%;
+    height: auto;
+    max-height: none;
     min-width: 0;
-    object-fit: contain;
 }
 
 body.is-reader-mobile .bottom-pager {
-    flex: 0 0 58px;
     position: static;
     left: auto;
     width: calc(100vw - 16px);
