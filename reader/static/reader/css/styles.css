@@ -1041,7 +1041,7 @@ body.is-reader-mobile .reader-shell {
     flex-direction: column;
     height: var(--reader-mobile-shell-height, calc(100dvh - 170px));
     min-height: 0;
-    padding: 10px 0 8px;
+    padding: 8px 0 0;
     overflow: hidden;
 }
 
@@ -1110,6 +1110,6 @@ body.is-reader-mobile .bottom-pager {
     left: auto;
     width: calc(100vw - 16px);
     height: 58px;
-    margin: 12px auto 0;
+    margin: 6px auto 0;
     transform: none;
 }
