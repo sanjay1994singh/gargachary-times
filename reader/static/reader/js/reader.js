@@ -31,7 +31,7 @@
             const shell = document.querySelector(".reader-shell");
             if (shell) {
                 const top = shell.getBoundingClientRect().top;
-                const height = Math.max(360, window.innerHeight - top - 8);
+                const height = Math.max(360, window.innerHeight - top);
                 document.documentElement.style.setProperty("--reader-mobile-shell-height", `${height}px`);
             }
         } else {
