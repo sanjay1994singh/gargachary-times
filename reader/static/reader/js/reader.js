@@ -26,6 +26,17 @@
         const isMobileReader = window.matchMedia("(max-width: 900px)").matches
             || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
         document.body.classList.toggle("is-reader-mobile", isMobileReader);
+
+        if (isMobileReader) {
+            const shell = document.querySelector(".reader-shell");
+            if (shell) {
+                const top = shell.getBoundingClientRect().top;
+                const height = Math.max(360, window.innerHeight - top - 8);
+                document.documentElement.style.setProperty("--reader-mobile-shell-height", `${height}px`);
+            }
+        } else {
+            document.documentElement.style.removeProperty("--reader-mobile-shell-height");
+        }
     }
 
     syncReaderMobileMode();
