@@ -1018,8 +1018,8 @@ button {
 body.is-reader-mobile .reader-toolbar {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: 54px;
-    min-height: 54px;
+    grid-auto-rows: 42px;
+    min-height: 42px;
 }
 
 body.is-reader-mobile .reader-toolbar .menu-button,
@@ -1040,7 +1040,7 @@ body.is-reader-mobile .reader-shell {
     display: block;
     height: auto;
     min-height: 0;
-    padding: 8px 0 0;
+    padding: 4px 0 0;
     overflow: visible;
 }
 
@@ -1050,7 +1050,7 @@ body.is-reader-mobile .toolbar-group [data-action="clip"] {
     display: inline-flex !important;
     min-width: 0;
     width: 100%;
-    min-height: 54px;
+    min-height: 42px;
     padding: 0;
 }
 
@@ -1078,7 +1078,7 @@ body.is-reader-mobile .page-stage {
     display: grid;
     place-items: center;
     width: 100vw;
-    padding: 0 10px;
+    padding: 0 6px;
     overflow-x: hidden;
     overflow-y: visible;
     touch-action: pan-y;
@@ -1103,8 +1103,26 @@ body.is-reader-mobile .paper-frame img {
 body.is-reader-mobile .bottom-pager {
     position: static;
     left: auto;
-    width: calc(100vw - 16px);
-    height: 58px;
-    margin: 6px auto 0;
+    width: calc(100vw - 10px);
+    height: 44px;
+    margin: 4px auto 0;
     transform: none;
+}
+
+body.is-reader-mobile .calendar-icon,
+body.is-reader-mobile .magnifier,
+body.is-reader-mobile .clip-icon,
+body.is-reader-mobile .grid-icon {
+    transform: scale(0.78);
+}
+
+body.is-reader-mobile .page-select {
+    min-width: 96px;
+    padding: 0 6px;
+    font-size: 13px;
+}
+
+body.is-reader-mobile .pager-command {
+    min-width: 42px;
+    padding: 0 10px;
 }
