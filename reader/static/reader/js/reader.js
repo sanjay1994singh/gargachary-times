@@ -41,6 +41,11 @@
 
     syncReaderMobileMode();
     window.addEventListener("resize", syncReaderMobileMode);
+    window.addEventListener("orientationchange", () => {
+        window.setTimeout(syncReaderMobileMode, 250);
+    });
+    window.addEventListener("load", syncReaderMobileMode);
+    paperImage?.addEventListener("load", syncReaderMobileMode);
 
     function showToast(message) {
         toast.textContent = message;
