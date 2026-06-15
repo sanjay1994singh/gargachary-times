@@ -22,6 +22,15 @@
     let swipeStart = null;
     let croppedImageUrl = "";
 
+    function syncReaderMobileMode() {
+        const isMobileReader = window.matchMedia("(max-width: 900px)").matches
+            || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+        document.body.classList.toggle("is-reader-mobile", isMobileReader);
+    }
+
+    syncReaderMobileMode();
+    window.addEventListener("resize", syncReaderMobileMode);
+
     function showToast(message) {
         toast.textContent = message;
         toast.hidden = false;

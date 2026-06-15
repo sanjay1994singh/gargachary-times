@@ -1014,3 +1014,81 @@ button {
         margin: 12px auto 0;
     }
 }
+
+body.is-reader-mobile .reader-toolbar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 54px;
+    min-height: 54px;
+}
+
+body.is-reader-mobile .reader-toolbar .menu-button,
+body.is-reader-mobile .reader-toolbar > .select-block,
+body.is-reader-mobile .reader-toolbar .share-actions,
+body.is-reader-mobile .toolbar-group .icon-button,
+body.is-reader-mobile .toolbar-group .tool-button,
+body.is-reader-mobile .reader-shell .side-nav,
+body.is-reader-mobile .bottom-pager .pager-icon,
+body.is-reader-mobile .bottom-pager [data-action="first"],
+body.is-reader-mobile .bottom-pager [data-action="previous"],
+body.is-reader-mobile .bottom-pager [data-action="next"],
+body.is-reader-mobile .bottom-pager [data-action="last"] {
+    display: none !important;
+}
+
+body.is-reader-mobile .reader-shell {
+    min-height: calc(100vh - 54px);
+    padding: 12px 0 18px;
+}
+
+body.is-reader-mobile .reader-toolbar .date-button,
+body.is-reader-mobile .toolbar-group [data-action="zoom-in"],
+body.is-reader-mobile .toolbar-group [data-action="clip"] {
+    display: inline-flex !important;
+    min-width: 0;
+    width: 100%;
+    min-height: 54px;
+    padding: 0;
+}
+
+body.is-reader-mobile .reader-toolbar .date-button {
+    order: 1;
+}
+
+body.is-reader-mobile .reader-toolbar .toolbar-group {
+    display: contents;
+}
+
+body.is-reader-mobile .toolbar-group [data-action="zoom-in"] {
+    order: 2;
+}
+
+body.is-reader-mobile .toolbar-group [data-action="clip"] {
+    order: 3;
+}
+
+body.is-reader-mobile .tool-button span:last-child {
+    display: none;
+}
+
+body.is-reader-mobile .page-stage {
+    width: 100vw;
+    padding: 0 10px;
+    overflow-x: hidden;
+    touch-action: pan-y;
+}
+
+body.is-reader-mobile .paper-frame,
+body.is-reader-mobile .paper-frame img {
+    width: 100%;
+    min-width: 0;
+}
+
+body.is-reader-mobile .bottom-pager {
+    position: static;
+    left: auto;
+    width: calc(100vw - 16px);
+    height: 58px;
+    margin: 12px auto 0;
+    transform: none;
+}
