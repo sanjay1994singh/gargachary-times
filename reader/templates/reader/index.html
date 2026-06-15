@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-38">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-39">
     <style>
         .social-follow {
             display: none !important;
@@ -46,6 +46,7 @@
             .reader-toolbar {
                 display: flex !important;
                 align-items: stretch !important;
+                justify-content: space-evenly !important;
                 min-height: 42px !important;
                 overflow-x: auto !important;
                 overflow-y: hidden !important;
@@ -75,16 +76,18 @@
             .toolbar-group [data-action="clip"],
             .reader-toolbar .share-actions .social-button {
                 display: inline-flex !important;
-                flex: 0 0 36px !important;
+                flex: 1 0 38px !important;
                 min-width: 0 !important;
-                width: 36px !important;
+                width: auto !important;
+                max-width: 54px !important;
                 min-height: 42px !important;
                 padding: 0 !important;
             }
 
             .reader-toolbar .toolbar-group {
                 display: flex !important;
-                flex: 0 0 auto !important;
+                flex: 1 1 auto !important;
+                justify-content: space-evenly !important;
                 order: 2 !important;
             }
 
@@ -417,7 +420,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-38"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-39"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
