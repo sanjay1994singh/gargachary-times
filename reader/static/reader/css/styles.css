@@ -1122,8 +1122,8 @@ body.is-reader-mobile .bottom-pager .page-select {
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"],
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
     display: block !important;
-    width: 34px;
-    flex: 0 0 34px;
+    width: 26px;
+    flex: 0 0 26px;
 }
 
 body.is-reader-mobile .calendar-icon,
@@ -1134,10 +1134,10 @@ body.is-reader-mobile .grid-icon {
 }
 
 body.is-reader-mobile .page-select {
-    min-width: 84px;
-    padding: 0 4px;
+    min-width: 72px;
+    padding: 0 2px;
     font-size: 12px;
-    gap: 4px;
+    gap: 3px;
 }
 
 body.is-reader-mobile .pager-command {
