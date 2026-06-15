@@ -34,10 +34,21 @@
                 const viewportHeight = window.visualViewport?.height || window.innerHeight;
                 const bottomReserve = 12;
                 const height = Math.max(260, viewportHeight - top - bottomReserve);
+                const pagerHeight = document.querySelector(".bottom-pager")?.getBoundingClientRect().height || 36;
+                const imageRatio = paperImage?.naturalWidth && paperImage?.naturalHeight
+                    ? paperImage.naturalWidth / paperImage.naturalHeight
+                    : 0.64;
+                const availableImageHeight = Math.max(260, height - pagerHeight - 8);
+                const maxWidthByHeight = availableImageHeight * imageRatio;
+                const maxWidthByScreen = window.innerWidth * 0.9;
+                const pageWidth = Math.max(240, Math.min(maxWidthByScreen, maxWidthByHeight));
+
                 document.documentElement.style.setProperty("--reader-mobile-shell-height", `${height}px`);
+                document.documentElement.style.setProperty("--reader-mobile-page-width", `${pageWidth}px`);
             }
         } else {
             document.documentElement.style.removeProperty("--reader-mobile-shell-height");
+            document.documentElement.style.removeProperty("--reader-mobile-page-width");
         }
     }
 
