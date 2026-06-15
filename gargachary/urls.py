@@ -17,6 +17,8 @@ urlpatterns = [
     path('subscriptions/', include('subscriptions.urls')),
     path('auth/', include('social_django.urls', namespace='social')),
 
+    path('reader/', include("reader.urls")),
+
     path(
         'logout/',
         views.logout_view,

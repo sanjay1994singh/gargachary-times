@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}">
+{% endblock css %}
+
+{% block content %}
+    <header class="reader-toolbar" aria-label="E-paper toolbar">
+        <button class="icon-button menu-button" type="button" data-action="menu" aria-label="Open menu">
+            <span></span><span></span><span></span>
+        </button>
+
+        <label class="select-block select-block--edition">
+            <span class="sr-only">Edition</span>
+            <select id="editionSelect" onchange="if (this.value) window.location.href = this.value">
+                {% for item in edition_list %}
+                    <option value="{% url 'reader:edition' item.pk %}" {% if edition.pk == item.pk %}selected{% endif %}>
+                        {{ item.city }}
+                    </option>
+                {% empty %}
+                    {% for edition_name in editions %}
+                        <option>{{ edition_name }}</option>
+                    {% endfor %}
+                {% endfor %}
+            </select>
+        </label>
+
+        <label class="select-block">
+            <span class="sr-only">Section</span>
+            <select id="sectionSelect">
+                {% for section in sections %}
+                    <option>{{ section }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label class="date-button" data-action="date" aria-label="Choose edition date">
+            <span>{{ edition_date }}</span>
+            <span class="calendar-icon" aria-hidden="true"></span>
+            <input
+                id="editionDatePicker"
+                class="date-input"
+                type="date"
+                value="{{ current_date_iso }}"
+                data-city="{{ current_city }}"
+                data-section="{{ current_section }}"
+                aria-label="Choose edition date"
+            >
+        </label>
+
+        <div class="toolbar-group" aria-label="View controls">
+            <button class="tool-button" type="button" data-action="zoom-in" aria-label="Zoom in">
+                <span class="magnifier plus" aria-hidden="true"></span>
+                <span>Zoom</span>
+            </button>
+            <button class="icon-button" type="button" data-action="zoom-out" aria-label="Zoom out">
+                <span class="magnifier minus" aria-hidden="true"></span>
+            </button>
+            <button class="icon-button" type="button" data-action="fit" aria-label="Fit page">
+                <span class="fit-icon" aria-hidden="true"></span>
+            </button>
+            <button class="icon-button" type="button" data-action="bookmark" aria-label="Bookmark page">
+                <span class="bookmark-icon" aria-hidden="true"></span>
+            </button>
+            <button class="tool-button" type="button" data-action="clip" aria-label="Clip article">
+                <span class="clip-icon" aria-hidden="true"></span>
+                <span>Clip</span>
+            </button>
+        </div>
+
+        <div class="share-actions" aria-label="Share">
+            <button class="social-button facebook" type="button" data-action="share-facebook" aria-label="Share on Facebook">f</button>
+            <button class="social-button x" type="button" data-action="share-x" aria-label="Share on X">X</button>
+            <button class="social-button profile" type="button" data-action="copy-link" aria-label="Copy reader link">I</button>
+        </div>
+    </header>
+
+    <div class="reader-shell">
+        <button class="side-nav side-nav--prev" type="button" data-action="previous" aria-label="Previous page">
+            <span aria-hidden="true"></span>
+        </button>
+        <button class="side-nav side-nav--next" type="button" data-action="next" aria-label="Next page">
+            <span aria-hidden="true"></span>
+        </button>
+
+        <section class="page-stage" aria-label="Newspaper page viewer">
+            <div class="paper-frame" id="paperFrame">
+                {% if initial_page %}
+                    <img id="paperImage" src="{{ initial_page.image }}" alt="{{ initial_page.title }} newspaper page">
+                    <div class="clip-box" id="clipBox" hidden></div>
+                {% else %}
+                    <div class="empty-reader">
+                        <h1>No e-paper available</h1>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <nav class="bottom-pager" aria-label="Page navigation">
+            <button type="button" class="pager-command" data-action="pages">
+                <span class="grid-icon" aria-hidden="true"></span>
+                <span>View All Pages</span>
+            </button>
+            <button type="button" class="pager-icon" data-action="first" aria-label="First page"></button>
+            <button type="button" class="pager-icon pager-icon--prev" data-action="previous" aria-label="Previous page"></button>
+            <label class="page-select">
+                <span>Page</span>
+                <select id="pageSelect">
+                    {% for page in pages %}
+                        <option value="{{ forloop.counter0 }}" {% if page.number == current_page %}selected{% endif %}>
+                            {{ page.number|stringformat:"02d" }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <span>of {{ pages|length }}</span>
+            </label>
+            <button type="button" class="pager-icon pager-icon--next" data-action="next" aria-label="Next page"></button>
+            <button type="button" class="pager-icon pager-icon--last" data-action="last" aria-label="Last page"></button>
+        </nav>
+    </div>
+
+    <aside class="pages-drawer" id="pagesDrawer" aria-label="All pages" hidden>
+        <div class="drawer-header">
+            <h2>All Pages</h2>
+            <button type="button" class="icon-button" data-action="close-pages" aria-label="Close pages">x</button>
+        </div>
+        <div class="thumbnail-grid">
+            {% for page in pages %}
+                <button class="thumbnail" type="button" data-page="{{ forloop.counter0 }}">
+                    <img src="{{ page.image }}" alt="{{ page.title }} thumbnail">
+                    <span>{{ page.title }}</span>
+                </button>
+            {% endfor %}
+        </div>
+    </aside>
+
+    <aside class="utility-drawer" id="utilityDrawer" aria-label="Reader menu" hidden>
+        <div class="drawer-header">
+            <h2>Reader Tools</h2>
+            <button type="button" class="icon-button" data-action="close-menu" aria-label="Close menu">x</button>
+        </div>
+        <dl class="edition-summary">
+            <div>
+                <dt>Edition</dt>
+                <dd>{% if edition %}{{ edition.city }}{% else %}Demo edition{% endif %}</dd>
+            </div>
+            <div>
+                <dt>Section</dt>
+                <dd>{% if edition %}{{ edition.section }}{% else %}Main{% endif %}</dd>
+            </div>
+            <div>
+                <dt>Date</dt>
+                <dd>{{ edition_date }}</dd>
+            </div>
+        </dl>
+        <div class="bookmark-list" id="bookmarkList">
+            <h3>Bookmarks</h3>
+            <p>No bookmarked pages yet.</p>
+        </div>
+    </aside>
+
+    <div class="reader-toast" id="readerToast" role="status" aria-live="polite" hidden></div>
+
+    {{ pages|json_script:"pagesData" }}
+    {{ editions_meta|json_script:"editionsData" }}
+{% endblock content %}
+
+{% block js %}
+    <script src="{% static '/reader/js/reader.js' %}"></script>
+{% endblock js %}

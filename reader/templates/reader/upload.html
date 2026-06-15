@@ -1,0 +1,62 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Upload E-Paper PDF</title>
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}">
+</head>
+<body class="upload-page">
+    <main class="upload-shell">
+        <section class="upload-panel">
+            <div class="upload-heading">
+                <a href="{% url 'reader:home' %}">Back to reader</a>
+                <h1>Upload E-Paper PDF</h1>
+            </div>
+
+            {% if messages %}
+                <div class="message-list">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="upload-form">
+                {% csrf_token %}
+
+                <label>
+                    <span>City</span>
+                    {{ form.city }}
+                    {{ form.city.errors }}
+                </label>
+
+                <label>
+                    <span>Section</span>
+                    {{ form.section }}
+                    {{ form.section.errors }}
+                </label>
+
+                <label>
+                    <span>Publish date</span>
+                    {{ form.publish_date }}
+                    {{ form.publish_date.errors }}
+                </label>
+
+                <label>
+                    <span>PDF file</span>
+                    {{ form.pdf }}
+                    {{ form.pdf.errors }}
+                </label>
+
+                {% if form.non_field_errors %}
+                    <div class="form-errors">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                <button type="submit">Upload and Convert</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
