@@ -23,6 +23,8 @@
     let pinchStartDistance = 0;
     let pinchStartZoom = 1;
     let isPinching = false;
+    let isPointerPinching = false;
+    const activePointers = new Map();
     let croppedImageUrl = "";
 
     function syncReaderMobileMode() {
@@ -157,9 +159,7 @@
     }
 
     function toggleClipMode(button) {
-        clipMode = !clipMode;
-        document.body.classList.toggle("clip-mode", clipMode);
-        button?.classList.toggle("is-active-tool", clipMode);
+        setClipMode(!clipMode);
         hideClipBox();
         showToast(clipMode ? "Drag on the page to crop" : "Crop mode off");
     }
@@ -499,35 +499,102 @@
         return Math.hypot(first.clientX - second.clientX, first.clientY - second.clientY);
     }
 
+    function pointerDistance() {
+        const pointers = Array.from(activePointers.values());
+        if (pointers.length < 2) {
+            return 0;
+        }
+
+        return Math.hypot(
+            pointers[0].clientX - pointers[1].clientX,
+            pointers[0].clientY - pointers[1].clientY
+        );
+    }
+
     const pageStage = document.querySelector(".page-stage");
     const readerShell = document.querySelector(".reader-shell");
     const swipeArea = readerShell || pageStage;
     if (swipeArea) {
         swipeArea.addEventListener("pointerdown", (event) => {
-            if (clipMode || isPinching || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
+            if (clipMode || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
                 return;
             }
 
-            swipeStart = {
-                x: event.clientX,
-                y: event.clientY,
-                time: Date.now(),
-            };
+            event.preventDefault();
+            activePointers.set(event.pointerId, {
+                clientX: event.clientX,
+                clientY: event.clientY,
+            });
+            swipeArea.setPointerCapture?.(event.pointerId);
+
+            if (activePointers.size === 2) {
+                isPointerPinching = true;
+                isPinching = true;
+                swipeStart = null;
+                pinchStartDistance = pointerDistance();
+                pinchStartZoom = zoom;
+                return;
+            }
+
+            if (activePointers.size === 1 && !isPointerPinching) {
+                swipeStart = {
+                    x: event.clientX,
+                    y: event.clientY,
+                    time: Date.now(),
+                };
+            }
+        });
+
+        swipeArea.addEventListener("pointermove", (event) => {
+            if (event.pointerType !== "touch" || !activePointers.has(event.pointerId)) {
+                return;
+            }
+
+            activePointers.set(event.pointerId, {
+                clientX: event.clientX,
+                clientY: event.clientY,
+            });
+
+            if (!isPointerPinching || activePointers.size < 2 || pinchStartDistance <= 0) {
+                return;
+            }
+
+            event.preventDefault();
+            const nextZoom = pinchStartZoom * (pointerDistance() / pinchStartDistance);
+            setZoom(nextZoom, false);
         });
 
         swipeArea.addEventListener("pointerup", (event) => {
             if (isPinching || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
+                activePointers.delete(event.pointerId);
+                if (activePointers.size < 2 && isPointerPinching) {
+                    isPinching = false;
+                    isPointerPinching = false;
+                    pinchStartDistance = 0;
+                    showToast(`Zoom ${Math.round(zoom * 100)}%`);
+                }
                 return;
             }
 
             handleSwipe(event.clientX, event.clientY, Date.now() - (swipeStart?.time || Date.now()));
+            activePointers.delete(event.pointerId);
         });
 
-        swipeArea.addEventListener("pointercancel", () => {
+        swipeArea.addEventListener("pointercancel", (event) => {
+            activePointers.delete(event.pointerId);
             swipeStart = null;
+            if (activePointers.size < 2) {
+                isPinching = false;
+                isPointerPinching = false;
+                pinchStartDistance = 0;
+            }
         });
 
         swipeArea.addEventListener("touchstart", (event) => {
+            if (activePointers.size > 0) {
+                return;
+            }
+
             if (clipMode || shouldIgnoreSwipeTarget(event.target)) {
                 swipeStart = null;
                 return;
@@ -556,6 +623,10 @@
         }, { passive: false });
 
         swipeArea.addEventListener("touchmove", (event) => {
+            if (activePointers.size > 0) {
+                return;
+            }
+
             if (!isPinching || event.touches.length !== 2 || pinchStartDistance <= 0) {
                 return;
             }
@@ -566,6 +637,10 @@
         }, { passive: false });
 
         swipeArea.addEventListener("touchend", (event) => {
+            if (activePointers.size > 0) {
+                return;
+            }
+
             if (isPinching) {
                 if (event.touches.length < 2) {
                     isPinching = false;

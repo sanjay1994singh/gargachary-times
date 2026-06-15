@@ -1104,7 +1104,7 @@ body.is-reader-mobile .paper-frame img {
 
 body.is-reader-mobile .bottom-pager {
     display: grid;
-    grid-template-columns: 36px 1fr 30px auto 30px 1fr;
+    grid-template-columns: 36px 1fr 30px auto 30px 1fr 36px;
     align-items: stretch;
     position: static;
     left: auto;
@@ -1120,6 +1120,19 @@ body.is-reader-mobile .bottom-pager .page-select {
     height: 36px;
     min-height: 36px;
     line-height: 1;
+}
+
+body.is-reader-mobile .bottom-pager .pager-crop {
+    grid-column: 7;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    min-width: 36px;
+    padding: 0;
+    color: #fff;
+    background: transparent;
+    border-left: 1px solid var(--control-border);
 }
 
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"],

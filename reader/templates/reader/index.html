@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-28">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-29">
     <style>
         .social-follow {
             display: none !important;
@@ -132,7 +132,7 @@
 
             .bottom-pager {
                 display: grid !important;
-                grid-template-columns: 36px 1fr 30px auto 30px 1fr !important;
+                grid-template-columns: 36px 1fr 30px auto 30px 1fr 36px !important;
                 align-items: stretch !important;
                 position: static !important;
                 left: auto !important;
@@ -148,6 +148,19 @@
                 height: 36px !important;
                 min-height: 36px !important;
                 line-height: 1 !important;
+            }
+
+            .bottom-pager .pager-crop {
+                grid-column: 7 !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 36px !important;
+                min-width: 36px !important;
+                padding: 0 !important;
+                color: #fff !important;
+                background: transparent !important;
+                border-left: 1px solid var(--control-border) !important;
             }
 
             .bottom-pager button.pager-icon[data-action="previous"],
@@ -296,6 +309,9 @@
             </label>
             <button type="button" class="pager-icon pager-icon--next" data-action="next" aria-label="Next page"></button>
             <button type="button" class="pager-icon pager-icon--last" data-action="last" aria-label="Last page"></button>
+            <button type="button" class="pager-crop" data-action="clip" aria-label="Crop image">
+                <span class="clip-icon" aria-hidden="true"></span>
+            </button>
         </nav>
     </div>
 
@@ -359,7 +375,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-28"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-29"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
