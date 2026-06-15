@@ -1103,6 +1103,9 @@ body.is-reader-mobile .paper-frame img {
 }
 
 body.is-reader-mobile .bottom-pager {
+    display: grid;
+    grid-template-columns: 36px 1fr 22px auto 22px 1fr;
+    align-items: stretch;
     position: static;
     left: auto;
     width: min(340px, calc(100vw - 48px));
@@ -1110,7 +1113,6 @@ body.is-reader-mobile .bottom-pager {
     min-height: 36px;
     margin: 3px auto 0;
     transform: none;
-    justify-content: center;
 }
 
 body.is-reader-mobile .bottom-pager button,
@@ -1124,8 +1126,16 @@ body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"],
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
     display: block !important;
     width: 22px;
-    flex: 0 0 22px;
-    margin: 0 -2px;
+    min-width: 22px;
+    margin: 0;
+}
+
+body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"] {
+    grid-column: 3;
+}
+
+body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
+    grid-column: 5;
 }
 
 body.is-reader-mobile .calendar-icon,
@@ -1136,7 +1146,7 @@ body.is-reader-mobile .grid-icon {
 }
 
 body.is-reader-mobile .page-select {
-    flex: 0 0 auto;
+    grid-column: 4;
     min-width: 66px;
     padding: 0 1px;
     font-size: 12px;
@@ -1144,8 +1154,8 @@ body.is-reader-mobile .page-select {
 }
 
 body.is-reader-mobile .pager-command {
-    position: absolute;
-    left: 0;
+    grid-column: 1;
+    position: static;
     min-width: 36px;
     padding: 0 7px;
 }
