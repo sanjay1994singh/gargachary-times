@@ -31,7 +31,8 @@
             const shell = document.querySelector(".reader-shell");
             if (shell) {
                 const top = shell.getBoundingClientRect().top;
-                const height = Math.max(360, window.innerHeight - top);
+                const viewportHeight = window.visualViewport?.height || window.innerHeight;
+                const height = Math.max(260, viewportHeight - top);
                 document.documentElement.style.setProperty("--reader-mobile-shell-height", `${height}px`);
             }
         } else {
@@ -45,6 +46,7 @@
         window.setTimeout(syncReaderMobileMode, 250);
     });
     window.addEventListener("load", syncReaderMobileMode);
+    window.visualViewport?.addEventListener("resize", syncReaderMobileMode);
     paperImage?.addEventListener("load", syncReaderMobileMode);
 
     function showToast(message) {
