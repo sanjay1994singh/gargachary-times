@@ -849,7 +849,7 @@ button {
 
     .reader-shell {
         min-height: calc(100vh - 104px);
-        padding: 12px 0 88px;
+        padding: 12px 0 18px;
     }
 
     .icon-button,
@@ -943,9 +943,12 @@ button {
     }
 
     .bottom-pager {
+        position: static;
+        left: auto;
+        transform: none;
         width: calc(100vw - 16px);
         height: 58px;
-        bottom: 12px;
+        margin: 12px auto 0;
     }
 
     .pager-command {
@@ -999,8 +1002,16 @@ button {
 }
 
 @media (max-width: 900px) {
+    .reader-toolbar .menu-button,
     .reader-shell .side-nav,
     .bottom-pager .pager-icon {
         display: none !important;
+    }
+
+    .bottom-pager {
+        position: static;
+        left: auto;
+        transform: none;
+        margin: 12px auto 0;
     }
 }
