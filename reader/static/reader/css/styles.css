@@ -1110,6 +1110,7 @@ body.is-reader-mobile .bottom-pager {
     min-height: 36px;
     margin: 3px auto 0;
     transform: none;
+    justify-content: center;
 }
 
 body.is-reader-mobile .bottom-pager button,
@@ -1122,8 +1123,9 @@ body.is-reader-mobile .bottom-pager .page-select {
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"],
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
     display: block !important;
-    width: 26px;
-    flex: 0 0 26px;
+    width: 22px;
+    flex: 0 0 22px;
+    margin: 0 -2px;
 }
 
 body.is-reader-mobile .calendar-icon,
@@ -1134,13 +1136,16 @@ body.is-reader-mobile .grid-icon {
 }
 
 body.is-reader-mobile .page-select {
-    min-width: 72px;
-    padding: 0 2px;
+    flex: 0 0 auto;
+    min-width: 66px;
+    padding: 0 1px;
     font-size: 12px;
-    gap: 3px;
+    gap: 2px;
 }
 
 body.is-reader-mobile .pager-command {
+    position: absolute;
+    left: 0;
     min-width: 36px;
     padding: 0 7px;
 }
