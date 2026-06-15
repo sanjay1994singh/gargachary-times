@@ -512,8 +512,7 @@
     }
 
     const pageStage = document.querySelector(".page-stage");
-    const readerShell = document.querySelector(".reader-shell");
-    const swipeArea = readerShell || pageStage;
+    const swipeArea = pageStage;
     if (swipeArea) {
         swipeArea.addEventListener("pointerdown", (event) => {
             if (clipMode || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
