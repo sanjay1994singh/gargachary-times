@@ -1087,7 +1087,7 @@ body.is-reader-mobile .page-stage {
 body.is-reader-mobile .paper-frame {
     display: grid;
     place-items: center;
-    width: 94%;
+    width: 90%;
     margin: 0 auto;
     height: auto;
     min-width: 0;
