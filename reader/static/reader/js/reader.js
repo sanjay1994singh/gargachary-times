@@ -32,7 +32,8 @@
             if (shell) {
                 const top = shell.getBoundingClientRect().top;
                 const viewportHeight = window.visualViewport?.height || window.innerHeight;
-                const height = Math.max(260, viewportHeight - top);
+                const bottomReserve = 12;
+                const height = Math.max(260, viewportHeight - top - bottomReserve);
                 document.documentElement.style.setProperty("--reader-mobile-shell-height", `${height}px`);
             }
         } else {
