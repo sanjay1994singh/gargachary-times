@@ -13,22 +13,22 @@
             Menu
         </button>
 
-<!--        <label class="select-block select-block&#45;&#45;edition">-->
-<!--            <span class="sr-only">Edition</span>-->
-<!--            <select id="editionSelect" onchange="if (this.value) window.location.href = this.value">-->
-<!--                <option value="">Delhi</option>-->
+        <label class="select-block select-block--edition">
+            <span class="sr-only">Edition</span>
+            <select id="editionSelect" onchange="if (this.value) window.location.href = this.value">
+                <option value="">Delhi</option>
 
-<!--            </select>-->
-<!--        </label>-->
+            </select>
+        </label>
 
-<!--        <label class="select-block">-->
-<!--            <span class="sr-only">Section</span>-->
-<!--            <select id="sectionSelect">-->
-<!--                {% for section in sections %}-->
-<!--                    <option>{{ section }}</option>-->
-<!--                {% endfor %}-->
-<!--            </select>-->
-<!--        </label>-->
+        <label class="select-block">
+            <span class="sr-only">Section</span>
+            <select id="sectionSelect">
+                {% for section in sections %}
+                    <option>{{ section }}</option>
+                {% endfor %}
+            </select>
+        </label>
 
         <label class="date-button" data-action="date" aria-label="Choose edition date">
             <span>{{ edition_date }}</span>
