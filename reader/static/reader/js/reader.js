@@ -415,6 +415,11 @@
                 showCropResult(imageUrl);
             }
         });
+
+        paperImage.addEventListener("pointercancel", () => {
+            clipStart = null;
+            hideClipBox();
+        });
     }
 
     const pageStage = document.querySelector(".page-stage");
