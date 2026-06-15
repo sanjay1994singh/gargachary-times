@@ -1105,27 +1105,33 @@ body.is-reader-mobile .paper-frame img {
 }
 
 body.is-reader-mobile .bottom-pager {
-    display: grid;
-    grid-template-columns: 36px 1fr 30px auto 30px 1fr 36px;
+    display: flex;
     align-items: stretch;
     position: static;
     left: auto;
-    width: min(340px, calc(100vw - 48px));
+    width: calc(100vw - 10px);
     height: 36px;
     min-height: 36px;
     margin: 3px auto 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
     transform: none;
+}
+
+body.is-reader-mobile .bottom-pager::-webkit-scrollbar {
+    display: none;
 }
 
 body.is-reader-mobile .bottom-pager button,
 body.is-reader-mobile .bottom-pager .page-select {
+    flex: 0 0 auto;
     height: 36px;
     min-height: 36px;
     line-height: 1;
 }
 
 body.is-reader-mobile .bottom-pager .pager-crop {
-    grid-column: 7;
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
@@ -1137,6 +1143,34 @@ body.is-reader-mobile .bottom-pager .pager-crop {
     border-left: 1px solid var(--control-border);
 }
 
+body.is-reader-mobile .bottom-pager .pager-tool {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    min-width: 36px;
+    padding: 0;
+    color: #fff;
+    background: transparent;
+    border-left: 1px solid var(--control-border);
+    font-weight: 800;
+}
+
+body.is-reader-mobile .bottom-pager .pager-tool--facebook {
+    color: #fff;
+    background: #1877f2;
+}
+
+body.is-reader-mobile .bottom-pager .pager-tool--x {
+    color: #fff;
+    background: #050505;
+}
+
+body.is-reader-mobile .bottom-pager .pager-tool--copy {
+    color: #172225;
+    background: var(--accent);
+}
+
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"],
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
     display: block !important;
@@ -1146,11 +1180,11 @@ body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
 }
 
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"] {
-    grid-column: 3;
+    order: 2;
 }
 
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
-    grid-column: 5;
+    order: 4;
 }
 
 body.is-reader-mobile .calendar-icon,
@@ -1161,7 +1195,8 @@ body.is-reader-mobile .grid-icon {
 }
 
 body.is-reader-mobile .page-select {
-    grid-column: 4;
+    order: 3;
+    flex: 0 0 auto;
     min-width: 76px;
     padding: 0 4px;
     font-size: 12px;
@@ -1169,8 +1204,13 @@ body.is-reader-mobile .page-select {
 }
 
 body.is-reader-mobile .pager-command {
-    grid-column: 1;
+    order: 1;
     position: static;
     min-width: 36px;
     padding: 0 7px;
+}
+
+body.is-reader-mobile .pager-crop,
+body.is-reader-mobile .pager-tool {
+    order: 5;
 }

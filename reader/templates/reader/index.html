@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-31">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-32">
     <style>
         .social-follow {
             display: none !important;
@@ -129,27 +129,33 @@
             }
 
             .bottom-pager {
-                display: grid !important;
-                grid-template-columns: 36px 1fr 30px auto 30px 1fr 36px !important;
+                display: flex !important;
                 align-items: stretch !important;
                 position: static !important;
                 left: auto !important;
-                width: min(340px, calc(100vw - 48px)) !important;
+                width: calc(100vw - 10px) !important;
                 height: 36px !important;
                 min-height: 36px !important;
                 margin: 3px auto 0 !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+                scrollbar-width: none !important;
                 transform: none !important;
+            }
+
+            .bottom-pager::-webkit-scrollbar {
+                display: none !important;
             }
 
             .bottom-pager button,
             .bottom-pager .page-select {
+                flex: 0 0 auto !important;
                 height: 36px !important;
                 min-height: 36px !important;
                 line-height: 1 !important;
             }
 
             .bottom-pager .pager-crop {
-                grid-column: 7 !important;
                 display: inline-flex !important;
                 align-items: center !important;
                 justify-content: center !important;
@@ -161,6 +167,34 @@
                 border-left: 1px solid var(--control-border) !important;
             }
 
+            .bottom-pager .pager-tool {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 36px !important;
+                min-width: 36px !important;
+                padding: 0 !important;
+                color: #fff !important;
+                background: transparent !important;
+                border-left: 1px solid var(--control-border) !important;
+                font-weight: 800 !important;
+            }
+
+            .bottom-pager .pager-tool--facebook {
+                color: #fff !important;
+                background: #1877f2 !important;
+            }
+
+            .bottom-pager .pager-tool--x {
+                color: #fff !important;
+                background: #050505 !important;
+            }
+
+            .bottom-pager .pager-tool--copy {
+                color: #172225 !important;
+                background: var(--accent) !important;
+            }
+
             .bottom-pager button.pager-icon[data-action="previous"],
             .bottom-pager button.pager-icon[data-action="next"] {
                 display: block !important;
@@ -170,11 +204,11 @@
             }
 
             .bottom-pager button.pager-icon[data-action="previous"] {
-                grid-column: 3 !important;
+                order: 2 !important;
             }
 
             .bottom-pager button.pager-icon[data-action="next"] {
-                grid-column: 5 !important;
+                order: 4 !important;
             }
 
             .calendar-icon,
@@ -185,7 +219,8 @@
             }
 
             .page-select {
-                grid-column: 4 !important;
+                order: 3 !important;
+                flex: 0 0 auto !important;
                 min-width: 76px !important;
                 padding: 0 4px !important;
                 font-size: 12px !important;
@@ -193,10 +228,15 @@
             }
 
             .pager-command {
-                grid-column: 1 !important;
+                order: 1 !important;
                 position: static !important;
                 min-width: 36px !important;
                 padding: 0 7px !important;
+            }
+
+            .pager-crop,
+            .pager-tool {
+                order: 5 !important;
             }
         }
     </style>
@@ -310,6 +350,24 @@
             <button type="button" class="pager-crop" data-action="clip" aria-label="Crop image">
                 <span class="clip-icon" aria-hidden="true"></span>
             </button>
+            <button type="button" class="pager-tool pager-tool--date" data-action="date" aria-label="Choose edition date">
+                <span class="calendar-icon" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="pager-tool" data-action="zoom-in" aria-label="Zoom in">
+                <span class="magnifier plus" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="pager-tool" data-action="zoom-out" aria-label="Zoom out">
+                <span class="magnifier minus" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="pager-tool" data-action="fit" aria-label="Fit page">
+                <span class="fit-icon" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="pager-tool" data-action="bookmark" aria-label="Bookmark page">
+                <span class="bookmark-icon" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="pager-tool pager-tool--facebook" data-action="share-facebook" aria-label="Share on Facebook">f</button>
+            <button type="button" class="pager-tool pager-tool--x" data-action="share-x" aria-label="Share on X">X</button>
+            <button type="button" class="pager-tool pager-tool--copy" data-action="copy-link" aria-label="Copy reader link">I</button>
         </nav>
     </div>
 
@@ -373,7 +431,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-31"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-32"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
