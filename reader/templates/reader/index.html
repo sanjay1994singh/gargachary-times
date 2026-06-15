@@ -4,13 +4,45 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-14">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-15">
     <style>
         .social-follow {
             display: none !important;
         }
 
         @media (max-width: 991px) {
+            body > .navbar {
+                min-height: 48px !important;
+                padding-top: 4px !important;
+                padding-bottom: 4px !important;
+            }
+
+            body > .navbar .container {
+                min-height: 40px !important;
+            }
+
+            body > .navbar .navbar-brand {
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                margin-right: 0 !important;
+            }
+
+            body > .navbar .navbar-brand img {
+                height: 34px !important;
+                width: auto !important;
+            }
+
+            body > .navbar .navbar-toggler {
+                padding: 4px 7px !important;
+                min-height: 34px !important;
+                line-height: 1 !important;
+            }
+
+            body > .navbar .navbar-toggler-icon {
+                width: 22px !important;
+                height: 22px !important;
+            }
+
             .reader-toolbar {
                 display: grid !important;
                 grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -294,7 +326,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-14"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-15"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
