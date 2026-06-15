@@ -1105,7 +1105,7 @@ body.is-reader-mobile .paper-frame img {
 body.is-reader-mobile .bottom-pager {
     position: static;
     left: auto;
-    width: calc(100vw - 10px);
+    width: min(340px, calc(100vw - 48px));
     height: 36px;
     min-height: 36px;
     margin: 3px auto 0;
