@@ -452,10 +452,16 @@
         });
     }
 
+    function shouldIgnoreSwipeTarget(target) {
+        return Boolean(target.closest("button, select, input, label, .pages-drawer, .utility-drawer, .crop-result"));
+    }
+
     const pageStage = document.querySelector(".page-stage");
-    if (pageStage) {
-        pageStage.addEventListener("pointerdown", (event) => {
-            if (clipMode || event.pointerType !== "touch") {
+    const readerShell = document.querySelector(".reader-shell");
+    const swipeArea = readerShell || pageStage;
+    if (swipeArea) {
+        swipeArea.addEventListener("pointerdown", (event) => {
+            if (clipMode || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
                 return;
             }
 
@@ -466,20 +472,20 @@
             };
         });
 
-        pageStage.addEventListener("pointerup", (event) => {
-            if (event.pointerType !== "touch") {
+        swipeArea.addEventListener("pointerup", (event) => {
+            if (event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
                 return;
             }
 
             handleSwipe(event.clientX, event.clientY, Date.now() - (swipeStart?.time || Date.now()));
         });
 
-        pageStage.addEventListener("pointercancel", () => {
+        swipeArea.addEventListener("pointercancel", () => {
             swipeStart = null;
         });
 
-        pageStage.addEventListener("touchstart", (event) => {
-            if (clipMode || event.touches.length !== 1) {
+        swipeArea.addEventListener("touchstart", (event) => {
+            if (clipMode || event.touches.length !== 1 || shouldIgnoreSwipeTarget(event.target)) {
                 swipeStart = null;
                 return;
             }
@@ -492,14 +498,16 @@
             };
         }, { passive: true });
 
-        pageStage.addEventListener("touchend", (event) => {
-            if (!swipeStart || clipMode || event.changedTouches.length !== 1) {
+        swipeArea.addEventListener("touchend", (event) => {
+            if (!swipeStart || clipMode || event.changedTouches.length !== 1 || shouldIgnoreSwipeTarget(event.target)) {
                 return;
             }
 
             const touch = event.changedTouches[0];
             handleSwipe(touch.clientX, touch.clientY, Date.now() - swipeStart.time);
         }, { passive: true });
+
+        window.readerSwipeReady = true;
     }
 
     document.addEventListener("keydown", (event) => {
