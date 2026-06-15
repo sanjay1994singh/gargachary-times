@@ -1105,8 +1105,16 @@ body.is-reader-mobile .bottom-pager {
     left: auto;
     width: calc(100vw - 10px);
     height: 36px;
+    min-height: 36px;
     margin: 3px auto 0;
     transform: none;
+}
+
+body.is-reader-mobile .bottom-pager button,
+body.is-reader-mobile .bottom-pager .page-select {
+    height: 36px;
+    min-height: 36px;
+    line-height: 1;
 }
 
 body.is-reader-mobile .calendar-icon,
