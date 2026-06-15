@@ -512,7 +512,7 @@
     }
 
     const pageStage = document.querySelector(".page-stage");
-    const swipeArea = pageStage;
+    const swipeArea = paperFrame;
     if (swipeArea) {
         swipeArea.addEventListener("pointerdown", (event) => {
             if (clipMode || event.pointerType !== "touch" || shouldIgnoreSwipeTarget(event.target)) {
@@ -660,6 +660,18 @@
 
         window.readerSwipeReady = true;
     }
+
+    document.addEventListener("touchmove", (event) => {
+        if (event.touches.length < 2) {
+            return;
+        }
+
+        if (event.target.closest(".paper-frame")) {
+            return;
+        }
+
+        event.preventDefault();
+    }, { passive: false });
 
     document.addEventListener("keydown", (event) => {
         if (event.key === "ArrowLeft") {

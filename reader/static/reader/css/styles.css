@@ -1082,7 +1082,7 @@ body.is-reader-mobile .page-stage {
     padding: 0 6px;
     overflow-x: hidden;
     overflow-y: visible;
-    touch-action: none;
+    touch-action: pan-y;
 }
 
 body.is-reader-mobile .paper-frame {
@@ -1092,6 +1092,7 @@ body.is-reader-mobile .paper-frame {
     margin: 0 auto;
     height: auto;
     min-width: 0;
+    touch-action: none;
 }
 
 body.is-reader-mobile .paper-frame img {
@@ -1100,6 +1101,7 @@ body.is-reader-mobile .paper-frame img {
     height: auto;
     max-height: var(--reader-mobile-page-height, none);
     min-width: 0;
+    touch-action: none;
 }
 
 body.is-reader-mobile .bottom-pager {
