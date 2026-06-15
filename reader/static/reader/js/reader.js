@@ -38,16 +38,18 @@
                 const imageRatio = paperImage?.naturalWidth && paperImage?.naturalHeight
                     ? paperImage.naturalWidth / paperImage.naturalHeight
                     : 0.64;
-                const availableImageHeight = Math.max(260, height - pagerHeight - 8);
+                const availableImageHeight = Math.max(220, height - pagerHeight - 10);
                 const maxWidthByHeight = availableImageHeight * imageRatio;
-                const maxWidthByScreen = window.innerWidth * 0.9;
-                const pageWidth = Math.max(240, Math.min(maxWidthByScreen, maxWidthByHeight));
+                const maxWidthByScreen = window.innerWidth * 0.96;
+                const pageWidth = Math.max(190, Math.min(maxWidthByScreen, maxWidthByHeight));
 
                 document.documentElement.style.setProperty("--reader-mobile-shell-height", `${height}px`);
+                document.documentElement.style.setProperty("--reader-mobile-page-height", `${availableImageHeight}px`);
                 document.documentElement.style.setProperty("--reader-mobile-page-width", `${pageWidth}px`);
             }
         } else {
             document.documentElement.style.removeProperty("--reader-mobile-shell-height");
+            document.documentElement.style.removeProperty("--reader-mobile-page-height");
             document.documentElement.style.removeProperty("--reader-mobile-page-width");
         }
     }

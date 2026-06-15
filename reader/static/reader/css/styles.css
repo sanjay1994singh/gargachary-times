@@ -1078,6 +1078,7 @@ body.is-reader-mobile .page-stage {
     display: grid;
     place-items: center;
     width: 100vw;
+    height: var(--reader-mobile-page-height, auto);
     padding: 0 6px;
     overflow-x: hidden;
     overflow-y: visible;
@@ -1087,17 +1088,17 @@ body.is-reader-mobile .page-stage {
 body.is-reader-mobile .paper-frame {
     display: grid;
     place-items: center;
-    width: min(90vw, var(--reader-mobile-page-width, 90vw));
+    width: min(96vw, var(--reader-mobile-page-width, 90vw));
     margin: 0 auto;
     height: auto;
     min-width: 0;
 }
 
 body.is-reader-mobile .paper-frame img {
-    width: 100%;
+    width: auto;
     max-width: 100%;
     height: auto;
-    max-height: none;
+    max-height: var(--reader-mobile-page-height, none);
     min-width: 0;
 }
 
