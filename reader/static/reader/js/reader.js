@@ -67,6 +67,7 @@
     window.addEventListener("load", syncReaderMobileMode);
     window.visualViewport?.addEventListener("resize", syncReaderMobileMode);
     paperImage?.addEventListener("load", syncReaderMobileMode);
+    document.querySelector(".reader-toolbar")?.scrollTo({ left: 0, top: 0 });
 
     function showToast(message) {
         toast.textContent = message;

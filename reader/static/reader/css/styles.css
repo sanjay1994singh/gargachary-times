@@ -1063,13 +1063,20 @@ body.is-reader-mobile .reader-toolbar .share-actions .social-button {
     padding: 0;
 }
 
+body.is-reader-mobile .reader-toolbar .date-button {
+    order: 1;
+}
+
 body.is-reader-mobile .reader-toolbar .toolbar-group {
     display: flex;
     flex: 0 0 auto;
+    order: 2;
 }
 
 body.is-reader-mobile .reader-toolbar .share-actions {
-    display: contents !important;
+    display: flex !important;
+    flex: 0 0 auto;
+    order: 3;
     width: auto;
     margin: 0;
 }
