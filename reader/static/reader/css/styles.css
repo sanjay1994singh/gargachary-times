@@ -1074,7 +1074,7 @@ body.is-reader-mobile .reader-toolbar .toolbar-group {
 }
 
 body.is-reader-mobile .reader-toolbar .share-actions {
-    display: flex !important;
+    display: none !important;
     flex: 0 0 auto;
     order: 3;
     width: auto;
