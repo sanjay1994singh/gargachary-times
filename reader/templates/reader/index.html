@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-15">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-16">
     <style>
         .social-follow {
             display: none !important;
@@ -132,8 +132,8 @@
                 position: static !important;
                 left: auto !important;
                 width: calc(100vw - 10px) !important;
-                height: 44px !important;
-                margin: 4px auto 0 !important;
+                height: 36px !important;
+                margin: 3px auto 0 !important;
                 transform: none !important;
             }
 
@@ -141,18 +141,19 @@
             .magnifier,
             .clip-icon,
             .grid-icon {
-                transform: scale(0.78) !important;
+                transform: scale(0.68) !important;
             }
 
             .page-select {
-                min-width: 96px !important;
-                padding: 0 6px !important;
-                font-size: 13px !important;
+                min-width: 84px !important;
+                padding: 0 4px !important;
+                font-size: 12px !important;
+                gap: 4px !important;
             }
 
             .pager-command {
-                min-width: 42px !important;
-                padding: 0 10px !important;
+                min-width: 36px !important;
+                padding: 0 7px !important;
             }
         }
     </style>
@@ -326,7 +327,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-15"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-16"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {

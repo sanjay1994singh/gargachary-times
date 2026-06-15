@@ -1104,8 +1104,8 @@ body.is-reader-mobile .bottom-pager {
     position: static;
     left: auto;
     width: calc(100vw - 10px);
-    height: 44px;
-    margin: 4px auto 0;
+    height: 36px;
+    margin: 3px auto 0;
     transform: none;
 }
 
@@ -1113,16 +1113,17 @@ body.is-reader-mobile .calendar-icon,
 body.is-reader-mobile .magnifier,
 body.is-reader-mobile .clip-icon,
 body.is-reader-mobile .grid-icon {
-    transform: scale(0.78);
+    transform: scale(0.68);
 }
 
 body.is-reader-mobile .page-select {
-    min-width: 96px;
-    padding: 0 6px;
-    font-size: 13px;
+    min-width: 84px;
+    padding: 0 4px;
+    font-size: 12px;
+    gap: 4px;
 }
 
 body.is-reader-mobile .pager-command {
-    min-width: 42px;
-    padding: 0 10px;
+    min-width: 36px;
+    padding: 0 7px;
 }
