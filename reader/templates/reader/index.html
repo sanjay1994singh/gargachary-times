@@ -10,21 +10,14 @@
 {% block content %}
     <header class="reader-toolbar" aria-label="E-paper toolbar">
         <button class="icon-button menu-button" type="button" data-action="menu" aria-label="Open menu">
-            <span></span><span></span><span></span>
+            Menu
         </button>
 
         <label class="select-block select-block--edition">
             <span class="sr-only">Edition</span>
             <select id="editionSelect" onchange="if (this.value) window.location.href = this.value">
-                {% for item in edition_list %}
-                    <option value="{% url 'reader:edition' item.pk %}" {% if edition.pk == item.pk %}selected{% endif %}>
-                        {{ item.city }}
-                    </option>
-                {% empty %}
-                    {% for edition_name in editions %}
-                        <option>{{ edition_name }}</option>
-                    {% endfor %}
-                {% endfor %}
+                <option value="">Delhi</option>
+
             </select>
         </label>
 
@@ -169,5 +162,5 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static '/reader/js/reader.js' %}"></script>
+    <script src="{% static 'reader/js/reader.js' %}"></script>
 {% endblock js %}
