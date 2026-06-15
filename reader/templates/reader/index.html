@@ -4,7 +4,7 @@
 {% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-26">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-27">
     <style>
         .social-follow {
             display: none !important;
@@ -132,7 +132,7 @@
 
             .bottom-pager {
                 display: grid !important;
-                grid-template-columns: 36px 1fr 22px auto 22px 1fr !important;
+                grid-template-columns: 36px 1fr 30px auto 30px 1fr !important;
                 align-items: stretch !important;
                 position: static !important;
                 left: auto !important;
@@ -153,8 +153,8 @@
             .bottom-pager button.pager-icon[data-action="previous"],
             .bottom-pager button.pager-icon[data-action="next"] {
                 display: block !important;
-                width: 22px !important;
-                min-width: 22px !important;
+                width: 30px !important;
+                min-width: 30px !important;
                 margin: 0 !important;
             }
 
@@ -175,10 +175,10 @@
 
             .page-select {
                 grid-column: 4 !important;
-                min-width: 66px !important;
-                padding: 0 1px !important;
+                min-width: 76px !important;
+                padding: 0 4px !important;
                 font-size: 12px !important;
-                gap: 2px !important;
+                gap: 4px !important;
             }
 
             .pager-command {
@@ -359,7 +359,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-26"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-27"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {

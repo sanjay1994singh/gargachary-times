@@ -1104,7 +1104,7 @@ body.is-reader-mobile .paper-frame img {
 
 body.is-reader-mobile .bottom-pager {
     display: grid;
-    grid-template-columns: 36px 1fr 22px auto 22px 1fr;
+    grid-template-columns: 36px 1fr 30px auto 30px 1fr;
     align-items: stretch;
     position: static;
     left: auto;
@@ -1125,8 +1125,8 @@ body.is-reader-mobile .bottom-pager .page-select {
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="previous"],
 body.is-reader-mobile .bottom-pager button.pager-icon[data-action="next"] {
     display: block !important;
-    width: 22px;
-    min-width: 22px;
+    width: 30px;
+    min-width: 30px;
     margin: 0;
 }
 
@@ -1147,10 +1147,10 @@ body.is-reader-mobile .grid-icon {
 
 body.is-reader-mobile .page-select {
     grid-column: 4;
-    min-width: 66px;
-    padding: 0 1px;
+    min-width: 76px;
+    padding: 0 4px;
     font-size: 12px;
-    gap: 2px;
+    gap: 4px;
 }
 
 body.is-reader-mobile .pager-command {
