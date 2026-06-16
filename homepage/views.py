@@ -362,49 +362,28 @@ def category_news(request, id):
 
 
 def privacy_policy(request):
-    return render(
-        request,
-        'pages/privacy_policy.html'
-    )
+    return render(request, 'pages/privacy_policy.html')
 
 
 def privacy_app(request):
-    return render(
-        request,
-        'privacy_app.html'
-    )
+    return render(request, 'pages/privacy_app.html')
 
 
 def disclaimer(request):
-    return render(
-        request,
-        'pages/disclaimer.html'
-    )
+    return render(request, 'pages/disclaimer.html')
 
 
 def refund_policy(request):
-    return render(
-        request,
-        'pages/refund_policy.html'
-    )
+    return render(request, 'pages/refund_policy.html')
 
 
 def terms_conditions(request):
-    return render(
-        request,
-        'pages/terms_conditions.html'
-    )
+    return render(request, 'pages/terms_conditions.html')
 
 
 def shipping_policy(request):
-    return render(
-        request,
-        'pages/shipping_policy.html'
-    )
+    return render(request, 'pages/shipping_policy.html')
 
 
 def contact_us(request):
-    return render(
-        request,
-        'pages/contact_us.html'
-    )
+    return render(request, 'pages/contact_us.html')

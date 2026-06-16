@@ -167,7 +167,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                 {% for i in news_col1 %}
                 <li class="mb-3">
                     <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                    <h3><span class="text-danger">{{i.category}}</span></h3>
+                    <p><span class="text-danger">{{i.category}}</span></p>
                 </li>
                 {% endfor %}
             </ul>
@@ -195,7 +195,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                title="{{news_col2.0.title}}">
                 {{news_col2.0.title}}
             </a>
-            <span class="text-danger">{{news_col2.0.category}}</span>
+            <span>{{news_col2.0.category}}</span>
             {% endif %}
             <ul class="custom-list mt-3">
                 {% for i in news_col2|slice:"1:" %}
@@ -204,24 +204,23 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                          width="90" height="60" loading="lazy" decoding="async" alt="">
                     <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                 </li>
-                <h3><span class="text-danger">{{i.category}}</span></h3>
-                {% endfor %}
-
+                <p><span class="text-danger">{{i.category}}</span></p>
             </ul>
+            {% endfor %}
         </div>
 
         <!-- ⚽ Column 3 -->
         <div class="col-md-4 col-sm-6 col-12 order-3 order-md-3">
             <h4 class="heading text-danger">खबरें और भी</h4>
-            <img src="/static/2.png" alt="" class="img-fluid mb-3" loading="lazy" decoding="async">
+            <img src="/static/2.png" alt="" class="img-fluid mb-3" loading="lazy" decoding="async"/>
             <ul class="custom-list">
                 {% for i in news_col3 %}
-                <li class="mb-3 d-flex align-items-center">
-                    <img src="{% if i.featured_image %} {{i.featured_image.url}} {% endif %}" class="me-3 rounded"
-                         width="90" height="60" loading="lazy" decoding="async" alt="">
-                    <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                </li>
-                <h3><span class="text-danger">{{i.category}}</span></h3>
+                    <li class="mb-3 d-flex align-items-center">
+                        <img src="{% if i.featured_image %} {{i.featured_image.url}} {% endif %}" class="me-3 rounded"
+                             width="90" height="60" loading="lazy" decoding="async" alt=""/>
+                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
+                    </li>
+                    <p><span class="text-danger">{{i.category}}</span></p>
                 {% endfor %}
             </ul>
         </div>
@@ -229,86 +228,8 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
     </div>
 </div>
 
-{% if home_videos %}
-<section class="home-video-section">
-    <div class="home-video-header">
-        <h2>Latest Videos</h2>
-        <a href="/video/" class="home-video-link">
-            View all
-            <i class="bi bi-arrow-right"></i>
-        </a>
-    </div>
-
-    <div class="row g-4">
-        {% for video in home_videos %}
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="home-video-card">
-                <a href="{{ video.url }}" target="_blank" rel="noopener" class="home-video-thumb" title="{{ video.title }}">
-                    <img src="{{ video.thumbnail }}" loading="lazy" decoding="async" alt="{{ video.title }}">
-                    <span class="home-video-play" aria-hidden="true">
-                        <i class="bi bi-play-fill"></i>
-                    </span>
-                </a>
-                <div class="home-video-body">
-                    <h3>
-                        <a href="{{ video.url }}" target="_blank" rel="noopener" class="custom-link" title="{{ video.title }}">
-                            {{ video.title }}
-                        </a>
-                    </h3>
-                    <p class="home-video-meta">
-                        YouTube · {{ video.publishedAt|slice:":10" }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</section>
-{% endif %}
-
 
 {% endblock content %}
 
 {% block js %}
-
-<!--<script>-->
-<!--    const channelId = "UC8eaQTAUBKj_OrNmXThrvbQ";-->
-<!--    const fallbackVideoId = "dQw4w9WgXcQ"; // or any YouTube video ID-->
-<!--    const apiKey = "AIzaSyCzsOJL0XQHTuSc7MgiR_HkJeeOrks4UhI";-->
-
-<!--    const player = document.getElementById("player");-->
-<!--    const status = document.getElementById("status");-->
-
-<!--    async function loadStream() {-->
-<!--      try {-->
-<!--        const res = await fetch(-->
-<!--          `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&eventType=live&type=video&key=${apiKey}`-->
-<!--        );-->
-<!--        const data = await res.json();-->
-
-<!--        if (data.items && data.items.length > 0) {-->
-<!--          const liveId = data.items[0].id.videoId;-->
-<!--          player.innerHTML = `-->
-<!--            <iframe src="https://www.youtube.com/embed/${liveId}?autoplay=1&mute=1&playsinline=1"-->
-<!--            allow="autoplay; encrypted-media"-->
-<!--            allowfullscreen></iframe>`;-->
-<!--          status.textContent = "✅ Live Now!";-->
-<!--        } else {-->
-<!--          player.innerHTML = `-->
-<!--            <iframe src="https://www.youtube.com/embed/${fallbackVideoId}?autoplay=0"-->
-<!--            allowfullscreen></iframe>`;-->
-<!--          status.textContent = "⚫ Channel is currently offline.";-->
-<!--        }-->
-<!--      } catch (err) {-->
-<!--        player.innerHTML = `<p style="color:red;">Error loading video. Please check your API key or network.</p>`;-->
-<!--        console.error(err);-->
-<!--      }-->
-<!--    }-->
-
-<!--    loadStream();-->
-<!--</script>-->
-
-<!-- square -->
-
-
 {% endblock js %}
