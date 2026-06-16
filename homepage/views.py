@@ -225,9 +225,9 @@ def get_youtube_videos(max_results=20, video_duration=None):
         snippet = item.get('snippet', {})
         title = snippet.get('title')
         thumbnail = (
-            snippet.get('thumbnails', {}).get('high', {}).get('url')
-            or snippet.get('thumbnails', {}).get('medium', {}).get('url')
-            or snippet.get('thumbnails', {}).get('default', {}).get('url')
+                snippet.get('thumbnails', {}).get('high', {}).get('url')
+                or snippet.get('thumbnails', {}).get('medium', {}).get('url')
+                or snippet.get('thumbnails', {}).get('default', {}).get('url')
         )
         published = snippet.get('publishedAt')
 
@@ -292,12 +292,36 @@ def video(request):
     return render(request, 'video.html', context)
 
 
+# def homepage(request):
+#     all_news = cache.get('homepage_latest_news')
+#
+#     if all_news is None:
+#         all_news = list(News.objects.select_related('category').order_by('-id')[:30])
+#         cache.set('homepage_latest_news', all_news, HOMEPAGE_NEWS_CACHE_SECONDS)
+#
+#     home_videos = get_cached_youtube_videos(max_results=4)
+#
+#     # Split into 3 parts
+#     column_2 = all_news[:8]  # latest 10
+#     column_1 = all_news[10:20]  # next 10
+#     column_3 = all_news[20:30]  # last 10
+#
+#     context = {
+#         'news_col1': column_1,
+#         'news_col2': column_2,
+#         'news_col3': column_3,
+#         'home_videos': home_videos,
+#     }
+#     return render(request, 'index.html', context)
+
+
 def homepage(request):
     all_news = cache.get('homepage_latest_news')
 
     if all_news is None:
         all_news = list(
-            News.objects.select_related('category').order_by('-id')[:30]
+            News.objects.select_related('category')
+            .order_by('-id')[:30]
         )
         cache.set(
             'homepage_latest_news',
@@ -307,8 +331,8 @@ def homepage(request):
 
     home_videos = get_cached_youtube_videos(max_results=4)
 
-    # Split into 3 parts
-    column_2 = all_news[:8]  # latest 10
+    # 3 columns, 10 news each
+    column_2 = all_news[:10]  # latest 10
     column_1 = all_news[10:20]  # next 10
     column_3 = all_news[20:30]  # last 10
 
@@ -318,6 +342,7 @@ def homepage(request):
         'news_col3': column_3,
         'home_videos': home_videos,
     }
+
     return render(request, 'index.html', context)
 
 
