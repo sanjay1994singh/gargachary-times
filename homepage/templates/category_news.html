@@ -72,7 +72,17 @@
 <script>
     let allNews = [];
     let currentPage = 1;
-    let perPage = 24;
+    let perPage = 28;
+
+    function limitWords(text, wordLimit = 20) {
+        let words = String(text || '').trim().split(/\s+/).filter(Boolean);
+
+        if (words.length <= wordLimit) {
+            return words.join(' ');
+        }
+
+        return words.slice(0, wordLimit).join(' ') + '...';
+    }
 
     // Collect all news
     $('.news-item').each(function(){
@@ -91,9 +101,9 @@
         let start = (page - 1) * perPage;
         let pageData = allNews.slice(start, start + perPage);
 
-        let col2 = pageData.slice(0,5);
-        let col1 = pageData.slice(5,15);
-        let col3 = pageData.slice(15,24);
+        let col2 = pageData.slice(0,8);
+        let col1 = pageData.slice(8,18);
+        let col3 = pageData.slice(18,28);
 
         // 🔥 Column 2 (Main Latest)
         if(col2.length > 0){
@@ -101,8 +111,8 @@
 
             $('#col2-main').append(`
                 <img src="${first.img}" class="img-fluid mb-3"/>
-                <a href="/news/news-detail/${first.id}/" class="custom-link fw-bold fs-5">
-                    ${first.title}
+                <a href="/news/news-detail/${first.id}/" class="custom-link fw-bold fs-5" title="${first.title}">
+                    ${limitWords(first.title)}
                 </a>
             `);
 
@@ -110,7 +120,7 @@
                 $('#col2-list').append(`
                     <li class="mb-3 d-flex align-items-center">
                         <img src="${item.img}" class="me-3 rounded" width="90" height="60">
-                        <a href="/news/news-detail/${item.id}/" class="custom-link">${item.title}</a>
+                        <a href="/news/news-detail/${item.id}/" class="custom-link" title="${item.title}">${limitWords(item.title)}</a>
                     </li>
                 `);
             });
@@ -120,7 +130,7 @@
         col1.forEach(item=>{
             $('#col1').append(`
                 <li class="mb-3">
-                    <a href="/news/news-detail/${item.id}/" class="custom-link">${item.title}</a>
+                    <a href="/news/news-detail/${item.id}/" class="custom-link" title="${item.title}">${limitWords(item.title)}</a>
                 </li>
             `);
         });
@@ -130,7 +140,7 @@
             $('#col3').append(`
                 <li class="mb-3 d-flex align-items-center">
                     <img src="${item.img}" class="me-3 rounded" width="90" height="60">
-                    <a href="/news/news-detail/${item.id}/" class="custom-link">${item.title}</a>
+                    <a href="/news/news-detail/${item.id}/" class="custom-link" title="${item.title}">${limitWords(item.title)}</a>
                 </li>
             `);
         });
