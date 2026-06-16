@@ -1,11 +1,13 @@
 from django.shortcuts import render
+from django.core.paginator import Paginator
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
 
 from video.models import Video
 
 from news.models import News, Visitor
 
 from account.models import User
-from django.http import HttpResponse
 from django.core.cache import cache
 
 import csv
@@ -153,6 +155,10 @@ CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
 YOUTUBE_CACHE_SECONDS = 60 * 15
 YOUTUBE_TIMEOUT_SECONDS = 4
 HOMEPAGE_NEWS_CACHE_SECONDS = 60
+HOMEPAGE_NEWS_LIMIT = 100
+HOMEPAGE_CENTER_COLUMN_COUNT = 8
+HOMEPAGE_LEFT_COLUMN_COUNT = 8
+HOMEPAGE_RIGHT_COLUMN_PER_PAGE = 10
 
 
 def get_youtube_channel_id():
@@ -316,34 +322,70 @@ def video(request):
 
 
 def homepage(request):
-    all_news = cache.get('homepage_latest_news')
-
-    if all_news is None:
-        all_news = list(
-            News.objects.select_related('category')
-            .order_by('-id')[:30]
-        )
-        cache.set(
-            'homepage_latest_news',
-            all_news,
-            HOMEPAGE_NEWS_CACHE_SECONDS
-        )
+    all_news = get_homepage_news()
 
     home_videos = get_cached_youtube_videos(max_results=4)
 
-    # 3 columns, 10 news each
-    column_2 = all_news[:10]  # latest 10
-    column_1 = all_news[10:20]  # next 10
-    column_3 = all_news[20:30]  # last 10
+    column_2 = all_news[:HOMEPAGE_CENTER_COLUMN_COUNT]
+    column_1_start = HOMEPAGE_CENTER_COLUMN_COUNT
+    column_1_end = column_1_start + HOMEPAGE_LEFT_COLUMN_COUNT
+    column_1 = all_news[column_1_start:column_1_end]
+    page_obj = get_homepage_more_news_page(request.GET.get('page'))
 
     context = {
         'news_col1': column_1,
         'news_col2': column_2,
-        'news_col3': column_3,
+        'news_col3': page_obj.object_list,
+        'page_obj': page_obj,
         'home_videos': home_videos,
     }
 
     return render(request, 'index.html', context)
+
+
+def get_homepage_news():
+    all_news = cache.get('homepage_latest_news_100')
+
+    if all_news is None:
+        all_news = list(
+            News.objects.select_related('category')
+            .order_by('-id')[:HOMEPAGE_NEWS_LIMIT]
+        )
+        cache.set(
+            'homepage_latest_news_100',
+            all_news,
+            HOMEPAGE_NEWS_CACHE_SECONDS
+        )
+
+    return all_news
+
+
+def get_homepage_more_news_page(page_number):
+    all_news = get_homepage_news()
+    right_column_start = HOMEPAGE_CENTER_COLUMN_COUNT + HOMEPAGE_LEFT_COLUMN_COUNT
+    paginator = Paginator(
+        all_news[right_column_start:],
+        HOMEPAGE_RIGHT_COLUMN_PER_PAGE
+    )
+    return paginator.get_page(page_number)
+
+
+def homepage_more_news(request):
+    page_obj = get_homepage_more_news_page(request.GET.get('page'))
+    html = render_to_string(
+        'partials/homepage_more_news.html',
+        {
+            'news_col3': page_obj.object_list,
+            'page_obj': page_obj,
+        },
+        request=request
+    )
+    return JsonResponse({
+        'html': html,
+        'page': page_obj.number,
+        'has_next': page_obj.has_next(),
+        'has_previous': page_obj.has_previous(),
+    })
 
 
 def contact(request):

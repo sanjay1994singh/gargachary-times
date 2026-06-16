@@ -145,11 +145,75 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
       font-weight: 700;
     }
 
+    .home-more-pagination {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .home-more-pagination .page-item {
+      margin: 0;
+    }
+
+    .home-more-pagination .page-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 11px;
+      border: 1px solid #e4ded6;
+      border-radius: 6px;
+      background: #fff;
+      color: #171717;
+      font-weight: 800;
+      line-height: 1;
+      box-shadow: 0 8px 18px rgba(23, 23, 23, 0.06);
+      transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .home-more-pagination .page-link:hover,
+    .home-more-pagination .page-link:focus {
+      border-color: #b91c1c;
+      background: #fff5f5;
+      color: #b91c1c;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(185, 28, 28, 0.12);
+    }
+
+    .home-more-pagination .page-item.active .page-link {
+      border-color: #b91c1c;
+      background: #b91c1c;
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(185, 28, 28, 0.22);
+    }
+
+    .home-more-pagination .page-arrow {
+      gap: 6px;
+      min-width: 42px;
+    }
+
+    .home-more-pagination .arrow-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
     @media (max-width: 575px) {
       .home-video-header {
         align-items: flex-start;
         flex-direction: column;
         gap: 8px;
+      }
+
+      .home-more-pagination {
+        justify-content: flex-start !important;
+      }
+
+      .home-more-pagination .page-link {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 10px;
       }
     }
 
@@ -200,31 +264,23 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
             {% endif %}
                 <ul class="custom-list mt-3">
                     {% for i in news_col2|slice:"1:" %}
-                    <p><span class="text-danger">{{i.category}}</span></p>
-                    <li class="mb-3 d-flex align-items-center">
-                        <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded"
-                             width="90" height="60" loading="lazy" decoding="async" alt="">
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                    </li>
+                        <p><span class="text-danger">{{i.category}}</span></p>
+                        <li class="mb-3 d-flex align-items-center">
+                            <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded"
+                                 width="90" height="60" loading="lazy" decoding="async" alt="">
+                            <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
+                        </li>
+                    {% endfor %}
                 </ul>
-            {% endfor %}
         </div>
 
         <!-- ⚽ Column 3 -->
         <div class="col-md-4 col-sm-6 col-12 order-3 order-md-3">
             <h4 class="heading text-danger">खबरें और भी</h4>
             <img src="/static/2.png" alt="" class="img-fluid mb-3" loading="lazy" decoding="async"/>
-            <ul class="custom-list">
-                {% for i in news_col3 %}
-                    <p><span class="text-danger">{{i.category}}</span></p>
-                    <li class="mb-3 d-flex align-items-center">
-                        <img src="{% if i.featured_image %} {{i.featured_image.url}} {% endif %}" class="me-3 rounded"
-                             width="90" height="60" loading="lazy" decoding="async" alt=""/>
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
-                    </li>
-
-                {% endfor %}
-            </ul>
+            <div id="homepage-more-news">
+                {% include 'partials/homepage_more_news.html' %}
+            </div>
         </div>
 
     </div>
@@ -234,4 +290,47 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 {% endblock content %}
 
 {% block js %}
+<script>
+    document.addEventListener('click', function(event) {
+        const link = event.target.closest('[data-more-news-page]');
+
+        if (!link) {
+            return;
+        }
+
+        event.preventDefault();
+
+        const moreNews = document.getElementById('homepage-more-news');
+        const page = link.dataset.moreNewsPage;
+
+        if (!moreNews || !page) {
+            window.location.href = link.href;
+            return;
+        }
+
+        moreNews.style.opacity = '0.55';
+
+        fetch(`/homepage-more-news/?page=${encodeURIComponent(page)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Unable to load news');
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                moreNews.innerHTML = data.html;
+                moreNews.style.opacity = '1';
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', data.page);
+                window.history.replaceState({}, '', url);
+            })
+            .catch(function() {
+                window.location.href = link.href;
+            });
+    });
+</script>
 {% endblock js %}

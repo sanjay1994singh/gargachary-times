@@ -7,6 +7,7 @@ urlpatterns = [
     path('download-visitors-data/<str:report_type>/', views.download_visitors_data, name='download_visitors_data'),
     path('contact/', views.contact, name='contact'),
     path('video/', views.video, name='video'),
+    path('homepage-more-news/', views.homepage_more_news, name='homepage_more_news'),
     path('category_news/<int:id>/', views.category_news, name='category_news'),
 
     path('privacy-policy/', views.privacy_policy, name='privacy_policy'),

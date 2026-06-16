@@ -1,0 +1,44 @@
+<ul class="custom-list">
+    {% for i in news_col3 %}
+        <p><span class="text-danger">{{ i.category }}</span></p>
+        <li class="mb-3 d-flex align-items-center">
+            <img src="{% if i.featured_image %}{{ i.featured_image.url }}{% endif %}" class="me-3 rounded"
+                 width="90" height="60" loading="lazy" decoding="async" alt=""/>
+            <a href="/news/news-detail/{{ i.id }}/" class="custom-link" title="{{ i.title }}">{{ i.title }}</a>
+        </li>
+    {% endfor %}
+</ul>
+
+{% if page_obj.has_other_pages %}
+    <nav aria-label="More news pages">
+        <ul class="pagination home-more-pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link page-arrow" href="?page={{ page_obj.previous_page_number }}" data-more-news-page="{{ page_obj.previous_page_number }}" aria-label="Previous news">
+                        <span class="arrow-icon" aria-hidden="true">&larr;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page_number in page_obj.paginator.page_range %}
+                {% if page_number == page_obj.number %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ page_number }}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_number }}" data-more-news-page="{{ page_number }}">{{ page_number }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link page-arrow" href="?page={{ page_obj.next_page_number }}" data-more-news-page="{{ page_obj.next_page_number }}" aria-label="Next news">
+                        <span class="arrow-icon" aria-hidden="true">&rarr;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
