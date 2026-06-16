@@ -4,7 +4,7 @@
         <li class="mb-3 d-flex align-items-center">
             <img src="{% if i.featured_image %}{{ i.featured_image.url }}{% endif %}" class="me-3 rounded"
                  width="90" height="60" loading="lazy" decoding="async" alt=""/>
-            <a href="/news/news-detail/{{ i.id }}/" class="custom-link" title="{{ i.title }}">{{ i.title }}</a>
+            <a href="/news/news-detail/{{ i.id }}/" class="custom-link" title="{{ i.title }}">{{ i.title|truncatewords:20 }}</a>
         </li>
     {% endfor %}
 </ul>
