@@ -16,6 +16,12 @@ urlpatterns = [
     ),
 
     path(
+        'privacy-app/',
+        views.privacy_app,
+        name='privacy_app'
+    ),
+
+    path(
         'disclaimer/',
         views.disclaimer,
         name='disclaimer'

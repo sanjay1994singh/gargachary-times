@@ -293,6 +293,13 @@ def privacy_policy(request):
     )
 
 
+def privacy_app(request):
+    return render(
+        request,
+        'privacy_app.html'
+    )
+
+
 def disclaimer(request):
     return render(
         request,
