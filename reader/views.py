@@ -39,6 +39,11 @@ def reader_home(request, pk=None):
         current_city = edition.city
         current_section = edition.section
         current_page = 1
+        seo_title = f"{edition.city} {edition.section} E-Paper - {edition_date}"
+        seo_description = (
+            f"Read Gargachary Times {edition.city} {edition.section} "
+            f"e-paper for {edition_date}."
+        )
     else:
         editions = ["Metro edition"]
         sections = ["Main"]
@@ -48,8 +53,15 @@ def reader_home(request, pk=None):
         current_city = ""
         current_section = ""
         current_page = 1
+        seo_title = "E-Paper Reader | Gargachary Times"
+        seo_description = "Read Gargachary Times e-paper online."
 
     initial_page = pages[current_page - 1] if pages else None
+    canonical_url = request.build_absolute_uri()
+    absolute_image_url = (
+        request.build_absolute_uri(initial_page["image"])
+        if initial_page else ""
+    )
 
     context = {
         "edition": edition,
@@ -64,6 +76,10 @@ def reader_home(request, pk=None):
         "current_city": current_city,
         "current_section": current_section,
         "editions_meta": editions_meta,
+        "seo_title": seo_title,
+        "seo_description": seo_description,
+        "canonical_url": canonical_url,
+        "absolute_image_url": absolute_image_url,
     }
     return render(request, "reader/index.html", context)
 

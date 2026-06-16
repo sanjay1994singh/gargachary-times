@@ -326,7 +326,9 @@
         const text = encodeURIComponent(document.title);
         const shareUrl = platform === "facebook"
             ? `https://www.facebook.com/sharer/sharer.php?u=${url}`
-            : `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+            : platform === "whatsapp"
+                ? `https://wa.me/?text=${text}%20-%20${url}`
+                : `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
         window.open(shareUrl, "_blank", "noopener,noreferrer,width=720,height=520");
     }
 
@@ -424,6 +426,11 @@
             openDatePicker();
         } else if (action === "share-facebook") {
             shareTo("facebook");
+        } else if (action === "share-whatsapp") {
+            if (actionButton.tagName === "A" && actionButton.href) {
+                return;
+            }
+            shareTo("whatsapp");
         } else if (action === "share-x") {
             shareTo("x");
         } else if (action === "copy-link") {

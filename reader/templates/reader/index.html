@@ -1,10 +1,29 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}E-Paper Reader | Gargachary Times{% endblock title %}
+{% block title %}{{ seo_title }}{% endblock title %}
+
+{% block metatags %}
+<meta name="description" content="{{ seo_description }}">
+<meta property="og:site_name" content="Gargachary Times">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ seo_title }}">
+<meta property="og:description" content="{{ seo_description }}">
+<meta property="og:image" content="{{ absolute_image_url }}">
+<meta property="og:url" content="{{ canonical_url }}">
+{% if edition %}<meta property="article:published_time" content="{{ edition.created_at|date:'c' }}">{% endif %}
+{% if edition %}<meta property="article:modified_time" content="{{ edition.created_at|date:'c' }}">{% endif %}
+{% if edition %}<meta property="article:section" content="{{ edition.section }}">{% endif %}
+{% if edition %}<meta name="keywords" content="{{ edition.city }}, {{ edition.section }}, e-paper, Gargachary Times">{% endif %}
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ seo_title }}">
+<meta name="twitter:description" content="{{ seo_description }}">
+<meta name="twitter:image" content="{{ absolute_image_url }}">
+{% endblock metatags %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260615-mobile-39">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260616-share-1">
     <style>
         .social-follow {
             display: none !important;
@@ -116,6 +135,7 @@
             }
 
             .reader-toolbar .facebook,
+            .reader-toolbar .whatsapp,
             .reader-toolbar .x,
             .reader-toolbar .profile {
                 width: 28px !important;
@@ -307,6 +327,14 @@
         </div>
 
         <div class="share-actions" aria-label="Share">
+            <a class="social-button whatsapp"
+               href="https://wa.me/?text={{ seo_title|urlencode }}%20-%20{{ canonical_url|urlencode }}"
+               target="_blank"
+               rel="noopener noreferrer"
+               data-action="share-whatsapp"
+               aria-label="Share on WhatsApp">
+                <i class="fa fa-whatsapp" aria-hidden="true"></i>
+            </a>
             <button class="social-button facebook" type="button" data-action="share-facebook" aria-label="Share on Facebook">f</button>
             <button class="social-button x" type="button" data-action="share-x" aria-label="Share on X">X</button>
             <button class="social-button profile" type="button" data-action="copy-link" aria-label="Copy reader link">I</button>
@@ -420,7 +448,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260615-mobile-39"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260616-share-1"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
