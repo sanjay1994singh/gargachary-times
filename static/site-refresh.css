@@ -15,7 +15,7 @@ body.site-refresh {
     font-family: "Anek Devanagari", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-body.site-refresh .navbar {
+body.site-refresh .site-navbar {
     position: sticky;
     top: 0;
     z-index: 1030;
@@ -25,43 +25,54 @@ body.site-refresh .navbar {
     backdrop-filter: blur(12px);
 }
 
-body.site-refresh .navbar .container {
-    max-width: 1240px;
+body.site-refresh .site-navbar .container {
+    width: 100%;
+    max-width: 1320px;
+    min-height: 66px;
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
-body.site-refresh .navbar-brand img {
-    height: 56px !important;
+body.site-refresh .site-navbar .navbar-brand img {
+    height: 48px !important;
     object-fit: contain;
 }
 
-body.site-refresh .navbar-nav {
-    align-items: center;
-    gap: 4px;
+body.site-refresh .site-navbar .navbar-collapse {
+    min-width: 0;
 }
 
-body.site-refresh .navbar .nav-link {
+body.site-refresh .site-navbar .navbar-nav {
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 1px;
+}
+
+body.site-refresh .site-navbar .nav-link {
     border-radius: 999px;
     color: var(--gt-ink) !important;
-    font-size: 15px;
+    font-size: clamp(12px, 0.92vw, 14px);
     font-weight: 700;
     line-height: 1.2;
-    padding: 9px 13px !important;
+    padding: 8px clamp(6px, 0.72vw, 10px) !important;
+    white-space: nowrap;
 }
 
-body.site-refresh .navbar .nav-link:hover,
-body.site-refresh .navbar .nav-link:focus {
+body.site-refresh .site-navbar .nav-link:hover,
+body.site-refresh .site-navbar .nav-link:focus {
     background: #fff1f1;
     color: var(--gt-red) !important;
 }
 
-body.site-refresh .navbar .nav-link[href*="plans"],
-body.site-refresh .navbar .nav-link[href*="login"] {
+body.site-refresh .site-navbar .nav-link[href*="plans"],
+body.site-refresh .site-navbar .nav-link[href*="login"] {
     background: var(--gt-red);
     color: #fff !important;
 }
 
-body.site-refresh .navbar .nav-link[href*="plans"]:hover,
-body.site-refresh .navbar .nav-link[href*="login"]:hover {
+body.site-refresh .site-navbar .nav-link[href*="plans"]:hover,
+body.site-refresh .site-navbar .nav-link[href*="login"]:hover {
     background: var(--gt-red-dark);
 }
 
@@ -70,6 +81,7 @@ body.site-refresh .dropdown-menu {
     border-radius: 8px;
     box-shadow: var(--gt-shadow);
     padding: 8px;
+    min-width: 220px;
 }
 
 body.site-refresh .dropdown-item {
@@ -289,15 +301,18 @@ body.site-refresh .social-btn {
     box-shadow: 0 8px 18px rgba(23, 23, 23, 0.14);
 }
 
-@media (max-width: 991px) {
-    body.site-refresh .navbar-nav {
+@media (max-width: 1199px) {
+    body.site-refresh .site-navbar .navbar-nav {
         align-items: stretch;
-        gap: 2px;
+        flex-wrap: nowrap;
+        gap: 3px;
         padding-top: 12px;
     }
 
-    body.site-refresh .navbar .nav-link {
+    body.site-refresh .site-navbar .nav-link {
         border-radius: 8px;
+        padding: 10px 12px !important;
+        white-space: normal;
     }
 
     body.site-refresh .container-box {
@@ -311,7 +326,7 @@ body.site-refresh .social-btn {
 }
 
 @media (max-width: 575px) {
-    body.site-refresh .navbar-brand img {
+    body.site-refresh .site-navbar .navbar-brand img {
         height: 44px !important;
     }
 
