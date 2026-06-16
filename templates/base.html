@@ -171,7 +171,7 @@
     </style>
 </head>
 
-<body class="{% if request.path|slice:':8' == '/reader/' %}reader-base{% else %}site-refresh{% endif %}">
+<body class="{% if request.path|slice:':8' == '/reader/' or request.path|slice:':8' == '/epaper/' %}reader-base{% else %}site-refresh{% endif %}">
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-xl navbar-light bg-light site-navbar">
@@ -192,7 +192,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="/reader/">E-paper</a>
+                    <a class="nav-link text-dark" href="/epaper/">E-paper</a>
                 </li>
 
                 <li class="nav-item">

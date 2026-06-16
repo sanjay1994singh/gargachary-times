@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from news.sitemap import NewsSitemap, CategorySitemap
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 from django.contrib.sitemaps.views import sitemap
 from account import views
 
@@ -17,7 +18,19 @@ urlpatterns = [
     path('subscriptions/', include('subscriptions.urls')),
     path('auth/', include('social_django.urls', namespace='social')),
 
-    path('reader/', include("reader.urls")),
+    path('epaper/', include("reader.urls")),
+    path(
+        'reader/',
+        RedirectView.as_view(pattern_name='reader:home', permanent=True)
+    ),
+    path(
+        'reader/upload/',
+        RedirectView.as_view(pattern_name='reader:upload', permanent=True)
+    ),
+    path(
+        'reader/edition/<int:pk>/',
+        RedirectView.as_view(pattern_name='reader:edition', permanent=True)
+    ),
 
     path(
         'logout/',
