@@ -6,6 +6,7 @@ from news.models import News, Visitor
 
 from account.models import User
 from django.http import HttpResponse
+from django.core.cache import cache
 
 import csv
 from category.models import Category
@@ -146,14 +147,52 @@ def download_visitors_data(request, report_type):
 
 
 API_KEY = 'AIzaSyCJQ2WoCt9gMmdKlkaRS_NqEyNeNyxDm9k'
+CHANNEL_HANDLE = 'Samachar24newschannel'
 CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
+YOUTUBE_CACHE_SECONDS = 60 * 15
+YOUTUBE_TIMEOUT_SECONDS = 4
+
+
+def get_youtube_channel_id():
+    cache_key = f'youtube_channel_id:{CHANNEL_HANDLE}'
+    cached_channel_id = cache.get(cache_key)
+
+    if cached_channel_id:
+        return cached_channel_id
+
+    try:
+        response = requests.get(
+            'https://www.googleapis.com/youtube/v3/channels',
+            params={
+                'key': API_KEY,
+                'part': 'id',
+                'forHandle': CHANNEL_HANDLE,
+            },
+            timeout=YOUTUBE_TIMEOUT_SECONDS
+        )
+        response.raise_for_status()
+        data = response.json()
+        channel_id = data.get('items', [{}])[0].get('id')
+    except (IndexError, requests.RequestException):
+        channel_id = None
+
+    channel_id = channel_id or CHANNEL_ID
+    cache.set(cache_key, channel_id, YOUTUBE_CACHE_SECONDS)
+    return channel_id
 
 
 def get_youtube_videos(max_results=20, video_duration=None):
+    channel_id = get_youtube_channel_id()
+    cache_key = f'youtube_videos:{channel_id}:{max_results}:{video_duration or "all"}'
+    cached_videos = cache.get(cache_key)
+
+    if cached_videos is not None:
+        return cached_videos
+
     url = 'https://www.googleapis.com/youtube/v3/search'
     params = {
         'key': API_KEY,
-        'channelId': CHANNEL_ID,
+        'channelId': channel_id,
         'part': 'snippet',
         'order': 'date',
         'maxResults': max_results,
@@ -163,21 +202,41 @@ def get_youtube_videos(max_results=20, video_duration=None):
     if video_duration:
         params['videoDuration'] = video_duration
 
-    response = requests.get(url, params=params)
-    data = response.json()
+    try:
+        response = requests.get(
+            url,
+            params=params,
+            timeout=YOUTUBE_TIMEOUT_SECONDS
+        )
+        response.raise_for_status()
+        data = response.json()
+    except requests.RequestException:
+        return []
+
     videos = []
     for item in data.get('items', []):
-        video_id = item['id']['videoId']
-        title = item['snippet']['title']
-        thumbnail = item['snippet']['thumbnails']['high']['url']
-        published = item['snippet']['publishedAt']
+        video_id = item.get('id', {}).get('videoId')
+        snippet = item.get('snippet', {})
+        title = snippet.get('title')
+        thumbnail = (
+            snippet.get('thumbnails', {}).get('high', {}).get('url')
+            or snippet.get('thumbnails', {}).get('medium', {}).get('url')
+            or snippet.get('thumbnails', {}).get('default', {}).get('url')
+        )
+        published = snippet.get('publishedAt')
+
+        if not video_id or not title or not thumbnail:
+            continue
+
         videos.append({
             'video_id': video_id,
             'title': title,
             'thumbnail': thumbnail,
-            'publishedAt': published,
+            'publishedAt': published or '',
             'url': f'https://www.youtube.com/watch?v={video_id}'
         })
+
+    cache.set(cache_key, videos, YOUTUBE_CACHE_SECONDS)
     return videos
 
 
