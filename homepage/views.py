@@ -9,6 +9,7 @@ from django.http import HttpResponse
 from django.core.cache import cache
 
 import csv
+import threading
 from category.models import Category
 import requests
 from django.utils import timezone
@@ -151,6 +152,7 @@ CHANNEL_HANDLE = 'Samachar24newschannel'
 CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
 YOUTUBE_CACHE_SECONDS = 60 * 15
 YOUTUBE_TIMEOUT_SECONDS = 4
+HOMEPAGE_NEWS_CACHE_SECONDS = 60
 
 
 def get_youtube_channel_id():
@@ -183,7 +185,11 @@ def get_youtube_channel_id():
 
 def get_youtube_videos(max_results=20, video_duration=None):
     channel_id = get_youtube_channel_id()
-    cache_key = f'youtube_videos:{channel_id}:{max_results}:{video_duration or "all"}'
+    cache_key = get_youtube_video_cache_key(
+        channel_id,
+        max_results,
+        video_duration
+    )
     cached_videos = cache.get(cache_key)
 
     if cached_videos is not None:
@@ -240,6 +246,44 @@ def get_youtube_videos(max_results=20, video_duration=None):
     return videos
 
 
+def get_youtube_video_cache_key(channel_id, max_results, video_duration=None):
+    return f'youtube_videos:{channel_id}:{max_results}:{video_duration or "all"}'
+
+
+def get_cached_youtube_videos(max_results=4, video_duration=None):
+    channel_ids = [
+        cache.get(f'youtube_channel_id:{CHANNEL_HANDLE}'),
+        CHANNEL_ID,
+    ]
+
+    for channel_id in dict.fromkeys(filter(None, channel_ids)):
+        cached_videos = cache.get(
+            get_youtube_video_cache_key(
+                channel_id,
+                max_results,
+                video_duration
+            )
+        )
+
+        if cached_videos is not None:
+            return cached_videos
+
+    refresh_key = f'youtube_refreshing:{max_results}:{video_duration or "all"}'
+
+    if cache.add(refresh_key, True, 60):
+        thread = threading.Thread(
+            target=get_youtube_videos,
+            kwargs={
+                'max_results': max_results,
+                'video_duration': video_duration,
+            },
+            daemon=True
+        )
+        thread.start()
+
+    return []
+
+
 def video(request):
     videos = get_youtube_videos()
     context = {
@@ -249,8 +293,19 @@ def video(request):
 
 
 def homepage(request):
-    all_news = list(News.objects.all().order_by('-id')[:30])
-    home_videos = get_youtube_videos(max_results=4)
+    all_news = cache.get('homepage_latest_news')
+
+    if all_news is None:
+        all_news = list(
+            News.objects.select_related('category').order_by('-id')[:30]
+        )
+        cache.set(
+            'homepage_latest_news',
+            all_news,
+            HOMEPAGE_NEWS_CACHE_SECONDS
+        )
+
+    home_videos = get_cached_youtube_videos(max_results=4)
 
     # Split into 3 parts
     column_2 = all_news[:8]  # latest 10

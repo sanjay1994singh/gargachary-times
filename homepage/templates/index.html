@@ -190,7 +190,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
             <hr>
             {% if news_col2 %}
             <img src="{% if news_col2.0.featured_image %}{{news_col2.0.featured_image.url}}{% endif %}"
-                 class="img-fluid mb-3" alt=""/>
+                 class="img-fluid mb-3" loading="lazy" decoding="async" alt=""/>
             <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5"
                title="{{news_col2.0.title}}">
                 {{news_col2.0.title}}
@@ -201,7 +201,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                 {% for i in news_col2|slice:"1:" %}
                 <li class="mb-3 d-flex align-items-center">
                     <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded"
-                         width="90" height="60" alt="">
+                         width="90" height="60" loading="lazy" decoding="async" alt="">
                     <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                 </li>
                 <h3><span class="text-danger">{{i.category}}</span></h3>
@@ -213,12 +213,12 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
         <!-- ⚽ Column 3 -->
         <div class="col-md-4 col-sm-6 col-12 order-3 order-md-3">
             <h4 class="heading text-danger">खबरें और भी</h4>
-            <img src="/static/2.png" alt="" class="img-fluid mb-3">
+            <img src="/static/2.png" alt="" class="img-fluid mb-3" loading="lazy" decoding="async">
             <ul class="custom-list">
                 {% for i in news_col3 %}
                 <li class="mb-3 d-flex align-items-center">
                     <img src="{% if i.featured_image %} {{i.featured_image.url}} {% endif %}" class="me-3 rounded"
-                         width="90" height="60" alt="">
+                         width="90" height="60" loading="lazy" decoding="async" alt="">
                     <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                 </li>
                 <h3><span class="text-danger">{{i.category}}</span></h3>
@@ -244,7 +244,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="home-video-card">
                 <a href="{{ video.url }}" target="_blank" rel="noopener" class="home-video-thumb" title="{{ video.title }}">
-                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                    <img src="{{ video.thumbnail }}" loading="lazy" decoding="async" alt="{{ video.title }}">
                     <span class="home-video-play" aria-hidden="true">
                         <i class="bi bi-play-fill"></i>
                     </span>
