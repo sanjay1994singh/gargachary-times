@@ -251,10 +251,6 @@ def video(request):
 def homepage(request):
     all_news = list(News.objects.all().order_by('-id')[:30])
     home_videos = get_youtube_videos(max_results=4)
-    home_short_videos = get_youtube_videos(
-        max_results=4,
-        video_duration='short'
-    )
 
     # Split into 3 parts
     column_2 = all_news[:8]  # latest 10
@@ -266,7 +262,6 @@ def homepage(request):
         'news_col2': column_2,
         'news_col3': column_3,
         'home_videos': home_videos,
-        'home_short_videos': home_short_videos,
     }
     return render(request, 'index.html', context)
 

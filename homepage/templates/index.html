@@ -266,43 +266,6 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 </section>
 {% endif %}
 
-{% if home_short_videos %}
-<section class="home-video-section">
-    <div class="home-video-header">
-        <h2>Latest Short Videos</h2>
-        <a href="/video/" class="home-video-link">
-            View all
-            <i class="bi bi-arrow-right"></i>
-        </a>
-    </div>
-
-    <div class="row g-4">
-        {% for video in home_short_videos %}
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="home-video-card">
-                <a href="{{ video.url }}" target="_blank" rel="noopener" class="home-video-thumb" title="{{ video.title }}">
-                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
-                    <span class="home-video-play" aria-hidden="true">
-                        <i class="bi bi-play-fill"></i>
-                    </span>
-                </a>
-                <div class="home-video-body">
-                    <h3>
-                        <a href="{{ video.url }}" target="_blank" rel="noopener" class="custom-link" title="{{ video.title }}">
-                            {{ video.title }}
-                        </a>
-                    </h3>
-                    <p class="home-video-meta">
-                        YouTube Shorts · {{ video.publishedAt|slice:":10" }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</section>
-{% endif %}
-
 
 {% endblock content %}
 
