@@ -1117,11 +1117,29 @@ body.is-reader-mobile .reader-toolbar .toolbar-group {
 }
 
 body.is-reader-mobile .reader-toolbar .share-actions {
-    display: none !important;
+    display: flex !important;
     flex: 0 0 auto;
     order: 3;
     width: auto;
     margin: 0;
+}
+
+body.is-reader-mobile .reader-toolbar .share-actions .facebook,
+body.is-reader-mobile .reader-toolbar .share-actions .x,
+body.is-reader-mobile .reader-toolbar .share-actions .profile {
+    display: none !important;
+}
+
+body.is-reader-mobile .reader-toolbar .share-actions .whatsapp {
+    display: inline-flex !important;
+    flex: 0 0 42px;
+    width: 42px;
+    min-width: 42px;
+    max-width: 42px;
+    min-height: 42px;
+    height: 42px;
+    margin: 0;
+    border-radius: 0;
 }
 
 body.is-reader-mobile .reader-toolbar .social-button {
@@ -1137,7 +1155,6 @@ body.is-reader-mobile .reader-toolbar .social-button {
 }
 
 body.is-reader-mobile .reader-toolbar .facebook,
-body.is-reader-mobile .reader-toolbar .whatsapp,
 body.is-reader-mobile .reader-toolbar .x,
 body.is-reader-mobile .reader-toolbar .profile {
     width: 28px;

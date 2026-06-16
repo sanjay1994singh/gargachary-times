@@ -915,6 +915,32 @@ button {
         display: none;
     }
 
+    .reader-toolbar .share-actions {
+        display: flex !important;
+        flex: 0 0 auto;
+        order: 3;
+        width: auto;
+        margin: 0;
+    }
+
+    .reader-toolbar .share-actions .facebook,
+    .reader-toolbar .share-actions .x,
+    .reader-toolbar .share-actions .profile {
+        display: none !important;
+    }
+
+    .reader-toolbar .share-actions .whatsapp {
+        display: inline-flex !important;
+        flex: 0 0 42px;
+        width: 42px;
+        min-width: 42px;
+        max-width: 42px;
+        min-height: 42px;
+        height: 42px;
+        margin: 0;
+        border-radius: 0;
+    }
+
     .page-stage {
         width: 100vw;
         padding: 0 10px;

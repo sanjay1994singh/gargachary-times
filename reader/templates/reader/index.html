@@ -23,7 +23,7 @@
 {% endblock metatags %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260616-share-4">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260616-share-5">
     <style>
         .social-follow {
             display: none !important;
@@ -127,11 +127,29 @@
             }
 
             .reader-toolbar .share-actions {
-                display: none !important;
+                display: flex !important;
                 flex: 0 0 auto !important;
                 order: 3 !important;
                 width: auto !important;
                 margin: 0 !important;
+            }
+
+            .reader-toolbar .share-actions .facebook,
+            .reader-toolbar .share-actions .x,
+            .reader-toolbar .share-actions .profile {
+                display: none !important;
+            }
+
+            .reader-toolbar .share-actions .whatsapp {
+                display: inline-flex !important;
+                flex: 0 0 42px !important;
+                width: 42px !important;
+                min-width: 42px !important;
+                max-width: 42px !important;
+                min-height: 42px !important;
+                height: 42px !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
             }
 
             .reader-toolbar .social-button {
@@ -147,7 +165,6 @@
             }
 
             .reader-toolbar .facebook,
-            .reader-toolbar .whatsapp,
             .reader-toolbar .x,
             .reader-toolbar .profile {
                 width: 28px !important;
@@ -460,7 +477,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260616-share-4"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260616-share-5"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
