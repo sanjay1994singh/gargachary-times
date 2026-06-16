@@ -27,10 +27,11 @@ body.site-refresh .site-navbar {
 
 body.site-refresh .site-navbar .container {
     width: 100%;
-    max-width: 1320px;
+    max-width: 1240px;
     min-height: 66px;
     padding-left: 12px;
     padding-right: 12px;
+    gap: clamp(10px, 1.4vw, 24px);
 }
 
 body.site-refresh .site-navbar .navbar-brand img {
@@ -38,7 +39,15 @@ body.site-refresh .site-navbar .navbar-brand img {
     object-fit: contain;
 }
 
+body.site-refresh .site-navbar .navbar-brand {
+    flex: 0 1 180px;
+    min-width: 118px;
+    max-width: 190px;
+    margin-right: 0;
+}
+
 body.site-refresh .site-navbar .navbar-collapse {
+    flex: 1 1 auto;
     min-width: 0;
 }
 
@@ -47,6 +56,7 @@ body.site-refresh .site-navbar .navbar-nav {
     flex-wrap: nowrap;
     justify-content: flex-end;
     gap: 1px;
+    width: 100%;
 }
 
 body.site-refresh .site-navbar .nav-link {
@@ -57,6 +67,27 @@ body.site-refresh .site-navbar .nav-link {
     line-height: 1.2;
     padding: 8px clamp(6px, 0.72vw, 10px) !important;
     white-space: nowrap;
+}
+
+@media (min-width: 1200px) and (max-width: 1360px) {
+    body.site-refresh .site-navbar .container {
+        max-width: calc(100% - 24px);
+    }
+
+    body.site-refresh .site-navbar .navbar-brand {
+        flex-basis: 150px;
+        max-width: 150px;
+    }
+
+    body.site-refresh .site-navbar .navbar-brand img {
+        height: 42px !important;
+    }
+
+    body.site-refresh .site-navbar .nav-link {
+        font-size: 12px;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
 }
 
 body.site-refresh .site-navbar .nav-link:hover,
