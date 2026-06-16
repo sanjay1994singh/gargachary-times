@@ -165,8 +165,8 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
             <h4 class="heading">अन्य खबरें</h4>
             <ul class="custom-list1">
                 {% for i in news_col1 %}
+                <p><span class="text-danger">{{i.category}}</span></p>
                 <li class="mb-3">
-                    <p><span class="text-danger">{{i.category}}</span></p>
                     <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
                 </li>
                 {% endfor %}
@@ -215,8 +215,8 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
             <img src="/static/2.png" alt="" class="img-fluid mb-3" loading="lazy" decoding="async"/>
             <ul class="custom-list">
                 {% for i in news_col3 %}
+                    <p><span class="text-danger">{{i.category}}</span></p>
                     <li class="mb-3 d-flex align-items-center">
-                        <p><span class="text-danger">{{i.category}}</span></p>
                         <img src="{% if i.featured_image %} {{i.featured_image.url}} {% endif %}" class="me-3 rounded"
                              width="90" height="60" loading="lazy" decoding="async" alt=""/>
                         <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title}}</a>
