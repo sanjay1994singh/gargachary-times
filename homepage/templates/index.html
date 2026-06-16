@@ -234,7 +234,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                 {% for i in news_col1 %}
                     <p><span class="text-danger">{{i.category}}</span></p>
                     <li class="mb-3">
-                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title|truncatewords:20}}</a>
+                        <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title|truncatewords:10}}</a>
                     </li>
                 {% endfor %}
             </ul>
@@ -261,7 +261,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                 <p><span class="text-danger">{{news_col2.0.category}}</span></p>
                 <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5"
                    title="{{news_col2.0.title}}">
-                    {{news_col2.0.title|truncatewords:20}}
+                    {{news_col2.0.title|truncatewords:10}}
                 </a>
 
             {% endif %}
@@ -271,7 +271,7 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
                         <li class="mb-3 d-flex align-items-center">
                             <img src="{% if i.featured_image %}{{i.featured_image.url}}{% endif %}" class="me-3 rounded"
                                  width="90" height="60" loading="lazy" decoding="async" alt="">
-                            <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title|truncatewords:20}}</a>
+                            <a href="/news/news-detail/{{i.id}}/" class="custom-link" title="{{i.title}}">{{i.title|truncatewords:10}}</a>
                         </li>
                     {% endfor %}
                 </ul>
