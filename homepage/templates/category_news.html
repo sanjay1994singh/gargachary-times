@@ -74,7 +74,7 @@
     let currentPage = 1;
     let perPage = 32;
 
-    function limitWords(text, wordLimit = 20) {
+    function limitWords(text, wordLimit = 15) {
         let words = String(text || '').trim().split(/\s+/).filter(Boolean);
 
         if (words.length <= wordLimit) {
