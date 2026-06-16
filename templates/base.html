@@ -64,6 +64,7 @@
 
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="/static/sweetalert2.min.css">
+    <link rel="stylesheet" href="/static/site-refresh.css?v=20260616">
 
     {% block css %}{% endblock css %}
 
@@ -176,7 +177,7 @@
     </style>
 </head>
 
-<body>
+<body class="{% if request.path|slice:':8' == '/reader/' %}reader-base{% else %}site-refresh{% endif %}">
 
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
