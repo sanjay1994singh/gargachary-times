@@ -189,10 +189,9 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 
             <hr>
             {% if news_col2 %}
-
                 <img src="{% if news_col2.0.featured_image %}{{news_col2.0.featured_image.url}}{% endif %}"
                      class="img-fluid mb-3" loading="lazy" decoding="async" alt=""/>
-                <span>{{news_col2.0.category}}</span>
+                <p><span class="text-danger">{{news_col2.0.category}}</span></p>
                 <a href="/news/news-detail/{{news_col2.0.id}}/" class="custom-link fw-bold fs-5"
                    title="{{news_col2.0.title}}">
                     {{news_col2.0.title}}
