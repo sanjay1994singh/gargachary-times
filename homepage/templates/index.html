@@ -43,6 +43,116 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
       border: 0;
     }
 
+    .home-video-section {
+      max-width: 1240px;
+      margin: 0 auto 34px;
+      padding: 0 12px;
+    }
+
+    .home-video-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .home-video-header h2 {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 800;
+    }
+
+    .home-video-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #b91c1c;
+      font-weight: 800;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .home-video-card {
+      height: 100%;
+      overflow: hidden;
+      background: #fff;
+      border: 1px solid #e4ded6;
+      border-radius: 8px;
+      box-shadow: 0 14px 34px rgba(23, 23, 23, 0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .home-video-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 42px rgba(23, 23, 23, 0.12);
+    }
+
+    .home-video-thumb {
+      position: relative;
+      display: block;
+      aspect-ratio: 16 / 9;
+      background: #171717;
+      overflow: hidden;
+    }
+
+    .home-video-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.25s ease;
+    }
+
+    .home-video-card:hover .home-video-thumb img {
+      transform: scale(1.04);
+    }
+
+    .home-video-play {
+      position: absolute;
+      left: 14px;
+      bottom: 14px;
+      display: inline-grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #b91c1c;
+      color: #fff;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+    }
+
+    .home-video-body {
+      padding: 15px;
+    }
+
+    .home-video-body h3 {
+      display: -webkit-box;
+      min-height: 46px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      color: #171717;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.35;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+    }
+
+    .home-video-meta {
+      margin-bottom: 0;
+      color: #626262;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 575px) {
+      .home-video-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+
 </style>
 {% endblock css %}
 
@@ -118,6 +228,80 @@ Gargachary Times - Trusted News from Brij, Bharat & Beyond
 
     </div>
 </div>
+
+{% if home_videos %}
+<section class="home-video-section">
+    <div class="home-video-header">
+        <h2>Latest Videos</h2>
+        <a href="/video/" class="home-video-link">
+            View all
+            <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for video in home_videos %}
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="home-video-card">
+                <a href="{{ video.url }}" target="_blank" rel="noopener" class="home-video-thumb" title="{{ video.title }}">
+                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                    <span class="home-video-play" aria-hidden="true">
+                        <i class="bi bi-play-fill"></i>
+                    </span>
+                </a>
+                <div class="home-video-body">
+                    <h3>
+                        <a href="{{ video.url }}" target="_blank" rel="noopener" class="custom-link" title="{{ video.title }}">
+                            {{ video.title }}
+                        </a>
+                    </h3>
+                    <p class="home-video-meta">
+                        YouTube · {{ video.publishedAt|slice:":10" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if home_short_videos %}
+<section class="home-video-section">
+    <div class="home-video-header">
+        <h2>Latest Short Videos</h2>
+        <a href="/video/" class="home-video-link">
+            View all
+            <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    <div class="row g-4">
+        {% for video in home_short_videos %}
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="home-video-card">
+                <a href="{{ video.url }}" target="_blank" rel="noopener" class="home-video-thumb" title="{{ video.title }}">
+                    <img src="{{ video.thumbnail }}" alt="{{ video.title }}">
+                    <span class="home-video-play" aria-hidden="true">
+                        <i class="bi bi-play-fill"></i>
+                    </span>
+                </a>
+                <div class="home-video-body">
+                    <h3>
+                        <a href="{{ video.url }}" target="_blank" rel="noopener" class="custom-link" title="{{ video.title }}">
+                            {{ video.title }}
+                        </a>
+                    </h3>
+                    <p class="home-video-meta">
+                        YouTube Shorts · {{ video.publishedAt|slice:":10" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
 
 
 {% endblock content %}

@@ -149,7 +149,7 @@ API_KEY = 'AIzaSyCJQ2WoCt9gMmdKlkaRS_NqEyNeNyxDm9k'
 CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
 
 
-def get_youtube_videos(max_results=20):
+def get_youtube_videos(max_results=20, video_duration=None):
     url = 'https://www.googleapis.com/youtube/v3/search'
     params = {
         'key': API_KEY,
@@ -159,6 +159,9 @@ def get_youtube_videos(max_results=20):
         'maxResults': max_results,
         'type': 'video'
     }
+
+    if video_duration:
+        params['videoDuration'] = video_duration
 
     response = requests.get(url, params=params)
     data = response.json()
@@ -188,6 +191,11 @@ def video(request):
 
 def homepage(request):
     all_news = list(News.objects.all().order_by('-id')[:30])
+    home_videos = get_youtube_videos(max_results=4)
+    home_short_videos = get_youtube_videos(
+        max_results=4,
+        video_duration='short'
+    )
 
     # Split into 3 parts
     column_2 = all_news[:8]  # latest 10
@@ -198,6 +206,8 @@ def homepage(request):
         'news_col1': column_1,
         'news_col2': column_2,
         'news_col3': column_3,
+        'home_videos': home_videos,
+        'home_short_videos': home_short_videos,
     }
     return render(request, 'index.html', context)
 
