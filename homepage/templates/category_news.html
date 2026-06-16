@@ -72,7 +72,7 @@
 <script>
     let allNews = [];
     let currentPage = 1;
-    let perPage = 29;
+    let perPage = 32;
 
     function limitWords(text, wordLimit = 20) {
         let words = String(text || '').trim().split(/\s+/).filter(Boolean);
@@ -102,8 +102,8 @@
         let pageData = allNews.slice(start, start + perPage);
 
         let col2 = pageData.slice(0,9);
-        let col1 = pageData.slice(9,19);
-        let col3 = pageData.slice(19,29);
+        let col1 = pageData.slice(9,22);
+        let col3 = pageData.slice(22,32);
 
         // 🔥 Column 2 (Main Latest)
         if(col2.length > 0){
