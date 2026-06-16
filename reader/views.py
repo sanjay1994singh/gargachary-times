@@ -37,7 +37,8 @@ def get_share_image_url(page):
     if not page or not page.image:
         return ""
 
-    share_path = f"editions/share/edition-{page.edition_id}-page-{page.number:02d}.jpg"
+    source_version = page.image.name.rsplit("/", 1)[-1].rsplit(".", 1)[0]
+    share_path = f"editions/share/{source_version}.jpg"
     if default_storage.exists(share_path):
         return default_storage.url(share_path)
 

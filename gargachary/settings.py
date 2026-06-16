@@ -60,6 +60,7 @@ FACEBOOK_ACCESS_TOKEN = "EAAO3ZAQYMxCMBRmKBUZC8CDtuTcBEeNb1m0UForAsGLTJPHE6OLRan
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'reader.middleware.EpaperMediaCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
