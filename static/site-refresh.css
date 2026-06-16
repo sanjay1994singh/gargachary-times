@@ -12,7 +12,7 @@ body.site-refresh {
         linear-gradient(180deg, rgba(255, 250, 242, 0.96), rgba(248, 249, 250, 0.98)),
         repeating-linear-gradient(90deg, rgba(185, 28, 28, 0.04) 0 1px, transparent 1px 84px);
     color: var(--gt-ink);
-    font-family: "Anek Devanagari", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 body.site-refresh .site-navbar {
