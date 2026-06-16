@@ -12,9 +12,8 @@
 
 {% block content %}
 <div class="container-box">
+    <h3>{{category_name}}</h3>
     <div class="row g-4">
-        <h3>{{category_name}}</h3>
-
         <!-- Hidden Data -->
         <div id="all-news" style="display:none;">
             {% for i in all_news %}
