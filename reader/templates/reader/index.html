@@ -23,10 +23,22 @@
 {% endblock metatags %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260616-share-3">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260616-share-4">
     <style>
         .social-follow {
             display: none !important;
+        }
+
+        .reader-toolbar .whatsapp {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+
+        .reader-toolbar .whatsapp .fa {
+            display: block !important;
+            line-height: 1 !important;
+            margin: 0 !important;
         }
 
         @media (max-width: 991px) {
@@ -448,7 +460,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260616-share-3"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v=20260616-share-4"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
