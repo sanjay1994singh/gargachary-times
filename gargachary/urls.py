@@ -17,7 +17,7 @@ urlpatterns = [
     path('news_pdf/', include('news_pdf.urls')),
     path('subscriptions/', include('subscriptions.urls')),
     path('auth/', include('social_django.urls', namespace='social')),
-
+    path("api/", include("api.urls")),
     path('epaper/', include("reader.urls")),
     path(
         'reader/',
