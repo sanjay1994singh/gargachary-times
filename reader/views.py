@@ -1,16 +1,22 @@
 from io import BytesIO
+from datetime import datetime
 from urllib.parse import urljoin, urlparse
 
 from django.conf import settings
 from django.contrib import messages
+from django.db.models import Count, Prefetch
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404, redirect, render
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.dateparse import parse_date
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from .forms import EditionUploadForm
-from .models import Edition
+from .models import Edition, EditionPage
+from .serializers import EditionDetailSerializer, EditionListSerializer
 from .services import convert_pdf_to_pages
 
 
@@ -168,3 +174,113 @@ def upload_edition(request):
         form = EditionUploadForm()
 
     return render(request, "reader/upload.html", {"form": form})
+
+
+def parse_epaper_date(date_value):
+    if not date_value:
+        return None
+
+    parsed_date = parse_date(date_value)
+    if parsed_date:
+        return parsed_date
+
+    for date_format in ("%d/%m/%Y", "%d-%m-%Y", "%d %b %Y", "%d %B %Y"):
+        try:
+            return datetime.strptime(date_value, date_format).date()
+        except ValueError:
+            continue
+
+    return None
+
+
+def edition_api_queryset():
+    first_page_queryset = EditionPage.objects.order_by("number")
+    return (
+        Edition.objects
+        .annotate(page_count=Count("pages"))
+        .prefetch_related(
+            Prefetch("pages", queryset=first_page_queryset)
+        )
+    )
+
+
+@api_view(["GET"])
+def api_edition_list(request):
+    limit = request.GET.get("limit", 30)
+    try:
+        limit = min(max(int(limit), 1), 100)
+    except (TypeError, ValueError):
+        limit = 30
+
+    editions = edition_api_queryset()
+    city = request.GET.get("city")
+    section = request.GET.get("section")
+    date_value = request.GET.get("date")
+
+    if city:
+        editions = editions.filter(city__iexact=city)
+
+    if section:
+        editions = editions.filter(section__iexact=section)
+
+    if date_value:
+        edition_date = parse_epaper_date(date_value)
+        if not edition_date:
+            return Response(
+                {"error": "Invalid date format. Use YYYY-MM-DD or DD/MM/YYYY."},
+                status=400
+            )
+        editions = editions.filter(publish_date=edition_date)
+
+    serializer = EditionListSerializer(
+        editions[:limit],
+        many=True,
+        context={"request": request}
+    )
+    return Response({"editions": serializer.data})
+
+
+@api_view(["GET"])
+def api_latest_edition(request):
+    editions = edition_api_queryset()
+    date_value = request.GET.get("date")
+    city = request.GET.get("city")
+    section = request.GET.get("section")
+
+    if city:
+        editions = editions.filter(city__iexact=city)
+
+    if section:
+        editions = editions.filter(section__iexact=section)
+
+    if date_value:
+        edition_date = parse_epaper_date(date_value)
+        if not edition_date:
+            return Response(
+                {"error": "Invalid date format. Use YYYY-MM-DD or DD/MM/YYYY."},
+                status=400
+            )
+        editions = editions.filter(publish_date=edition_date)
+
+    edition = editions.first()
+    if not edition:
+        return Response({
+            "edition": None,
+            "message": "No e-paper found."
+        })
+
+    serializer = EditionDetailSerializer(
+        edition,
+        context={"request": request}
+    )
+    return Response({"edition": serializer.data})
+
+
+@api_view(["GET"])
+def api_edition_detail(request, pk):
+    edition = get_object_or_404(edition_api_queryset(), pk=pk)
+    serializer = EditionDetailSerializer(
+        edition,
+        context={"request": request}
+    )
+    return Response({"edition": serializer.data})
