@@ -396,6 +396,10 @@ def refund_policy(request):
     return render(request, 'pages/refund_policy.html')
 
 
+def return_policy(request):
+    return render(request, 'pages/return_policy.html')
+
+
 def terms_conditions(request):
     return render(request, 'pages/terms_conditions.html')
 
