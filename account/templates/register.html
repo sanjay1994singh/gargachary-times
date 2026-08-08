@@ -16,14 +16,6 @@ Register | Gargachary Times
                 </div>
 
                 <div class="card-body p-5">
-                    {% if messages %}
-                    {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} rounded-4">
-                        {{ message }}
-                    </div>
-                    {% endfor %}
-                    {% endif %}
-
                     <form method="POST">
                         {% csrf_token %}
 

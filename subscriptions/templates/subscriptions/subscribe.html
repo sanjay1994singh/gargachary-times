@@ -292,6 +292,15 @@ Subscribe {{ plan.name }} | Gargachary Times
         function showError(message) {
             errorBox.textContent = message;
             errorBox.classList.remove('d-none');
+
+            if (window.Swal) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Payment Error',
+                    text: message,
+                    confirmButtonColor: '#b91c1c'
+                });
+            }
         }
 
         function setLoading(isLoading) {
@@ -299,6 +308,14 @@ Subscribe {{ plan.name }} | Gargachary Times
             button.innerHTML = isLoading
                 ? 'Please wait...'
                 : '<i class="bi bi-shield-lock"></i> Pay with Razorpay';
+
+            if (isLoading && window.showSiteLoader) {
+                window.showSiteLoader();
+            }
+
+            if (!isLoading && window.hideSiteLoader) {
+                window.hideSiteLoader();
+            }
         }
 
         form.addEventListener('submit', function (event) {
@@ -336,6 +353,9 @@ Subscribe {{ plan.name }} | Gargachary Times
                             document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
                             document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
                             document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                            if (window.showSiteLoader) {
+                                window.showSiteLoader();
+                            }
                             form.submit();
                         },
                         modal: {
@@ -349,6 +369,9 @@ Subscribe {{ plan.name }} | Gargachary Times
                     });
 
                     razorpay.open();
+                    if (window.hideSiteLoader) {
+                        window.hideSiteLoader();
+                    }
                 })
                 .catch(function (error) {
                     setLoading(false);

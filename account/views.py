@@ -138,6 +138,11 @@ def register(request):
             backend='django.contrib.auth.backends.ModelBackend'
         )
 
+        messages.success(
+            request,
+            'Account created successfully. Login details have been sent to your email.'
+        )
+
         return redirect('profile')
 
     return render(
@@ -204,6 +209,11 @@ def login_view(request):
                     'profile'
                 )
 
+        messages.error(
+            request,
+            'Invalid login credentials'
+        )
+
         return render(
 
             request,
@@ -211,8 +221,6 @@ def login_view(request):
             'login.html',
 
             {
-                'error':
-                    'Invalid login credentials',
                 'next': request.POST.get('next', '')
             }
         )

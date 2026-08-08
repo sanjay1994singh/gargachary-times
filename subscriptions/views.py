@@ -95,6 +95,10 @@ def subscribe(request, plan_id):
         mobile = request.POST.get('mobile')
 
         if User.objects.filter(email=email).exists():
+            messages.error(
+                request,
+                'Email already exists. Please login or use Google.'
+            )
             return render(
                 request,
                 'subscriptions/subscribe.html',
@@ -107,6 +111,10 @@ def subscribe(request, plan_id):
             )
 
         if mobile and User.objects.filter(mobile=mobile).exists():
+            messages.error(
+                request,
+                'Mobile already exists. Please login or use Google.'
+            )
             return render(
                 request,
                 'subscriptions/subscribe.html',
@@ -136,6 +144,10 @@ def subscribe(request, plan_id):
             request,
             user,
             backend='django.contrib.auth.backends.ModelBackend'
+        )
+        messages.success(
+            request,
+            'Account created successfully. Login details have been sent to your email.'
         )
 
     context = {

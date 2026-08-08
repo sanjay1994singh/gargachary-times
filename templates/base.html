@@ -117,13 +117,18 @@
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
-            z-index: 9999;
+            z-index: 10000;
             display: none;
+            text-align: center;
         }
 
         #loader img {
-            width: 50px;
-            height: 50px;
+            width: 64px;
+            height: 64px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.24);
         }
 
         #loader-overlay {
@@ -132,9 +137,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 9998;
+            background-color: rgba(255, 255, 255, 0.72);
+            z-index: 9999;
             display: none;
+            backdrop-filter: blur(2px);
         }
     </style>
 
@@ -456,6 +462,76 @@
 <script src="/static/offline-base.js?v=20260616"></script>
 <!-- SweetAlert2 -->
 <script src="/static/sweetalert2.min.js"></script>
+<script>
+    window.showSiteLoader = function () {
+        var overlay = document.getElementById('loader-overlay');
+        var loader = document.getElementById('loader');
+
+        if (overlay) {
+            overlay.style.display = 'block';
+        }
+
+        if (loader) {
+            loader.style.display = 'block';
+        }
+    };
+
+    window.hideSiteLoader = function () {
+        var overlay = document.getElementById('loader-overlay');
+        var loader = document.getElementById('loader');
+
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+
+        if (loader) {
+            loader.style.display = 'none';
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+
+            if (!form || form.dataset.noLoader === 'true') {
+                return;
+            }
+
+            if (form.checkValidity && !form.checkValidity()) {
+                return;
+            }
+
+            window.showSiteLoader();
+
+            var submitButton = form.querySelector('[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.dataset.originalText = submitButton.innerHTML;
+                submitButton.innerHTML = 'Please wait...';
+            }
+        });
+
+        window.addEventListener('pageshow', window.hideSiteLoader);
+    });
+</script>
+{% if messages %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        {% for message in messages %}
+        if (window.hideSiteLoader) {
+            window.hideSiteLoader();
+        }
+
+        Swal.fire({
+            icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %}",
+            title: "{% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Error{% elif message.tags == 'warning' %}Warning{% else %}Notice{% endif %}",
+            text: "{{ message|escapejs }}",
+            confirmButtonColor: '#b91c1c'
+        });
+        {% endfor %}
+    });
+</script>
+{% endif %}
 
 {% block js %}{% endblock js %}
 </body>

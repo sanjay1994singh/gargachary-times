@@ -301,19 +301,40 @@ body.site-refresh .price {
 }
 
 body.site-refresh .form-control,
+body.site-refresh .form-select,
 body.site-refresh .login-input {
+    display: block;
+    width: 100%;
     min-height: 48px;
     border: 1px solid var(--gt-line) !important;
     border-radius: 8px !important;
     background-color: #fff !important;
     color: var(--gt-ink) !important;
     box-shadow: none !important;
+    font-size: 16px;
+    line-height: 1.35;
+    max-width: 100%;
 }
 
 body.site-refresh .form-control:focus,
+body.site-refresh .form-select:focus,
 body.site-refresh .login-input:focus {
     border-color: var(--gt-red) !important;
     box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.12) !important;
+}
+
+body.site-refresh textarea.form-control {
+    min-height: 110px;
+    resize: vertical;
+}
+
+body.site-refresh label {
+    overflow-wrap: anywhere;
+}
+
+body.site-refresh .table-responsive {
+    width: 100%;
+    overflow-x: auto;
 }
 
 body.site-refresh section.bg-light,
@@ -407,5 +428,34 @@ body.site-refresh .social-btn {
         border-right: 0;
         margin-left: 0;
         margin-right: 0;
+    }
+
+    body.site-refresh .container,
+    body.site-refresh .container-fluid {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    body.site-refresh .card-body,
+    body.site-refresh .profile-panel-body,
+    body.site-refresh .panel-body {
+        padding: 16px !important;
+    }
+
+    body.site-refresh .btn {
+        width: 100%;
+        white-space: normal;
+    }
+
+    body.site-refresh h1 {
+        font-size: 28px;
+    }
+
+    body.site-refresh h2 {
+        font-size: 24px;
+    }
+
+    body.site-refresh h3 {
+        font-size: 21px;
     }
 }
