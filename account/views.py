@@ -62,9 +62,9 @@ def google_oauth_complete(request):
     try:
         return complete(request, backend='google-oauth2')
     except SocialAuthBaseException:
-        messages.error(
+        messages.warning(
             request,
-            'This Google account is already connected with another user. Please login with your email/mobile or use a different Google account.'
+            'This Gmail is already registered. Please login with your email/mobile password, or choose another Google account.'
         )
         return redirect('login')
 
