@@ -90,6 +90,15 @@ def subscribe(request, plan_id):
         is_active=True
     )
 
+    if request.user.is_authenticated and (
+        request.user.is_staff or request.user.is_superuser
+    ):
+        messages.error(
+            request,
+            'Admin users cannot purchase subscriptions. Please use a normal user account.'
+        )
+        return redirect('profile')
+
     if not request.user.is_authenticated and request.method == 'POST':
         email = request.POST.get('email')
         mobile = request.POST.get('mobile')
@@ -331,6 +340,14 @@ def send_account_updated_email(user):
 def razorpay_create_order(request, plan_id):
     if request.method != 'POST':
         return HttpResponseBadRequest('Invalid request method')
+
+    if request.user.is_staff or request.user.is_superuser:
+        return JsonResponse(
+            {
+                'error': 'Admin users cannot purchase subscriptions. Please use a normal user account.'
+            },
+            status=403
+        )
 
     if not settings.RAZORPAY_KEY_ID or not settings.RAZORPAY_KEY_SECRET:
         return JsonResponse(
