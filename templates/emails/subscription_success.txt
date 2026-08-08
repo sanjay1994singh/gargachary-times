@@ -6,6 +6,8 @@ Plan: {{ subscription.plan.name }}
 Amount: Rs. {{ invoice.amount }}
 Invoice number: {{ invoice.invoice_number }}
 Payment status: {{ subscription.payment_status }}
+Delivery status: {{ invoice.get_delivery_status_display }}
+Delivery note: {{ invoice.delivery_note|default:"No delivery note yet" }}
 Start date: {{ subscription.start_date }}
 End date: {{ subscription.end_date|default:"Lifetime" }}
 

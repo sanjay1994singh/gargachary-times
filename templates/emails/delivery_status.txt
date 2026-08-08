@@ -1,0 +1,13 @@
+Hello {{ user.full_name|default:user.username }},
+
+Your Gargachary Times delivery status has been updated.
+
+Invoice number: {{ invoice.invoice_number }}
+Plan: {{ subscription.plan.name }}
+Delivery status: {{ invoice.get_delivery_status_display }}
+Delivery note: {{ invoice.delivery_note|default:"No delivery note provided" }}
+
+Login page: {{ login_url }}
+You can view full invoice and subscription details from your profile.
+
+Gargachary Times

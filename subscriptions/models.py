@@ -38,6 +38,16 @@ PAYMENT_STATUS = (
 )
 
 
+DELIVERY_STATUS = (
+    ('NOT_REQUIRED', 'Not Required'),
+    ('PENDING', 'Pending'),
+    ('PROCESSING', 'Processing'),
+    ('SHIPPED', 'Shipped'),
+    ('DELIVERED', 'Delivered'),
+    ('CANCELLED', 'Cancelled'),
+)
+
+
 class SubscriptionPlan(models.Model):
 
     name = models.CharField(
@@ -245,6 +255,17 @@ class Invoice(models.Model):
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2
+    )
+
+    delivery_status = models.CharField(
+        max_length=20,
+        choices=DELIVERY_STATUS,
+        default='PENDING'
+    )
+
+    delivery_note = models.CharField(
+        max_length=255,
+        blank=True
     )
 
     created_at = models.DateTimeField(

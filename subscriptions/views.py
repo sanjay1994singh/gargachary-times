@@ -21,6 +21,7 @@ from django.contrib.auth.decorators import (
     login_required
 )
 from django.contrib.auth import login
+from django.contrib import messages
 
 from django.urls import reverse
 
@@ -213,6 +214,38 @@ def send_subscription_success_email(subscription, invoice):
     )
     html_body = render_to_string(
         'emails/subscription_success.html',
+        context
+    )
+
+    email = EmailMultiAlternatives(
+        subject,
+        text_body,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email]
+    )
+    email.attach_alternative(html_body, 'text/html')
+    email.send(fail_silently=True)
+
+
+def send_delivery_status_email(invoice):
+    user = invoice.subscription.user
+
+    if not user.email:
+        return
+
+    context = {
+        'user': user,
+        'invoice': invoice,
+        'subscription': invoice.subscription,
+        'login_url': f'{settings.BASE_URL}/login/',
+    }
+    subject = f'Delivery update - {invoice.invoice_number}'
+    text_body = render_to_string(
+        'emails/delivery_status.txt',
+        context
+    )
+    html_body = render_to_string(
+        'emails/delivery_status.html',
         context
     )
 
@@ -606,6 +639,37 @@ def invoice_detail(request, invoice_number):
 
 @login_required
 def profile(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        mobile = request.POST.get('mobile')
+
+        if (
+            email and
+            User.objects.exclude(id=request.user.id).filter(email=email).exists()
+        ):
+            messages.error(request, 'Email already exists.')
+            return redirect('profile')
+
+        if (
+            mobile and
+            User.objects.exclude(id=request.user.id).filter(mobile=mobile).exists()
+        ):
+            messages.error(request, 'Mobile already exists.')
+            return redirect('profile')
+
+        request.user.full_name = request.POST.get('full_name')
+        request.user.email = email
+        request.user.mobile = mobile
+        request.user.address = request.POST.get('address')
+        request.user.city = request.POST.get('city')
+        request.user.state = request.POST.get('state')
+        request.user.pincode = request.POST.get('pincode')
+        request.user.country = request.POST.get('country') or 'India'
+        request.user.save()
+
+        messages.success(request, 'Account details updated successfully.')
+        return redirect('profile')
+
     subscription = (
 
         UserSubscription.objects.filter(
@@ -626,9 +690,19 @@ def profile(request):
 
     )
 
+    subscriptions = (
+        UserSubscription.objects
+        .select_related('plan', 'invoice')
+        .filter(user=request.user)
+        .order_by('-created_at')
+    )
+
     context = {
 
-        'subscription': subscription
+        'subscription': subscription,
+        'subscriptions': subscriptions,
+        'states': State.objects.filter(country__code='IN'),
+        'default_state': request.user.state or 'Uttar Pradesh',
 
     }
 
@@ -652,7 +726,7 @@ def my_subscription(request):
 
             user=request.user
 
-        ).order_by('-created_at')
+        ).select_related('plan', 'invoice').order_by('-created_at')
 
     )
 

@@ -35,6 +35,10 @@ Invoice {{ invoice.invoice_number }} | Gargachary Times
             <div class="col-md-6 text-md-end">
                 <p><strong>Date:</strong> {{ invoice.created_at|date:"d M Y" }}</p>
                 <p><strong>Status:</strong> {{ invoice.subscription.payment_status }}</p>
+                <p><strong>Delivery:</strong> {{ invoice.get_delivery_status_display }}</p>
+                {% if invoice.delivery_note %}
+                <p><strong>Delivery Note:</strong> {{ invoice.delivery_note }}</p>
+                {% endif %}
             </div>
         </div>
 

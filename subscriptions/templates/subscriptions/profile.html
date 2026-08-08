@@ -4,204 +4,250 @@
 My Profile | Gargachary Times
 {% endblock %}
 
+{% block css %}
+<style>
+    .profile-panel {
+        background: #fff;
+        border: 1px solid #e4ded6;
+        border-radius: 8px;
+        box-shadow: 0 14px 35px rgba(23, 23, 23, 0.08);
+    }
+
+    .profile-panel-header {
+        border-bottom: 1px solid #e4ded6;
+        padding: 18px 22px;
+    }
+
+    .profile-panel-body {
+        padding: 22px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        border-bottom: 1px solid #f1ede7;
+        padding: 10px 0;
+    }
+
+    .detail-row:last-child {
+        border-bottom: 0;
+    }
+
+    .detail-label {
+        color: #6b7280;
+        font-weight: 700;
+    }
+
+    .detail-value {
+        color: #111827;
+        font-weight: 700;
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-
 <div class="container py-5">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} rounded-4">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
 
-    <div class="row">
-
-        <div class="col-lg-4 mb-4">
-
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-
-                <div class="bg-dark text-white text-center p-5">
-
-                    <img src="https://ui-avatars.com/api/?name={{ request.user.username }}&background=dc3545&color=fff&size=120"
-                         class="rounded-circle mb-3">
-
-                    <h3 class="fw-bold">
-
-                        {{ request.user.username }}
-
-                    </h3>
-
-                    <p class="mb-1">
-
-                        {{ request.user.email }}
-
-                    </p>
-
-                    <p>
-
-                        {{ request.user.mobile }}
-
-                    </p>
-
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="profile-panel mb-4">
+                <div class="bg-dark text-white text-center p-4">
+                    <img src="https://ui-avatars.com/api/?name={{ request.user.full_name|default:request.user.username }}&background=dc3545&color=fff&size=120"
+                         class="rounded-circle mb-3"
+                         alt="{{ request.user.username }}">
+                    <h3 class="fw-bold">{{ request.user.full_name|default:request.user.username }}</h3>
+                    <p class="mb-1">{{ request.user.email }}</p>
+                    <p class="mb-0">{{ request.user.mobile }}</p>
                 </div>
 
-                <div class="card-body p-4">
-
-                    <p>
-
-                        <strong>City:</strong>
-
-                        {{ request.user.city }}
-
-                    </p>
-
-                    <p>
-
-                        <strong>District:</strong>
-
-                        {{ request.user.district }}
-
-                    </p>
-
-                    <p>
-
-                        <strong>State:</strong>
-
-                        {{ request.user.state }}
-
-                    </p>
-
+                <div class="profile-panel-body">
+                    <div class="detail-row">
+                        <span class="detail-label">City</span>
+                        <span class="detail-value">{{ request.user.city|default:"-" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">State</span>
+                        <span class="detail-value">{{ request.user.state|default:"-" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">PIN</span>
+                        <span class="detail-value">{{ request.user.pincode|default:"-" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Country</span>
+                        <span class="detail-value">{{ request.user.country|default:"India" }}</span>
+                    </div>
                 </div>
-
             </div>
 
+            <div class="profile-panel">
+                <div class="profile-panel-header">
+                    <h4 class="fw-bold mb-0">Update Account</h4>
+                </div>
+                <div class="profile-panel-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="fw-bold mb-2">Full name</label>
+                            <input type="text" name="full_name" value="{{ request.user.full_name|default:'' }}" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold mb-2">Email</label>
+                            <input type="email" name="email" value="{{ request.user.email|default:'' }}" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold mb-2">Mobile</label>
+                            <input type="text" name="mobile" value="{{ request.user.mobile|default:'' }}" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold mb-2">Address</label>
+                            <textarea name="address" class="form-control" rows="3">{{ request.user.address|default:'' }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold mb-2">City</label>
+                            <input type="text" name="city" value="{{ request.user.city|default:'' }}" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold mb-2">PIN code</label>
+                            <input type="text" name="pincode" value="{{ request.user.pincode|default:'' }}" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold mb-2">State</label>
+                            <select name="state" class="form-select">
+                                {% for state in states %}
+                                <option value="{{ state.name }}" {% if state.name == default_state %}selected{% endif %}>
+                                    {{ state.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="fw-bold mb-2">Country</label>
+                            <input type="text" name="country" value="{{ request.user.country|default:'India' }}" class="form-control" readonly>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100">
+                            Save Account Details
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <div class="col-lg-8">
-
-            <div class="card border-0 shadow-lg rounded-4">
-
-                <div class="card-body p-5">
-
-                    <h2 class="fw-bold mb-4">
-
-                        My Subscription
-
-                    </h2>
-
-                    {% if subscription %}
-
-                    <div class="row g-4">
-
-                        <div class="col-md-6">
-
-                            <div class="bg-light rounded-4 p-4">
-
-                                <small class="text-muted">
-
-                                    Current Plan
-
-                                </small>
-
-                                <h4 class="fw-bold text-danger">
-
-                                    {{ subscription.plan.name }}
-
-                                </h4>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="bg-light rounded-4 p-4">
-
-                                <small class="text-muted">
-
-                                    Status
-
-                                </small>
-
-                                <h4>
-
-                                    <span class="badge bg-success">
-
-                                        Active
-
-                                    </span>
-
-                                </h4>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="bg-light rounded-4 p-4">
-
-                                <small class="text-muted">
-
-                                    Start Date
-
-                                </small>
-
-                                <h5>
-
-                                    {{ subscription.start_date }}
-
-                                </h5>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-6">
-
-                            <div class="bg-light rounded-4 p-4">
-
-                                <small class="text-muted">
-
-                                    Expiry Date
-
-                                </small>
-
-                                <h5>
-
-                                    {{ subscription.end_date }}
-
-                                </h5>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    {% else %}
-
-                    <div class="text-center py-5">
-
-                        <h4 class="mb-4">
-
-                            No Active Subscription
-
-                        </h4>
-
-                        <a href="{% url 'plans' %}"
-                           class="btn btn-danger btn-lg rounded-pill px-5">
-
-                            Buy Subscription
-
-                        </a>
-
-                    </div>
-
-                    {% endif %}
-
+            <div class="profile-panel mb-4">
+                <div class="profile-panel-header">
+                    <h3 class="fw-bold mb-0">Active Subscription</h3>
                 </div>
-
+                <div class="profile-panel-body">
+                    {% if subscription %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <span class="detail-label">Plan</span>
+                                <span class="detail-value">{{ subscription.plan.name }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <span class="detail-label">Status</span>
+                                <span class="badge bg-success">Active</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <span class="detail-label">Start</span>
+                                <span class="detail-value">{{ subscription.start_date|date:"d M Y" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-row">
+                                <span class="detail-label">Expiry</span>
+                                <span class="detail-value">{{ subscription.end_date|date:"d M Y"|default:"Lifetime" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <h4 class="mb-3">No Active Subscription</h4>
+                        <a href="{% url 'plans' %}" class="btn btn-danger px-5">Buy Subscription</a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
 
+            <div class="profile-panel">
+                <div class="profile-panel-header">
+                    <h3 class="fw-bold mb-0">Subscriptions & Invoices</h3>
+                </div>
+                <div class="profile-panel-body">
+                    {% if subscriptions %}
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                            <tr>
+                                <th>Plan</th>
+                                <th>Payment</th>
+                                <th>Invoice</th>
+                                <th>Delivery</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in subscriptions %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.plan.name }}</strong><br>
+                                    <small class="text-muted">{{ item.created_at|date:"d M Y" }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge {% if item.payment_status == 'SUCCESS' %}bg-success{% elif item.payment_status == 'FAILED' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                        {{ item.payment_status }}
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">{{ item.transaction_id }}</small>
+                                </td>
+                                <td>
+                                    {% if item.invoice %}
+                                    <a href="{% url 'invoice_detail' item.invoice.invoice_number %}" class="fw-bold">
+                                        {{ item.invoice.invoice_number }}
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.invoice %}
+                                    <span class="badge bg-light text-dark border">
+                                        {{ item.invoice.get_delivery_status_display }}
+                                    </span>
+                                    {% if item.invoice.delivery_note %}
+                                    <br><small class="text-muted">{{ item.invoice.delivery_note }}</small>
+                                    {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">Rs. {{ item.amount }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted mb-0">No subscription history found.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-
     </div>
-
 </div>
-
 {% endblock %}

@@ -195,6 +195,24 @@ My Subscription | Gargachary Times
 
                     </div>
 
+                    {% if subscription.invoice %}
+                    <div class="mb-3">
+                        <strong>Invoice:</strong>
+                        <a href="{% url 'invoice_detail' subscription.invoice.invoice_number %}">
+                            {{ subscription.invoice.invoice_number }}
+                        </a>
+                    </div>
+
+                    <div class="mb-4">
+                        <strong>Delivery Status:</strong>
+                        {{ subscription.invoice.get_delivery_status_display }}
+                        {% if subscription.invoice.delivery_note %}
+                        <br>
+                        <small class="text-muted">{{ subscription.invoice.delivery_note }}</small>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
                     {% if subscription.is_active %}
 
                     <a href="{% url 'epaper' %}"
