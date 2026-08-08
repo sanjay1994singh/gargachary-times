@@ -31,9 +31,9 @@ body.site-refresh .site-navbar .container {
     min-height: 66px;
     padding-left: 12px;
     padding-right: 12px;
-    gap: clamp(18px, 3vw, 52px);
-    flex-wrap: nowrap;
-    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
 
 body.site-refresh .site-navbar .navbar-brand img {
@@ -42,37 +42,25 @@ body.site-refresh .site-navbar .navbar-brand img {
 }
 
 body.site-refresh .site-navbar .navbar-brand {
-    flex: 0 1 160px;
+    flex: 0 0 160px;
     min-width: 118px;
     max-width: 170px;
     margin-right: 0;
 }
 
 body.site-refresh .site-navbar .navbar-collapse {
-    flex: 0 1 auto;
+    flex: 1 1 auto;
     min-width: 0;
     overflow: visible;
 }
 
 body.site-refresh .site-navbar .navbar-nav {
     align-items: center;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: flex-start;
-    gap: 1px;
-    width: auto;
-}
-
-@media (min-width: 1200px) {
-    body.site-refresh .site-navbar .navbar-collapse {
-        max-width: calc(100vw - 220px);
-        overflow-x: auto;
-        overflow-y: visible;
-        scrollbar-width: thin;
-    }
-
-    body.site-refresh .site-navbar .navbar-collapse::-webkit-scrollbar {
-        height: 4px;
-    }
+    gap: 4px;
+    width: 100%;
+    overflow: visible;
 }
 
 body.site-refresh .site-navbar .nav-link {
@@ -84,7 +72,7 @@ body.site-refresh .site-navbar .nav-link {
     font-size: clamp(12px, 0.92vw, 14px);
     font-weight: 700;
     line-height: 1.2;
-    padding: 8px clamp(6px, 0.72vw, 10px) !important;
+    padding: 8px 9px !important;
     white-space: nowrap;
 }
 
@@ -133,6 +121,19 @@ body.site-refresh .dropdown-menu {
     box-shadow: var(--gt-shadow);
     padding: 8px;
     min-width: 220px;
+    z-index: 2000;
+}
+
+@media (min-width: 1200px) {
+    body.site-refresh .dropdown:hover > .dropdown-menu {
+        display: block;
+    }
+
+    body.site-refresh .site-navbar .navbar-nav > .nav-item:last-child .nav-link {
+        max-width: 210px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 body.site-refresh .dropdown-item {
