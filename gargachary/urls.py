@@ -6,10 +6,20 @@ from news.sitemap import NewsSitemap, CategorySitemap
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from django.contrib.sitemaps.views import sitemap
+from django.http import HttpResponse
 from account import views
+
+
+def ads_txt(request):
+    return HttpResponse(
+        'google.com, pub-6716930239576338, DIRECT, f08c47fec0942fa0\n',
+        content_type='text/plain'
+    )
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('ads.txt', ads_txt, name='ads_txt'),
     path('', include('homepage.urls')),
     path('video/', include('video.urls')),
     path('news/', include('news.urls')),
