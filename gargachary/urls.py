@@ -26,6 +26,11 @@ urlpatterns = [
     path('account/', include('account.urls')),
     path('news_pdf/', include('news_pdf.urls')),
     path('subscriptions/', include('subscriptions.urls')),
+    path(
+        'auth/complete/google-oauth2/',
+        views.google_oauth_complete,
+        name='google_oauth_complete'
+    ),
     path('auth/', include('social_django.urls', namespace='social')),
     path("api/", include("api.urls")),
     path('epaper/', include("reader.urls")),

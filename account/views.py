@@ -9,6 +9,8 @@ from django.contrib.auth import authenticate, login, logout
 from account.models import State, User
 from django.shortcuts import redirect
 from django.contrib import messages
+from social_core.exceptions import SocialAuthBaseException
+from social_django.views import complete
 
 
 def generate_strong_password(length=14):
@@ -54,6 +56,17 @@ def send_account_created_email(user, password):
     )
     email.attach_alternative(html_body, 'text/html')
     email.send(fail_silently=True)
+
+
+def google_oauth_complete(request):
+    try:
+        return complete(request, backend='google-oauth2')
+    except SocialAuthBaseException:
+        messages.error(
+            request,
+            'This Google account is already connected with another user. Please login with your email/mobile or use a different Google account.'
+        )
+        return redirect('login')
 
 
 def register(request):
