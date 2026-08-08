@@ -206,6 +206,15 @@ My Subscription | Gargachary Times
 
                     </a>
 
+                    {% if subscription.invoice %}
+                    <a href="{% url 'invoice_detail' subscription.invoice.invoice_number %}"
+                       class="btn btn-outline-dark rounded-pill px-4 ms-2">
+
+                        Invoice
+
+                    </a>
+                    {% endif %}
+
                     {% else %}
 
                     <a href="{% url 'plans' %}"

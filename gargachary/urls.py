@@ -55,6 +55,12 @@ urlpatterns = [
     ),
 
     path(
+        'accounts/login/',
+        views.login_view,
+        name='accounts_login'
+    ),
+
+    path(
         'register/',
         views.register,
         name='register'

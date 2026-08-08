@@ -1,0 +1,15 @@
+Hello {{ user.full_name|default:user.username }},
+
+Your Gargachary Times subscription is active.
+
+Plan: {{ subscription.plan.name }}
+Amount: Rs. {{ invoice.amount }}
+Invoice number: {{ invoice.invoice_number }}
+Payment status: {{ subscription.payment_status }}
+Start date: {{ subscription.start_date }}
+End date: {{ subscription.end_date|default:"Lifetime" }}
+
+Login page: {{ login_url }}
+You can login with your email or mobile number and password.
+
+Gargachary Times

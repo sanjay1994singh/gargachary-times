@@ -7,166 +7,117 @@ Register | Gargachary Times
 {% block content %}
 
 <div class="container py-5">
-
     <div class="row justify-content-center">
-
-        <div class="col-lg-7">
-
+        <div class="col-lg-8">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-
                 <div class="bg-danger text-white text-center p-4">
-
-                    <h2 class="fw-bold">
-
-                        Create account
-
-                    </h2>
-
+                    <h2 class="fw-bold">Create account</h2>
+                    <p class="mb-0">A strong password will be sent to your email.</p>
                 </div>
 
                 <div class="card-body p-5">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} rounded-4">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
 
                     <form method="POST">
-
                         {% csrf_token %}
 
                         <div class="row">
-
                             <div class="col-md-6 mb-4">
-
-                                <label class="fw-bold mb-2">
-
-                                    Username
-
-                                </label>
-
+                                <label class="fw-bold mb-2">Full name</label>
                                 <input type="text"
-                                       name="username"
+                                       name="full_name"
                                        class="form-control form-control-lg rounded-4"
                                        required>
-
                             </div>
 
                             <div class="col-md-6 mb-4">
-
-                                <label class="fw-bold mb-2">
-
-                                    Email
-
-                                </label>
-
+                                <label class="fw-bold mb-2">Email</label>
                                 <input type="email"
                                        name="email"
                                        class="form-control form-control-lg rounded-4"
                                        required>
-
                             </div>
 
                             <div class="col-md-6 mb-4">
-
-                                <label class="fw-bold mb-2">
-
-                                    Mobile
-
-                                </label>
-
+                                <label class="fw-bold mb-2">Mobile</label>
                                 <input type="text"
                                        name="mobile"
-                                       class="form-control form-control-lg rounded-4">
-
+                                       class="form-control form-control-lg rounded-4"
+                                       required>
                             </div>
 
                             <div class="col-md-6 mb-4">
-
-                                <label class="fw-bold mb-2">
-
-                                    City
-
-                                </label>
-
+                                <label class="fw-bold mb-2">City</label>
                                 <input type="text"
                                        name="city"
-                                       class="form-control form-control-lg rounded-4">
-
-                            </div>
-
-                            <div class="col-md-6 mb-4">
-
-                                <label class="fw-bold mb-2">
-
-                                    District
-
-                                </label>
-
-                                <input type="text"
-                                       name="district"
-                                       class="form-control form-control-lg rounded-4">
-
-                            </div>
-
-                            <div class="col-md-6 mb-4">
-
-                                <label class="fw-bold mb-2">
-
-                                    State
-
-                                </label>
-
-                                <input type="text"
-                                       name="state"
-                                       class="form-control form-control-lg rounded-4">
-
-                            </div>
-
-                            <div class="col-md-6 mb-4">
-
-                                <label class="fw-bold mb-2">
-
-                                    Password
-
-                                </label>
-
-                                <input type="password"
-                                       name="password"
                                        class="form-control form-control-lg rounded-4"
                                        required>
-
                             </div>
 
-                            <div class="col-md-6 mb-4">
+                            <div class="col-12 mb-4">
+                                <label class="fw-bold mb-2">Address</label>
+                                <textarea name="address"
+                                          class="form-control rounded-4"
+                                          rows="3"
+                                          required></textarea>
+                            </div>
 
-                                <label class="fw-bold mb-2">
-
-                                    Confirm Password
-
-                                </label>
-
-                                <input type="password"
-                                       name="confirm_password"
+                            <div class="col-md-4 mb-4">
+                                <label class="fw-bold mb-2">PIN code</label>
+                                <input type="text"
+                                       name="pincode"
                                        class="form-control form-control-lg rounded-4"
                                        required>
-
                             </div>
 
+                            <div class="col-md-4 mb-4">
+                                <label class="fw-bold mb-2">State</label>
+                                <select name="state"
+                                        class="form-select form-select-lg rounded-4"
+                                        required>
+                                    {% for state in states %}
+                                    <option value="{{ state.name }}"
+                                            {% if state.name == default_state %}selected{% endif %}>
+                                        {{ state.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mb-4">
+                                <label class="fw-bold mb-2">Country</label>
+                                <input type="text"
+                                       name="country"
+                                       value="India"
+                                       class="form-control form-control-lg rounded-4"
+                                       readonly>
+                            </div>
                         </div>
 
                         <button type="submit"
                                 class="btn btn-danger btn-lg w-100 rounded-pill mt-3">
-
                             Create account
-
                         </button>
-
                     </form>
 
+                    <a href="{% url 'social:begin' 'google-oauth2' %}"
+                       class="btn btn-light border w-100 mt-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                        <img src="https://www.svgrepo.com/show/355037/google.svg"
+                             width="20"
+                             height="20"
+                             alt="Google">
+                        <span class="fw-semibold text-dark">Continue with Google</span>
+                    </a>
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 {% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0;background:#f4f6f8;font-family:Arial,sans-serif;color:#111827;">
+<div style="max-width:680px;margin:0 auto;padding:24px;">
+    <div style="background:#ffffff;border:1px solid #e5e7eb;padding:28px;">
+        <h2 style="margin:0 0 12px;color:#16a34a;">Subscription active</h2>
+        <p>Hello {{ user.full_name|default:user.username }},</p>
+        <p>Your Gargachary Times subscription has been activated successfully.</p>
+
+        <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Invoice number</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ invoice.invoice_number }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Plan</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ subscription.plan.name }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Amount</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">Rs. {{ invoice.amount }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Status</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ subscription.payment_status }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Validity</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">
+                    {{ subscription.start_date }} to {{ subscription.end_date|default:"Lifetime" }}
+                </td>
+            </tr>
+        </table>
+
+        <p>Login here: <a href="{{ login_url }}">{{ login_url }}</a></p>
+        <p>You can login with your email or mobile number and password.</p>
+    </div>
+</div>
+</body>
+</html>

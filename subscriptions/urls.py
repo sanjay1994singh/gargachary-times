@@ -59,6 +59,12 @@ urlpatterns = [
     ),
 
     path(
+        'invoice/<str:invoice_number>/',
+        views.invoice_detail,
+        name='invoice_detail'
+    ),
+
+    path(
         'profile/',
         views.profile,
         name='profile'

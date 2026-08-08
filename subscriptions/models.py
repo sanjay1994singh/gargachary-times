@@ -193,6 +193,68 @@ class UserSubscription(models.Model):
         )
 
 
+class Invoice(models.Model):
+    subscription = models.OneToOneField(
+        UserSubscription,
+        on_delete=models.CASCADE,
+        related_name='invoice'
+    )
+
+    invoice_number = models.CharField(
+        max_length=40,
+        unique=True
+    )
+
+    billing_name = models.CharField(
+        max_length=150
+    )
+
+    billing_email = models.EmailField(
+        blank=True
+    )
+
+    billing_mobile = models.CharField(
+        max_length=20,
+        blank=True
+    )
+
+    billing_address = models.TextField(
+        blank=True
+    )
+
+    billing_city = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    billing_state = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    billing_pincode = models.CharField(
+        max_length=10,
+        blank=True
+    )
+
+    billing_country = models.CharField(
+        max_length=50,
+        default='India'
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return self.invoice_number
+
+
 class MagazineOrder(models.Model):
 
     user = models.ForeignKey(

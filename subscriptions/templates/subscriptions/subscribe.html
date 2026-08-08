@@ -230,6 +230,115 @@ Subscribe {{ plan.name }} | Gargachary Times
 
                         </div>
 
+                        {% if not request.user.is_authenticated %}
+                        {% if register_error %}
+                        <div class="alert alert-danger rounded-4">
+                            {{ register_error }}
+                        </div>
+                        {% endif %}
+
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+                            <h3 class="fw-bold mb-4">
+                                Create account
+                            </h3>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold mb-2">Full name</label>
+                                    <input type="text"
+                                           name="full_name"
+                                           class="form-control form-control-lg rounded-4"
+                                           required>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold mb-2">Email</label>
+                                    <input type="email"
+                                           name="email"
+                                           class="form-control form-control-lg rounded-4"
+                                           required>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold mb-2">Mobile</label>
+                                    <input type="text"
+                                           name="mobile"
+                                           class="form-control form-control-lg rounded-4"
+                                           required>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold mb-2">City</label>
+                                    <input type="text"
+                                           name="city"
+                                           class="form-control form-control-lg rounded-4"
+                                           required>
+                                </div>
+
+                                <div class="col-12 mb-3">
+                                    <label class="fw-bold mb-2">Address</label>
+                                    <textarea name="address"
+                                              class="form-control rounded-4"
+                                              rows="3"
+                                              required></textarea>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold mb-2">PIN code</label>
+                                    <input type="text"
+                                           name="pincode"
+                                           class="form-control form-control-lg rounded-4"
+                                           required>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold mb-2">State</label>
+                                    <select name="state"
+                                            class="form-select form-select-lg rounded-4"
+                                            required>
+                                        {% for state in states %}
+                                        <option value="{{ state.name }}"
+                                                {% if state.name == default_state %}selected{% endif %}>
+                                            {{ state.name }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-bold mb-2">Country</label>
+                                    <input type="text"
+                                           name="country"
+                                           value="India"
+                                           class="form-control form-control-lg rounded-4"
+                                           readonly>
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn pay-btn w-100 mt-3">
+                                Create account and continue
+                            </button>
+
+                        </form>
+
+                        <div class="text-center my-4 text-muted">
+                            or
+                        </div>
+
+                        <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}"
+                           class="btn btn-light border w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                            <img src="https://www.svgrepo.com/show/355037/google.svg"
+                                 width="20"
+                                 height="20"
+                                 alt="Google">
+                            <span class="fw-semibold text-dark">Continue with Google</span>
+                        </a>
+
+                        {% else %}
                         <form id="razorpay-payment-form"
                               action="{% url 'razorpay_payment_callback' %}"
                               method="POST">
@@ -263,6 +372,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                         <div id="razorpay-payment-error"
                              class="alert alert-danger mt-3 d-none"
                              role="alert"></div>
+                        {% endif %}
 
                         <div class="text-center mt-4">
 
@@ -291,6 +401,7 @@ Subscribe {{ plan.name }} | Gargachary Times
 {% endblock %}
 
 {% block js %}
+{% if request.user.is_authenticated %}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     (function () {
@@ -368,4 +479,5 @@ Subscribe {{ plan.name }} | Gargachary Times
         });
     })();
 </script>
+{% endif %}
 {% endblock js %}

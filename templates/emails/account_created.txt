@@ -1,0 +1,17 @@
+Hello {{ user.full_name|default:user.username }},
+
+Your Gargachary Times account has been created successfully.
+
+Login page: {{ login_url }}
+Username: {{ user.email }} or {{ user.mobile }}
+Password: {{ password }}
+
+How to login:
+1. Open the login page.
+2. Enter your email or mobile number in the Username / Email / Mobile field.
+3. Enter the password shown above.
+4. After login, open My Subscription to view your plan.
+
+Please keep this password safe and change it after login if needed.
+
+Gargachary Times

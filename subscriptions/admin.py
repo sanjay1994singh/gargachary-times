@@ -65,3 +65,20 @@ class EPaperAdmin(admin.ModelAdmin):
         'published_date',
         'premium_only'
     )
+
+
+@admin.register(Invoice)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = (
+        'invoice_number',
+        'billing_name',
+        'billing_email',
+        'amount',
+        'created_at'
+    )
+
+    search_fields = (
+        'invoice_number',
+        'billing_email',
+        'subscription__transaction_id'
+    )

@@ -20,6 +20,7 @@ from django.shortcuts import (
 from django.contrib.auth.decorators import (
     login_required
 )
+from django.contrib.auth import login
 
 from django.urls import reverse
 
@@ -28,8 +29,17 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from django.db.models import Q
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
+from account.models import State, User
+from account.views import (
+    generate_strong_password,
+    send_account_created_email
+)
 
 from .models import (
+    Invoice,
     SubscriptionPlan,
     UserSubscription,
     EPaper
@@ -58,7 +68,6 @@ def plans(request):
 
 # SUBSCRIBE PAGE
 
-@login_required
 def subscribe(request, plan_id):
     plan = get_object_or_404(
         SubscriptionPlan,
@@ -66,9 +75,55 @@ def subscribe(request, plan_id):
         is_active=True
     )
 
+    if not request.user.is_authenticated and request.method == 'POST':
+        email = request.POST.get('email')
+        mobile = request.POST.get('mobile')
+
+        if User.objects.filter(email=email).exists():
+            return render(
+                request,
+                'subscriptions/subscribe.html',
+                {
+                    'plan': plan,
+                    'states': State.objects.filter(country__code='IN'),
+                    'default_state': 'Uttar Pradesh',
+                    'register_error': 'Email already exists. Please login or use Google.',
+                }
+            )
+
+        if mobile and User.objects.filter(mobile=mobile).exists():
+            return render(
+                request,
+                'subscriptions/subscribe.html',
+                {
+                    'plan': plan,
+                    'states': State.objects.filter(country__code='IN'),
+                    'default_state': 'Uttar Pradesh',
+                    'register_error': 'Mobile already exists. Please login or use Google.',
+                }
+            )
+
+        password = generate_strong_password()
+        user = User.objects.create_user(
+            username=email or mobile,
+            email=email,
+            mobile=mobile,
+            full_name=request.POST.get('full_name'),
+            address=request.POST.get('address'),
+            city=request.POST.get('city'),
+            state=request.POST.get('state') or 'Uttar Pradesh',
+            pincode=request.POST.get('pincode'),
+            country=request.POST.get('country') or 'India',
+            password=password
+        )
+        send_account_created_email(user, password)
+        login(request, user)
+
     context = {
         'plan': plan,
         'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'states': State.objects.filter(country__code='IN'),
+        'default_state': 'Uttar Pradesh',
     }
 
     return render(
@@ -92,15 +147,79 @@ def verify_razorpay_signature(message, signature, secret):
 
 
 def mark_subscription_success(subscription):
+    was_success = subscription.payment_status == 'SUCCESS'
     subscription.payment_status = 'SUCCESS'
     subscription.is_active = True
     subscription.save()
+    invoice = get_or_create_invoice(subscription)
+
+    if not was_success:
+        send_subscription_success_email(subscription, invoice)
 
 
 def mark_subscription_failed(subscription):
     subscription.payment_status = 'FAILED'
     subscription.is_active = False
     subscription.save()
+
+
+def get_or_create_invoice(subscription):
+    user = subscription.user
+    invoice_number = f'GT-{timezone.now().strftime("%Y%m%d")}-{subscription.id:06d}'
+
+    invoice, _ = Invoice.objects.get_or_create(
+        subscription=subscription,
+        defaults={
+            'invoice_number': invoice_number,
+            'billing_name': (
+                user.full_name or
+                user.get_full_name() or
+                user.username
+            ),
+            'billing_email': user.email or '',
+            'billing_mobile': user.mobile or '',
+            'billing_address': user.address or '',
+            'billing_city': user.city or '',
+            'billing_state': user.state or '',
+            'billing_pincode': user.pincode or '',
+            'billing_country': user.country or 'India',
+            'amount': subscription.amount,
+        }
+    )
+
+    return invoice
+
+
+def send_subscription_success_email(subscription, invoice):
+    user = subscription.user
+
+    if not user.email:
+        return
+
+    context = {
+        'user': user,
+        'subscription': subscription,
+        'invoice': invoice,
+        'login_url': f'{settings.BASE_URL}/login/',
+    }
+    subject = f'Subscription active - Invoice {invoice.invoice_number}'
+    text_body = render_to_string(
+        'emails/subscription_success.txt',
+        context
+    )
+    html_body = render_to_string(
+        'emails/subscription_success.html',
+        context
+    )
+
+    email = EmailMultiAlternatives(
+        subject,
+        text_body,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email]
+    )
+    email.attach_alternative(html_body, 'text/html')
+    email.send(fail_silently=True)
 
 
 @login_required
@@ -455,6 +574,27 @@ def payment_failed(request):
     return render(
         request,
         'subscriptions/payment_failed.html'
+    )
+
+
+@login_required
+def invoice_detail(request, invoice_number):
+    invoice = get_object_or_404(
+        Invoice.objects.select_related(
+            'subscription',
+            'subscription__plan',
+            'subscription__user'
+        ),
+        invoice_number=invoice_number,
+        subscription__user=request.user
+    )
+
+    return render(
+        request,
+        'subscriptions/invoice.html',
+        {
+            'invoice': invoice
+        }
     )
 
 
