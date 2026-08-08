@@ -117,7 +117,11 @@ def subscribe(request, plan_id):
             password=password
         )
         send_account_created_email(user, password)
-        login(request, user)
+        login(
+            request,
+            user,
+            backend='django.contrib.auth.backends.ModelBackend'
+        )
 
     context = {
         'plan': plan,

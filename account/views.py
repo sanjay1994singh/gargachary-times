@@ -134,7 +134,8 @@ def register(request):
 
         login(
             request,
-            user
+            user,
+            backend='django.contrib.auth.backends.ModelBackend'
         )
 
         return redirect('profile')

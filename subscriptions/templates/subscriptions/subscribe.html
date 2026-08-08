@@ -5,232 +5,160 @@ Subscribe {{ plan.name }} | Gargachary Times
 {% endblock %}
 
 {% block css %}
-
 <style>
+    .subscribe-page {
+        background: #f8fafc;
+        min-height: 100vh;
+        padding: 34px 0 60px;
+    }
 
-.subscribe-section {
+    .subscribe-shell {
+        max-width: 1180px;
+    }
 
-    background: linear-gradient(
-        135deg,
-        #0f172a,
-        #1e293b
-    );
+    .subscribe-panel {
+        background: #fff;
+        border: 1px solid #e4ded6;
+        border-radius: 8px;
+        box-shadow: 0 14px 35px rgba(23, 23, 23, 0.08);
+        overflow: hidden;
+    }
 
-    min-height: 100vh;
+    .panel-title {
+        border-bottom: 1px solid #e4ded6;
+        padding: 18px 22px;
+    }
 
-    padding: 80px 0;
-}
+    .panel-body {
+        padding: 22px;
+    }
 
-.subscribe-card {
+    .plan-summary {
+        position: sticky;
+        top: 94px;
+    }
 
-    border: none;
+    .plan-summary-top {
+        background: #b91c1c;
+        color: #fff;
+        padding: 24px;
+    }
 
-    border-radius: 30px;
+    .plan-price {
+        color: #b91c1c;
+        font-size: 42px;
+        font-weight: 800;
+    }
 
-    overflow: hidden;
+    .flow-step {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        color: #111827;
+        font-weight: 800;
+    }
 
-    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-}
+    .step-number {
+        display: inline-flex;
+        width: 32px;
+        height: 32px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #b91c1c;
+        color: #fff;
+        flex: 0 0 32px;
+    }
 
-.plan-header {
+    .pay-btn {
+        background: #16a34a;
+        border: none;
+        color: white;
+        min-height: 56px;
+        font-size: 18px;
+        font-weight: 800;
+    }
 
-    background: linear-gradient(
-        135deg,
-        #dc2626,
-        #991b1b
-    );
+    .pay-btn:hover {
+        background: #15803d;
+        color: white;
+    }
 
-    color: white;
+    .google-panel {
+        background: #fff;
+    }
 
-    padding: 40px;
-}
+    .divider-line {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #6b7280;
+        font-weight: 700;
+    }
 
-.price {
+    .divider-line::before,
+    .divider-line::after {
+        content: "";
+        height: 1px;
+        background: #e4ded6;
+        flex: 1;
+    }
 
-    font-size: 70px;
-
-    font-weight: 700;
-}
-
-.feature-item {
-
-    padding: 15px 0;
-
-    border-bottom: 1px solid #eee;
-}
-
-.pay-btn {
-
-    background: linear-gradient(
-        135deg,
-        #16a34a,
-        #15803d
-    );
-
-    color: white;
-
-    border: none;
-
-    height: 60px;
-
-    border-radius: 50px;
-
-    font-size: 20px;
-
-    font-weight: 600;
-
-    transition: 0.3s;
-}
-
-.pay-btn:hover {
-
-    color: white;
-
-    transform: translateY(-2px);
-
-    opacity: 0.95;
-}
-
-.secure-box {
-
-    background: #f8fafc;
-
-    border-radius: 20px;
-
-    padding: 20px;
-}
-
+    @media (max-width: 991px) {
+        .plan-summary {
+            position: static;
+        }
+    }
 </style>
-
 {% endblock %}
 
 {% block content %}
-
-<section class="subscribe-section">
-
-    <div class="container">
-
-        <div class="row justify-content-center">
-
-            <div class="col-lg-8">
-
-                <div class="card subscribe-card">
-
-                    <div class="plan-header text-center">
-
-                        {% if plan.subscription_type == 'news' %}
-
-                        <i class="bi bi-newspaper display-1"></i>
-
-                        {% else %}
-
-                        <i class="bi bi-journal-richtext display-1"></i>
-
-                        {% endif %}
-
-                        <h1 class="fw-bold mt-3">
-
-                            {{ plan.name }}
-
-                        </h1>
-
-                        <div class="price">
-
-                            ₹{{ plan.price }}
-
-                        </div>
-
-                        <p class="lead mb-0">
-
-                            {{ plan.duration }}
-
-                            {{ plan.duration_type }}
-
-                            Premium Access
-
+<section class="subscribe-page">
+    <div class="container subscribe-shell">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <aside class="subscribe-panel plan-summary">
+                    <div class="plan-summary-top">
+                        <h2 class="fw-bold mb-2">{{ plan.name }}</h2>
+                        <p class="mb-0">
+                            {{ plan.duration }} {{ plan.duration_type }} Premium Access
                         </p>
-
                     </div>
 
-                    <div class="card-body p-5">
+                    <div class="panel-body">
+                        <div class="plan-price mb-3">₹{{ plan.price }}</div>
 
-                        <h3 class="fw-bold mb-4">
-
-                            Plan Benefits
-
-                        </h3>
-
-                        <div class="feature-item">
-
+                        <div class="mb-3">
                             <i class="bi bi-check-circle-fill text-success"></i>
-
-                            Unlimited Premium News Access
-
+                            Premium news access
                         </div>
-
-                        <div class="feature-item">
-
+                        <div class="mb-3">
                             <i class="bi bi-check-circle-fill text-success"></i>
-
-                            Daily E-Paper Access
-
+                            Daily E-Paper access
                         </div>
-
-                        <div class="feature-item">
-
+                        <div class="mb-3">
                             <i class="bi bi-check-circle-fill text-success"></i>
-
-                            Exclusive Reports & Interviews
-
+                            Exclusive reports
                         </div>
-
-                        <div class="feature-item">
-
-                            <i class="bi bi-check-circle-fill text-success"></i>
-
-                            Mobile & Desktop Reading
-
+                        <div>
+                            <i class="bi bi-shield-lock-fill text-success"></i>
+                            Secure Razorpay payment
                         </div>
+                    </div>
+                </aside>
+            </div>
 
-                        <div class="feature-item">
-
-                            <i class="bi bi-check-circle-fill text-success"></i>
-
-                            Priority Subscriber Benefits
-
+            <div class="col-lg-8">
+                {% if not request.user.is_authenticated %}
+                <div class="subscribe-panel mb-4">
+                    <div class="panel-title">
+                        <div class="flow-step">
+                            <span class="step-number">1</span>
+                            <span>Create your account</span>
                         </div>
+                    </div>
 
-                        <div class="secure-box mt-5 mb-4">
-
-                            <div class="d-flex align-items-center">
-
-                                <i class="bi bi-shield-lock-fill
-                                          text-success
-                                          display-6
-                                          me-3"></i>
-
-                                <div>
-
-                                    <h5 class="fw-bold mb-1">
-
-                                        Secure Payment
-
-                                    </h5>
-
-                                    <p class="mb-0 text-muted">
-
-                                        100% secure payment powered by
-                                        Razorpay Payment Gateway.
-
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        {% if not request.user.is_authenticated %}
+                    <div class="panel-body">
                         {% if register_error %}
                         <div class="alert alert-danger rounded-4">
                             {{ register_error }}
@@ -238,70 +166,44 @@ Subscribe {{ plan.name }} | Gargachary Times
                         {% endif %}
 
                         <form method="POST">
-
                             {% csrf_token %}
-
-                            <h3 class="fw-bold mb-4">
-                                Create account
-                            </h3>
 
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="fw-bold mb-2">Full name</label>
-                                    <input type="text"
-                                           name="full_name"
-                                           class="form-control form-control-lg rounded-4"
-                                           required>
+                                    <input type="text" name="full_name" class="form-control form-control-lg" required>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="fw-bold mb-2">Email</label>
-                                    <input type="email"
-                                           name="email"
-                                           class="form-control form-control-lg rounded-4"
-                                           required>
+                                    <input type="email" name="email" class="form-control form-control-lg" required>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="fw-bold mb-2">Mobile</label>
-                                    <input type="text"
-                                           name="mobile"
-                                           class="form-control form-control-lg rounded-4"
-                                           required>
+                                    <input type="text" name="mobile" class="form-control form-control-lg" required>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
                                     <label class="fw-bold mb-2">City</label>
-                                    <input type="text"
-                                           name="city"
-                                           class="form-control form-control-lg rounded-4"
-                                           required>
+                                    <input type="text" name="city" class="form-control form-control-lg" required>
                                 </div>
 
                                 <div class="col-12 mb-3">
                                     <label class="fw-bold mb-2">Address</label>
-                                    <textarea name="address"
-                                              class="form-control rounded-4"
-                                              rows="3"
-                                              required></textarea>
+                                    <textarea name="address" class="form-control" rows="3" required></textarea>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
                                     <label class="fw-bold mb-2">PIN code</label>
-                                    <input type="text"
-                                           name="pincode"
-                                           class="form-control form-control-lg rounded-4"
-                                           required>
+                                    <input type="text" name="pincode" class="form-control form-control-lg" required>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
                                     <label class="fw-bold mb-2">State</label>
-                                    <select name="state"
-                                            class="form-select form-select-lg rounded-4"
-                                            required>
+                                    <select name="state" class="form-select form-select-lg" required>
                                         {% for state in states %}
-                                        <option value="{{ state.name }}"
-                                                {% if state.name == default_state %}selected{% endif %}>
+                                        <option value="{{ state.name }}" {% if state.name == default_state %}selected{% endif %}>
                                             {{ state.name }}
                                         </option>
                                         {% endfor %}
@@ -310,94 +212,70 @@ Subscribe {{ plan.name }} | Gargachary Times
 
                                 <div class="col-md-4 mb-3">
                                     <label class="fw-bold mb-2">Country</label>
-                                    <input type="text"
-                                           name="country"
-                                           value="India"
-                                           class="form-control form-control-lg rounded-4"
-                                           readonly>
+                                    <input type="text" name="country" value="India" class="form-control form-control-lg" readonly>
                                 </div>
                             </div>
 
-                            <button type="submit"
-                                    class="btn pay-btn w-100 mt-3">
+                            <button type="submit" class="btn btn-danger w-100 mt-2">
                                 Create account and continue
                             </button>
-
                         </form>
+                    </div>
+                </div>
 
-                        <div class="text-center my-4 text-muted">
-                            or
+                <div class="subscribe-panel google-panel">
+                    <div class="panel-title">
+                        <div class="flow-step">
+                            <span class="step-number">2</span>
+                            <span>Continue with Google</span>
                         </div>
-
+                    </div>
+                    <div class="panel-body">
+                        <div class="divider-line mb-3">or</div>
                         <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}"
                            class="btn btn-light border w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
-                            <img src="https://www.svgrepo.com/show/355037/google.svg"
-                                 width="20"
-                                 height="20"
-                                 alt="Google">
+                            <img src="https://www.svgrepo.com/show/355037/google.svg" width="20" height="20" alt="Google">
                             <span class="fw-semibold text-dark">Continue with Google</span>
                         </a>
+                    </div>
+                </div>
+                {% else %}
+                <div class="subscribe-panel">
+                    <div class="panel-title">
+                        <div class="flow-step">
+                            <span class="step-number">3</span>
+                            <span>Complete payment</span>
+                        </div>
+                    </div>
 
-                        {% else %}
+                    <div class="panel-body">
+                        <p class="text-muted">
+                            Payment ke baad subscription active hogi, invoice generate hoga, aur confirmation email jayega.
+                        </p>
+
                         <form id="razorpay-payment-form"
                               action="{% url 'razorpay_payment_callback' %}"
                               method="POST">
-
                             {% csrf_token %}
 
-                            <input type="hidden"
-                                   name="razorpay_payment_id"
-                                   id="razorpay_payment_id">
+                            <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                            <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+                            <input type="hidden" name="razorpay_signature" id="razorpay_signature">
 
-                            <input type="hidden"
-                                   name="razorpay_order_id"
-                                   id="razorpay_order_id">
-
-                            <input type="hidden"
-                                   name="razorpay_signature"
-                                   id="razorpay_signature">
-
-                            <button type="submit"
-                                    id="razorpay-payment-button"
-                                    class="btn pay-btn w-100">
-
+                            <button type="submit" id="razorpay-payment-button" class="btn pay-btn w-100">
                                 <i class="bi bi-shield-lock"></i>
-
                                 Pay ₹{{ plan.price }} with Razorpay
-
                             </button>
-
                         </form>
 
-                        <div id="razorpay-payment-error"
-                             class="alert alert-danger mt-3 d-none"
-                             role="alert"></div>
-                        {% endif %}
-
-                        <div class="text-center mt-4">
-
-                            <small class="text-muted">
-
-                                By continuing you agree to our
-                                Terms & Conditions and
-                                Refund Policy.
-
-                            </small>
-
-                        </div>
-
+                        <div id="razorpay-payment-error" class="alert alert-danger mt-3 d-none" role="alert"></div>
                     </div>
-
                 </div>
-
+                {% endif %}
             </div>
-
         </div>
-
     </div>
-
 </section>
-
 {% endblock %}
 
 {% block js %}
