@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<body style="margin:0;background:#f4f6f8;font-family:Arial,sans-serif;color:#111827;">
+<div style="max-width:680px;margin:0 auto;padding:24px;">
+    <div style="background:#ffffff;border:1px solid #e5e7eb;padding:28px;">
+        <h2 style="margin:0 0 12px;color:#16a34a;">Account details updated</h2>
+        <p>Hello {{ user.full_name|default:user.username }},</p>
+        <p>Your Gargachary Times account details have been updated successfully.</p>
+
+        <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Name</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ user.full_name|default:"-" }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Email</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ user.email|default:"-" }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Mobile</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ user.mobile|default:"-" }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">Address</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ user.address|default:"-" }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">City / State</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ user.city|default:"-" }}, {{ user.state|default:"-" }}</td>
+            </tr>
+            <tr>
+                <td style="padding:10px;border:1px solid #e5e7eb;font-weight:bold;">PIN / Country</td>
+                <td style="padding:10px;border:1px solid #e5e7eb;">{{ user.pincode|default:"-" }}, {{ user.country|default:"India" }}</td>
+            </tr>
+        </table>
+
+        <p>Login here: <a href="{{ login_url }}">{{ login_url }}</a></p>
+        <p style="color:#4b5563;">If you did not make this change, please contact Gargachary Times immediately.</p>
+
+        {% include "emails/partials/contact_ads.html" %}
+    </div>
+</div>
+</body>
+</html>

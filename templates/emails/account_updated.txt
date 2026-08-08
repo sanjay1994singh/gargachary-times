@@ -1,0 +1,21 @@
+Hello {{ user.full_name|default:user.username }},
+
+Your Gargachary Times account details have been updated successfully.
+
+Updated details:
+Name: {{ user.full_name|default:"-" }}
+Email: {{ user.email|default:"-" }}
+Mobile: {{ user.mobile|default:"-" }}
+Address: {{ user.address|default:"-" }}
+City: {{ user.city|default:"-" }}
+State: {{ user.state|default:"-" }}
+PIN: {{ user.pincode|default:"-" }}
+Country: {{ user.country|default:"India" }}
+
+Login page: {{ login_url }}
+
+If you did not make this change, please contact Gargachary Times immediately.
+
+{% include "emails/partials/contact_ads.txt" %}
+
+Gargachary Times

@@ -296,6 +296,34 @@ def send_delivery_status_email(invoice):
     email.send(fail_silently=True)
 
 
+def send_account_updated_email(user):
+    if not user.email:
+        return
+
+    context = {
+        'user': user,
+        'login_url': f'{settings.BASE_URL}/login/',
+    }
+    subject = 'Your Gargachary Times account details were updated'
+    text_body = render_to_string(
+        'emails/account_updated.txt',
+        context
+    )
+    html_body = render_to_string(
+        'emails/account_updated.html',
+        context
+    )
+
+    email = EmailMultiAlternatives(
+        subject,
+        text_body,
+        settings.DEFAULT_FROM_EMAIL,
+        [user.email]
+    )
+    email.attach_alternative(html_body, 'text/html')
+    email.send(fail_silently=True)
+
+
 @login_required
 def razorpay_create_order(request, plan_id):
     if request.method != 'POST':
@@ -759,6 +787,7 @@ def profile(request):
         request.user.country = request.POST.get('country') or 'India'
         request.user.save()
 
+        send_account_updated_email(request.user)
         messages.success(request, 'Account details updated successfully.')
         return redirect('profile')
 

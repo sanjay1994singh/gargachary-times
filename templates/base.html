@@ -525,18 +525,19 @@
         var text = options.text || '';
 
         Swal.fire({
-            toast: true,
-            position: 'top-end',
+            toast: false,
+            position: 'center',
             icon: icon,
             title: title,
             text: text,
             timer: icon === 'error' ? 4200 : 3000,
             timerProgressBar: true,
             showConfirmButton: false,
+            backdrop: false,
             background: '#fff',
             color: '#111827',
-            width: window.innerWidth < 576 ? 'calc(100vw - 24px)' : 360,
-            padding: '12px 14px',
+            width: window.innerWidth < 576 ? 'calc(100vw - 32px)' : 340,
+            padding: '14px 16px',
             customClass: {
                 popup: 'gt-cute-alert',
                 title: 'gt-cute-alert-title',
