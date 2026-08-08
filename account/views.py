@@ -34,6 +34,7 @@ def send_account_created_email(user, password):
         'user': user,
         'password': password,
         'login_url': f'{settings.BASE_URL}/login/',
+        'site_url': settings.BASE_URL,
     }
     subject = 'Your Gargachary Times account is ready'
     text_body = render_to_string(

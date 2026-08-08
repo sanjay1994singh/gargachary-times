@@ -243,6 +243,7 @@ def send_subscription_success_email(subscription, invoice):
         'subscription': subscription,
         'invoice': invoice,
         'login_url': f'{settings.BASE_URL}/login/',
+        'site_url': settings.BASE_URL,
     }
     subject = f'Subscription active - Invoice {invoice.invoice_number}'
     text_body = render_to_string(
@@ -275,6 +276,7 @@ def send_delivery_status_email(invoice):
         'invoice': invoice,
         'subscription': invoice.subscription,
         'login_url': f'{settings.BASE_URL}/login/',
+        'site_url': settings.BASE_URL,
     }
     subject = f'Delivery update - {invoice.invoice_number}'
     text_body = render_to_string(
@@ -303,6 +305,7 @@ def send_account_updated_email(user):
     context = {
         'user': user,
         'login_url': f'{settings.BASE_URL}/login/',
+        'site_url': settings.BASE_URL,
     }
     subject = 'Your Gargachary Times account details were updated'
     text_body = render_to_string(
