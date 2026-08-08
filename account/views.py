@@ -144,7 +144,7 @@ def register(request):
         request,
         'register.html',
         {
-            'states': State.objects.filter(country__code='IN'),
+            'account_states': State.objects.filter(country__code='IN'),
             'default_state': 'Uttar Pradesh',
         }
     )

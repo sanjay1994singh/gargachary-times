@@ -81,7 +81,7 @@ Register | Gargachary Times
                                 <select name="state"
                                         class="form-select form-select-lg rounded-4"
                                         required>
-                                    {% for state in states %}
+                                    {% for state in account_states %}
                                     <option value="{{ state.name }}"
                                             {% if state.name == default_state %}selected{% endif %}>
                                         {{ state.name }}

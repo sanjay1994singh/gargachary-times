@@ -123,7 +123,7 @@ My Profile | Gargachary Times
                         <div class="mb-3">
                             <label class="fw-bold mb-2">State</label>
                             <select name="state" class="form-select">
-                                {% for state in states %}
+                                {% for state in account_states %}
                                 <option value="{{ state.name }}" {% if state.name == default_state %}selected{% endif %}>
                                     {{ state.name }}
                                 </option>

@@ -202,7 +202,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                                 <div class="col-md-4 mb-3">
                                     <label class="fw-bold mb-2">State</label>
                                     <select name="state" class="form-select form-select-lg" required>
-                                        {% for state in states %}
+                                        {% for state in account_states %}
                                         <option value="{{ state.name }}" {% if state.name == default_state %}selected{% endif %}>
                                             {{ state.name }}
                                         </option>

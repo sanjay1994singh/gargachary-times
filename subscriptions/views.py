@@ -50,6 +50,20 @@ merchant_id = settings.PHONEPE_MERCHANT_ID
 RAZORPAY_ORDERS_URL = 'https://api.razorpay.com/v1/orders'
 
 
+def unique_subscriptions_by_plan(subscriptions):
+    unique_subscriptions = []
+    seen_plan_ids = set()
+
+    for subscription in subscriptions:
+        if subscription.plan_id in seen_plan_ids:
+            continue
+
+        unique_subscriptions.append(subscription)
+        seen_plan_ids.add(subscription.plan_id)
+
+    return unique_subscriptions
+
+
 # SUBSCRIPTION PLANS PAGE
 
 
@@ -86,7 +100,7 @@ def subscribe(request, plan_id):
                 'subscriptions/subscribe.html',
                 {
                     'plan': plan,
-                    'states': State.objects.filter(country__code='IN'),
+                    'account_states': State.objects.filter(country__code='IN'),
                     'default_state': 'Uttar Pradesh',
                     'register_error': 'Email already exists. Please login or use Google.',
                 }
@@ -98,7 +112,7 @@ def subscribe(request, plan_id):
                 'subscriptions/subscribe.html',
                 {
                     'plan': plan,
-                    'states': State.objects.filter(country__code='IN'),
+                    'account_states': State.objects.filter(country__code='IN'),
                     'default_state': 'Uttar Pradesh',
                     'register_error': 'Mobile already exists. Please login or use Google.',
                 }
@@ -127,7 +141,7 @@ def subscribe(request, plan_id):
     context = {
         'plan': plan,
         'razorpay_key_id': settings.RAZORPAY_KEY_ID,
-        'states': State.objects.filter(country__code='IN'),
+        'account_states': State.objects.filter(country__code='IN'),
         'default_state': 'Uttar Pradesh',
     }
 
@@ -160,6 +174,17 @@ def mark_subscription_success(subscription):
 
     if not was_success:
         send_subscription_success_email(subscription, invoice)
+
+    (
+        UserSubscription.objects
+        .filter(
+            user=subscription.user,
+            plan=subscription.plan,
+            payment_status='PENDING'
+        )
+        .exclude(id=subscription.id)
+        .update(payment_status='FAILED', is_active=False)
+    )
 
 
 def mark_subscription_failed(subscription):
@@ -277,6 +302,61 @@ def razorpay_create_order(request, plan_id):
         id=plan_id,
         is_active=True
     )
+
+    active_subscription_exists = (
+        UserSubscription.objects
+        .filter(
+            user=request.user,
+            plan=plan,
+            is_active=True,
+            payment_status='SUCCESS'
+        )
+        .filter(
+            Q(end_date__gte=timezone.now()) |
+            Q(end_date__isnull=True)
+        )
+        .exists()
+    )
+
+    if active_subscription_exists:
+        return JsonResponse(
+            {
+                'error': 'This subscription plan is already active on your account.'
+            },
+            status=409
+        )
+
+    pending_subscription = (
+        UserSubscription.objects
+        .filter(
+            user=request.user,
+            plan=plan,
+            payment_status='PENDING',
+            transaction_id__startswith='order_'
+        )
+        .order_by('-created_at')
+        .first()
+    )
+
+    if pending_subscription:
+        return JsonResponse(
+            {
+                'key': settings.RAZORPAY_KEY_ID,
+                'order_id': pending_subscription.transaction_id,
+                'amount': int(pending_subscription.amount * 100),
+                'currency': 'INR',
+                'name': 'Gargachary Times',
+                'description': plan.name,
+                'prefill': {
+                    'name': request.user.full_name or request.user.username,
+                    'email': request.user.email,
+                    'contact': getattr(request.user, 'mobile', '') or '',
+                },
+                'callback_url': request.build_absolute_uri(
+                    reverse('razorpay_payment_callback')
+                ),
+            }
+        )
 
     receipt = f"sub_{request.user.id}_{uuid.uuid4().hex[:24]}"
 
@@ -696,12 +776,13 @@ def profile(request):
         .filter(user=request.user)
         .order_by('-created_at')
     )
+    subscriptions = unique_subscriptions_by_plan(subscriptions)
 
     context = {
 
         'subscription': subscription,
         'subscriptions': subscriptions,
-        'states': State.objects.filter(country__code='IN'),
+        'account_states': State.objects.filter(country__code='IN'),
         'default_state': request.user.state or 'Uttar Pradesh',
 
     }
@@ -729,6 +810,7 @@ def my_subscription(request):
         ).select_related('plan', 'invoice').order_by('-created_at')
 
     )
+    subscriptions = unique_subscriptions_by_plan(subscriptions)
 
     context = {
 
