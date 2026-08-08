@@ -293,12 +293,11 @@ Subscribe {{ plan.name }} | Gargachary Times
             errorBox.textContent = message;
             errorBox.classList.remove('d-none');
 
-            if (window.Swal) {
-                Swal.fire({
+            if (window.showCuteAlert) {
+                window.showCuteAlert({
                     icon: 'error',
                     title: 'Payment Error',
-                    text: message,
-                    confirmButtonColor: '#b91c1c'
+                    text: message
                 });
             }
         }

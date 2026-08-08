@@ -142,6 +142,36 @@
             display: none;
             backdrop-filter: blur(2px);
         }
+
+        .gt-cute-alert {
+            border-radius: 8px !important;
+            border: 1px solid #f1d5d5 !important;
+            box-shadow: 0 14px 35px rgba(23, 23, 23, 0.16) !important;
+            font-size: 14px !important;
+        }
+
+        .gt-cute-alert-title {
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            line-height: 1.25 !important;
+        }
+
+        .gt-cute-alert-text {
+            margin-top: 2px !important;
+            font-size: 13px !important;
+            line-height: 1.35 !important;
+            overflow-wrap: anywhere !important;
+        }
+
+        @media (max-width: 575px) {
+            .swal2-container {
+                padding: 10px !important;
+            }
+
+            .gt-cute-alert {
+                max-width: calc(100vw - 24px) !important;
+            }
+        }
     </style>
 
     <style>
@@ -489,6 +519,36 @@
         }
     };
 
+    window.showCuteAlert = function (options) {
+        var icon = options.icon || 'info';
+        var title = options.title || 'Notice';
+        var text = options.text || '';
+
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: icon,
+            title: title,
+            text: text,
+            timer: icon === 'error' ? 4200 : 3000,
+            timerProgressBar: true,
+            showConfirmButton: false,
+            background: '#fff',
+            color: '#111827',
+            width: window.innerWidth < 576 ? 'calc(100vw - 24px)' : 360,
+            padding: '12px 14px',
+            customClass: {
+                popup: 'gt-cute-alert',
+                title: 'gt-cute-alert-title',
+                htmlContainer: 'gt-cute-alert-text'
+            },
+            didOpen: function (toast) {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+        });
+    };
+
     document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('submit', function (event) {
             var form = event.target;
@@ -522,11 +582,10 @@
             window.hideSiteLoader();
         }
 
-        Swal.fire({
+        window.showCuteAlert({
             icon: "{% if message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% elif message.tags == 'success' %}success{% else %}info{% endif %}",
             title: "{% if message.tags == 'success' %}Success{% elif message.tags == 'error' %}Error{% elif message.tags == 'warning' %}Warning{% else %}Notice{% endif %}",
-            text: "{{ message|escapejs }}",
-            confirmButtonColor: '#b91c1c'
+            text: "{{ message|escapejs }}"
         });
         {% endfor %}
     });
