@@ -230,6 +230,74 @@ body.site-refresh article {
     color: var(--gt-muted);
 }
 
+body.site-refresh .text-white,
+body.site-refresh .text-white h1,
+body.site-refresh .text-white h2,
+body.site-refresh .text-white h3,
+body.site-refresh .text-white h4,
+body.site-refresh .text-white h5,
+body.site-refresh .text-white h6,
+body.site-refresh .text-white p,
+body.site-refresh .text-white li,
+body.site-refresh .bg-dark,
+body.site-refresh .bg-dark h1,
+body.site-refresh .bg-dark h2,
+body.site-refresh .bg-dark h3,
+body.site-refresh .bg-dark h4,
+body.site-refresh .bg-dark h5,
+body.site-refresh .bg-dark h6,
+body.site-refresh .hero-section,
+body.site-refresh .hero-section h1,
+body.site-refresh .hero-section h2,
+body.site-refresh .hero-section h3,
+body.site-refresh .login-left,
+body.site-refresh .login-left h1,
+body.site-refresh .login-left h2,
+body.site-refresh .subscription-header,
+body.site-refresh .subscription-header h1,
+body.site-refresh .subscription-header h2,
+body.site-refresh .subscription-header h3 {
+    color: #fff !important;
+}
+
+body.site-refresh .text-white .text-muted,
+body.site-refresh .text-white p,
+body.site-refresh .bg-dark p,
+body.site-refresh .hero-section p,
+body.site-refresh .login-left p,
+body.site-refresh .subscription-header p,
+body.site-refresh .subscription-header .lead {
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+
+body.site-refresh i,
+body.site-refresh .fa,
+body.site-refresh .fas,
+body.site-refresh .fab,
+body.site-refresh .bi {
+    color: inherit;
+    line-height: 1;
+    vertical-align: -0.08em;
+}
+
+body.site-refresh .btn i,
+body.site-refresh .nav-link i,
+body.site-refresh .dropdown-item i {
+    margin-right: 5px;
+}
+
+body.site-refresh .text-success {
+    color: #16a34a !important;
+}
+
+body.site-refresh .text-warning {
+    color: #d97706 !important;
+}
+
+body.site-refresh .text-primary {
+    color: #2563eb !important;
+}
+
 body.site-refresh img.rounded,
 body.site-refresh .img-fluid.rounded,
 body.site-refresh .img-fluid.shadow-sm {
