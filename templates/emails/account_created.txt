@@ -14,4 +14,6 @@ How to login:
 
 Please keep this password safe and change it after login if needed.
 
+{% include "emails/partials/contact_ads.txt" %}
+
 Gargachary Times

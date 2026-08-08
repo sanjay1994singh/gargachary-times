@@ -14,4 +14,6 @@ End date: {{ subscription.end_date|default:"Lifetime" }}
 Login page: {{ login_url }}
 You can login with your email or mobile number and password.
 
+{% include "emails/partials/contact_ads.txt" %}
+
 Gargachary Times

@@ -10,4 +10,6 @@ Delivery note: {{ invoice.delivery_note|default:"No delivery note provided" }}
 Login page: {{ login_url }}
 You can view full invoice and subscription details from your profile.
 
+{% include "emails/partials/contact_ads.txt" %}
+
 Gargachary Times
