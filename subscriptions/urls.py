@@ -23,6 +23,24 @@ urlpatterns = [
     ),
 
     path(
+        'razorpay/order/<int:plan_id>/',
+        views.razorpay_create_order,
+        name='razorpay_create_order'
+    ),
+
+    path(
+        'razorpay/callback/',
+        views.razorpay_payment_callback,
+        name='razorpay_payment_callback'
+    ),
+
+    path(
+        'razorpay/webhook/',
+        views.razorpay_webhook,
+        name='razorpay_webhook'
+    ),
+
+    path(
         'payment-callback/',
         views.payment_callback,
         name='payment_callback'

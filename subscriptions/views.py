@@ -2,9 +2,15 @@ import uuid
 import json
 import base64
 import hashlib
+import hmac
 import requests
 
 from django.conf import settings
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    JsonResponse
+)
 from django.shortcuts import (
     render,
     redirect,
@@ -19,6 +25,8 @@ from django.urls import reverse
 
 from django.utils import timezone
 
+from django.views.decorators.csrf import csrf_exempt
+
 from django.db.models import Q
 
 from .models import (
@@ -28,6 +36,7 @@ from .models import (
 )
 
 merchant_id = settings.PHONEPE_MERCHANT_ID
+RAZORPAY_ORDERS_URL = 'https://api.razorpay.com/v1/orders'
 
 
 # SUBSCRIPTION PLANS PAGE
@@ -58,7 +67,8 @@ def subscribe(request, plan_id):
     )
 
     context = {
-        'plan': plan
+        'plan': plan,
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
     }
 
     return render(
@@ -66,6 +76,200 @@ def subscribe(request, plan_id):
         'subscriptions/subscribe.html',
         context
     )
+
+
+def verify_razorpay_signature(message, signature, secret):
+    if not signature or not secret:
+        return False
+
+    expected_signature = hmac.new(
+        secret.encode(),
+        message.encode(),
+        hashlib.sha256
+    ).hexdigest()
+
+    return hmac.compare_digest(expected_signature, signature)
+
+
+def mark_subscription_success(subscription):
+    subscription.payment_status = 'SUCCESS'
+    subscription.is_active = True
+    subscription.save()
+
+
+def mark_subscription_failed(subscription):
+    subscription.payment_status = 'FAILED'
+    subscription.is_active = False
+    subscription.save()
+
+
+@login_required
+def razorpay_create_order(request, plan_id):
+    if request.method != 'POST':
+        return HttpResponseBadRequest('Invalid request method')
+
+    if not settings.RAZORPAY_KEY_ID or not settings.RAZORPAY_KEY_SECRET:
+        return JsonResponse(
+            {
+                'error': 'Razorpay keys are not configured.'
+            },
+            status=500
+        )
+
+    plan = get_object_or_404(
+        SubscriptionPlan,
+        id=plan_id,
+        is_active=True
+    )
+
+    receipt = f"sub_{request.user.id}_{uuid.uuid4().hex[:24]}"
+
+    payload = {
+        'amount': int(plan.price * 100),
+        'currency': 'INR',
+        'receipt': receipt,
+        'payment_capture': 1,
+        'notes': {
+            'user_id': str(request.user.id),
+            'plan_id': str(plan.id),
+            'plan_name': plan.name,
+        }
+    }
+
+    response = requests.post(
+        RAZORPAY_ORDERS_URL,
+        auth=(
+            settings.RAZORPAY_KEY_ID,
+            settings.RAZORPAY_KEY_SECRET
+        ),
+        json=payload,
+        timeout=15
+    )
+
+    if response.status_code >= 400:
+        return JsonResponse(
+            {
+                'error': 'Unable to create Razorpay order.'
+            },
+            status=502
+        )
+
+    order = response.json()
+
+    UserSubscription.objects.create(
+        user=request.user,
+        plan=plan,
+        amount=plan.price,
+        transaction_id=order['id'],
+        payment_status='PENDING'
+    )
+
+    return JsonResponse(
+        {
+            'key': settings.RAZORPAY_KEY_ID,
+            'order_id': order['id'],
+            'amount': order['amount'],
+            'currency': order['currency'],
+            'name': 'Gargachary Times',
+            'description': plan.name,
+            'prefill': {
+                'name': request.user.get_full_name() or request.user.username,
+                'email': request.user.email,
+                'contact': getattr(request.user, 'mobile', '') or '',
+            },
+            'callback_url': request.build_absolute_uri(
+                reverse('razorpay_payment_callback')
+            ),
+        }
+    )
+
+
+@login_required
+def razorpay_payment_callback(request):
+    if request.method != 'POST':
+        return redirect('payment_failed')
+
+    payment_id = request.POST.get('razorpay_payment_id')
+    order_id = request.POST.get('razorpay_order_id')
+    signature = request.POST.get('razorpay_signature')
+
+    if not payment_id or not order_id or not signature:
+        return redirect('payment_failed')
+
+    try:
+        subscription = UserSubscription.objects.get(
+            transaction_id=order_id,
+            user=request.user
+        )
+    except UserSubscription.DoesNotExist:
+        return redirect('payment_failed')
+
+    message = f'{order_id}|{payment_id}'
+    if verify_razorpay_signature(
+        message,
+        signature,
+        settings.RAZORPAY_KEY_SECRET
+    ):
+        mark_subscription_success(subscription)
+        return redirect('payment_success')
+
+    mark_subscription_failed(subscription)
+    return redirect('payment_failed')
+
+
+@csrf_exempt
+def razorpay_webhook(request):
+    if request.method != 'POST':
+        return HttpResponseBadRequest('Invalid request method')
+
+    if not settings.RAZORPAY_WEBHOOK_SECRET:
+        return HttpResponseBadRequest('Webhook secret is not configured')
+
+    payload = request.body.decode('utf-8')
+    signature = request.headers.get('X-Razorpay-Signature')
+
+    if not verify_razorpay_signature(
+        payload,
+        signature,
+        settings.RAZORPAY_WEBHOOK_SECRET
+    ):
+        return HttpResponseBadRequest('Invalid signature')
+
+    try:
+        event = json.loads(payload)
+    except json.JSONDecodeError:
+        return HttpResponseBadRequest('Invalid payload')
+
+    event_name = event.get('event')
+    payment = (
+        event.get('payload', {})
+        .get('payment', {})
+        .get('entity', {})
+    )
+    order_id = payment.get('order_id')
+    payment_id = payment.get('id')
+
+    if event_name in ('payment.captured', 'order.paid') and order_id:
+        subscription = (
+            UserSubscription.objects
+            .filter(transaction_id=order_id)
+            .first()
+        )
+
+        if subscription:
+            mark_subscription_success(subscription)
+
+    elif event_name == 'payment.failed' and order_id:
+        subscription = (
+            UserSubscription.objects
+            .filter(transaction_id=order_id)
+            .first()
+        )
+
+        if subscription:
+            mark_subscription_failed(subscription)
+
+    return HttpResponse(status=200)
 
 
 # PHONEPE PAYMENT

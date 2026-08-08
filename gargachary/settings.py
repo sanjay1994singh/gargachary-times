@@ -151,7 +151,6 @@ STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -166,3 +165,7 @@ PHONEPE_MERCHANT_ID = os.getenv("PHONEPE_MERCHANT_ID")
 PHONEPE_SALT_KEY = os.getenv("PHONEPE_SALT_KEY")
 PHONEPE_SALT_INDEX = os.getenv("PHONEPE_SALT_INDEX")
 PHONEPE_ENV = os.getenv("PHONEPE_ENV")
+
+RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
+RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET")
+RAZORPAY_WEBHOOK_SECRET = os.getenv("RAZORPAY_WEBHOOK_SECRET")

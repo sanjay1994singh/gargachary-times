@@ -220,7 +220,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                                     <p class="mb-0 text-muted">
 
                                         100% secure payment powered by
-                                        PhonePe Payment Gateway.
+                                        Razorpay Payment Gateway.
 
                                     </p>
 
@@ -230,21 +230,39 @@ Subscribe {{ plan.name }} | Gargachary Times
 
                         </div>
 
-                        <form action="{% url 'phonepe_payment' plan.id %}"
+                        <form id="razorpay-payment-form"
+                              action="{% url 'razorpay_payment_callback' %}"
                               method="POST">
 
                             {% csrf_token %}
 
+                            <input type="hidden"
+                                   name="razorpay_payment_id"
+                                   id="razorpay_payment_id">
+
+                            <input type="hidden"
+                                   name="razorpay_order_id"
+                                   id="razorpay_order_id">
+
+                            <input type="hidden"
+                                   name="razorpay_signature"
+                                   id="razorpay_signature">
+
                             <button type="submit"
+                                    id="razorpay-payment-button"
                                     class="btn pay-btn w-100">
 
-                                <i class="bi bi-phone"></i>
+                                <i class="bi bi-shield-lock"></i>
 
-                                Pay ₹{{ plan.price }} with PhonePe
+                                Pay ₹{{ plan.price }} with Razorpay
 
                             </button>
 
                         </form>
+
+                        <div id="razorpay-payment-error"
+                             class="alert alert-danger mt-3 d-none"
+                             role="alert"></div>
 
                         <div class="text-center mt-4">
 
@@ -271,3 +289,83 @@ Subscribe {{ plan.name }} | Gargachary Times
 </section>
 
 {% endblock %}
+
+{% block js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    (function () {
+        const form = document.getElementById('razorpay-payment-form');
+        const button = document.getElementById('razorpay-payment-button');
+        const errorBox = document.getElementById('razorpay-payment-error');
+        const createOrderUrl = "{% url 'razorpay_create_order' plan.id %}";
+        const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        function showError(message) {
+            errorBox.textContent = message;
+            errorBox.classList.remove('d-none');
+        }
+
+        function setLoading(isLoading) {
+            button.disabled = isLoading;
+            button.innerHTML = isLoading
+                ? 'Please wait...'
+                : '<i class="bi bi-shield-lock"></i> Pay with Razorpay';
+        }
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            errorBox.classList.add('d-none');
+            setLoading(true);
+
+            fetch(createOrderUrl, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Accept': 'application/json',
+                },
+            })
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Payment could not be started.');
+                        }
+
+                        return data;
+                    });
+                })
+                .then(function (data) {
+                    const razorpay = new Razorpay({
+                        key: data.key,
+                        amount: data.amount,
+                        currency: data.currency,
+                        name: data.name,
+                        description: data.description,
+                        order_id: data.order_id,
+                        prefill: data.prefill,
+                        callback_url: data.callback_url,
+                        handler: function (response) {
+                            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                            form.submit();
+                        },
+                        modal: {
+                            ondismiss: function () {
+                                setLoading(false);
+                            }
+                        },
+                        theme: {
+                            color: '#dc2626'
+                        }
+                    });
+
+                    razorpay.open();
+                })
+                .catch(function (error) {
+                    setLoading(false);
+                    showError(error.message || 'Payment could not be started.');
+                });
+        });
+    })();
+</script>
+{% endblock js %}
