@@ -530,9 +530,9 @@
             icon: icon,
             title: title,
             text: text,
-            timer: icon === 'error' ? 4200 : 3000,
-            timerProgressBar: true,
-            showConfirmButton: false,
+            showConfirmButton: true,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#b91c1c',
             backdrop: false,
             background: '#fff',
             color: '#111827',
@@ -542,10 +542,6 @@
                 popup: 'gt-cute-alert',
                 title: 'gt-cute-alert-title',
                 htmlContainer: 'gt-cute-alert-text'
-            },
-            didOpen: function (toast) {
-                toast.addEventListener('mouseenter', Swal.stopTimer);
-                toast.addEventListener('mouseleave', Swal.resumeTimer);
             }
         });
     };
