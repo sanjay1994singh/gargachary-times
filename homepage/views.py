@@ -125,11 +125,35 @@ def dashboard_news_form(request, news_id=None):
         messages.success(request, 'News saved successfully.')
         return redirect('dashboard_news_list')
 
+    reporter_users = (
+        User.objects
+        .filter(user_type='reporter')
+        .order_by('full_name', 'username')
+    )
+    reporter_options = []
+
+    for reporter_user in reporter_users:
+        reporter_name = (
+            reporter_user.full_name or
+            reporter_user.username or
+            reporter_user.email or
+            reporter_user.mobile
+        )
+
+        if not reporter_name:
+            continue
+
+        reporter_options.append({
+            'name': reporter_name,
+            'mobile': reporter_user.mobile or '',
+        })
+
     context = {
         'active_menu': 'news',
         'page_title': 'Edit News' if news_obj else 'Add News',
         'news_obj': news_obj,
         'category': Category.objects.all().order_by('-id'),
+        'reporter_options': reporter_options,
     }
 
     return render(request, 'dashboard_news_form.html', context)

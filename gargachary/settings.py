@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'news_pdf',
     'rest_framework',
     'subscriptions',
+    'ckeditor',
 
     'news.apps.NewsConfig',
 ]
@@ -180,6 +181,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "account.User"
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 420,
+        'width': '100%',
+        'extraPlugins': 'colorbutton,font,justify,uploadimage',
+        'removePlugins': 'stylesheetparser',
+    }
+}
 
 PHONEPE_MERCHANT_ID = os.getenv("PHONEPE_MERCHANT_ID")
 PHONEPE_SALT_KEY = os.getenv("PHONEPE_SALT_KEY")

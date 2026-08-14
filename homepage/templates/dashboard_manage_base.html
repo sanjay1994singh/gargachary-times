@@ -8,6 +8,7 @@
     <title>{{ page_title }} | NewsPanel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *{margin:0;padding:0;box-sizing:border-box}
@@ -38,6 +39,13 @@
         .form-control:focus,.form-select:focus{background:rgba(255,255,255,.1);border-color:#00c6ff;color:white;box-shadow:none}
         .form-control::placeholder{color:rgba(255,255,255,.5)}
         .form-select option{color:#111827}
+        .select2-container--default .select2-selection--single{height:38px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:.375rem}
+        .select2-container--default .select2-selection--single .select2-selection__rendered{color:white;line-height:36px}
+        .select2-container--default .select2-selection--single .select2-selection__arrow{height:36px}
+        .select2-dropdown{background:#1f2937;border-color:rgba(255,255,255,.16);color:white}
+        .select2-container--default .select2-search--dropdown .select2-search__field{background:#111827;border-color:rgba(255,255,255,.16);color:white}
+        .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable{background:#2563eb}
+        .select2-container--default .select2-results__option--selected{background:#374151}
         .table{color:white;vertical-align:middle}
         .table thead{background:rgba(255,255,255,.1)}
         .table tbody tr{border-color:rgba(255,255,255,.1)}
@@ -116,6 +124,8 @@
         {% block content %}{% endblock %}
     </main>
 </div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     document.querySelectorAll('.sidebar-menu .has-submenu .menu-parent').forEach(function (trigger) {
         trigger.addEventListener('click', function () {
@@ -124,5 +134,6 @@
         });
     });
 </script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

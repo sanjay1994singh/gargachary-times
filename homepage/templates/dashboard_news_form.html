@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-semibold">News Category</label>
-                <select name="news_category" class="form-select" required>
+                <select name="news_category" class="form-select searchable-select" data-placeholder="Search category" required>
                     <option value="">Select Category</option>
                     {% for item in category %}
                         <option value="{{ item.id }}" {% if news_obj and news_obj.category_id == item.id %}selected{% endif %}>
@@ -18,7 +18,16 @@
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-semibold">Reporter</label>
-                <input type="text" name="reporter" class="form-control" value="{{ news_obj.reporter|default:'Gargachary Times' }}">
+                <select name="reporter" class="form-select searchable-select" data-placeholder="Search reporter">
+                    <option value="">Gargachary Times</option>
+                    {% for reporter in reporter_options %}
+                        <option value="{{ reporter.name }}"
+                                {% if news_obj and news_obj.reporter == reporter.name %}selected{% endif %}>
+                            {{ reporter.name }}
+                            {% if reporter.mobile %} - {{ reporter.mobile }}{% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-12 mb-3">
                 <label class="form-label fw-semibold">Title</label>
@@ -26,7 +35,7 @@
             </div>
             <div class="col-12 mb-3">
                 <label class="form-label fw-semibold">News Text</label>
-                <textarea name="news_text" class="form-control" rows="12" placeholder="Enter news text" required>{{ news_obj.text|default:'' }}</textarea>
+                <textarea name="news_text" id="news_text" class="form-control" rows="12" placeholder="Enter news text" required>{{ news_obj.text|default:'' }}</textarea>
             </div>
             <div class="col-md-6 mb-3">
                 <label class="form-label fw-semibold">Image</label>
@@ -45,4 +54,33 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/ckeditor/ckeditor/ckeditor.js"></script>
+<script>
+    $(function () {
+        $('.searchable-select').select2({
+            width: '100%',
+            allowClear: true,
+            placeholder: function () {
+                return $(this).data('placeholder');
+            }
+        });
+
+        if (window.CKEDITOR) {
+            CKEDITOR.replace('news_text', {
+                height: 420,
+                width: '100%',
+                toolbar: 'Full'
+            });
+        }
+
+        document.querySelector('form').addEventListener('submit', function () {
+            if (window.CKEDITOR && CKEDITOR.instances.news_text) {
+                CKEDITOR.instances.news_text.updateElement();
+            }
+        });
+    });
+</script>
 {% endblock %}
