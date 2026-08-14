@@ -217,6 +217,9 @@ Subscribe {{ plan.name }} | Gargachary Times
         align-items: center;
         justify-content: center;
         z-index: 2;
+        font-size: 22px;
+        font-weight: 900;
+        line-height: 1;
     }
 
     .reporter-add-btn:hover {
@@ -269,6 +272,12 @@ Subscribe {{ plan.name }} | Gargachary Times
         width: 34px;
         height: 34px;
         border-radius: 50%;
+        font-size: 22px;
+        font-weight: 900;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .reporter-modal-body {
@@ -368,7 +377,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                                                placeholder="Reporter name ya mobile search kare">
                                         <input type="hidden" name="reporter_mobile" class="reporter-mobile-value">
                                         <button type="button" class="reporter-add-btn" title="Add reporter">
-                                            <i class="bi bi-plus-lg"></i>
+                                            +
                                         </button>
                                         <div class="reporter-dropdown">
                                             {% for reporter in reporter_options %}
@@ -467,7 +476,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                                            placeholder="Reporter name ya mobile search kare">
                                     <input type="hidden" name="reporter_mobile" class="reporter-mobile-value" value="{{ reporter_mobile }}">
                                     <button type="button" class="reporter-add-btn" title="Add reporter">
-                                        <i class="bi bi-plus-lg"></i>
+                                        +
                                     </button>
                                     <div class="reporter-dropdown">
                                         {% for reporter in reporter_options %}
@@ -508,7 +517,7 @@ Subscribe {{ plan.name }} | Gargachary Times
         <div class="reporter-modal-header">
             <h4>Add Reporter Account</h4>
             <button type="button" class="reporter-modal-close" id="reporter-modal-close" aria-label="Close">
-                <i class="bi bi-x-lg"></i>
+                ×
             </button>
         </div>
         <div class="reporter-modal-body">
