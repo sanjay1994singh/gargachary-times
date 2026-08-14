@@ -71,34 +71,83 @@ def google_oauth_complete(request):
 
 def register(request):
     if request.method == 'POST':
+        first_name = (
+            request.POST.get('first_name') or ''
+        ).strip()
+
+        last_name = (
+            request.POST.get('last_name') or ''
+        ).strip()
 
         email = request.POST.get(
             'email'
-        )
+        ).strip()
 
         mobile = request.POST.get(
             'mobile'
-        )
+        ).strip()
 
         city = request.POST.get(
             'city'
-        )
+        ).strip()
 
         district = request.POST.get(
             'district'
-        )
+        ).strip()
 
         state = request.POST.get(
             'state'
-        )
+        ).strip()
 
         address = request.POST.get(
             'address'
-        )
+        ).strip()
 
         pincode = request.POST.get(
             'pincode'
+        ).strip()
+
+        country = (
+            request.POST.get('country') or 'India'
+        ).strip()
+
+        user_type = (
+            request.POST.get('user_type') or ''
+        ).strip()
+
+        allowed_user_types = {
+            'subscriber',
+            'reporter'
+        }
+
+        required_values = (
+            first_name,
+            last_name,
+            email,
+            mobile,
+            city,
+            state,
+            address,
+            pincode,
+            country,
+            user_type
         )
+
+        if not all(required_values):
+            messages.error(
+                request,
+                'All fields are required.'
+            )
+
+            return redirect('register')
+
+        if user_type not in allowed_user_types:
+            messages.error(
+                request,
+                'Please select a valid user type.'
+            )
+
+            return redirect('register')
 
         if User.objects.filter(email=email).exists():
             messages.error(
@@ -118,6 +167,7 @@ def register(request):
 
         password = generate_strong_password()
         username = email or mobile
+        full_name = f'{first_name} {last_name}'.strip()
 
         user = User.objects.create_user(
 
@@ -127,7 +177,13 @@ def register(request):
 
             mobile=mobile,
 
-            full_name=request.POST.get('full_name'),
+            first_name=first_name,
+
+            last_name=last_name,
+
+            full_name=full_name,
+
+            user_type=user_type,
 
             address=address,
 
@@ -139,7 +195,7 @@ def register(request):
 
             pincode=pincode,
 
-            country=request.POST.get('country') or 'India',
+            country=country,
 
             password=password
         )

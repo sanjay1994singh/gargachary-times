@@ -17,6 +17,12 @@ urlpatterns = [
     ),
 
     path(
+        'reporters/create/',
+        views.create_reporter_account,
+        name='create_reporter_account'
+    ),
+
+    path(
         'payment/<int:plan_id>/',
         views.phonepe_payment,
         name='phonepe_payment'

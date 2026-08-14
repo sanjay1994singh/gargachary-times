@@ -133,6 +133,79 @@ def is_reporter_mobile_allowed(reporter_mobile):
     ).exists()
 
 
+def create_reporter_account(request):
+    if request.method != 'POST':
+        return JsonResponse(
+            {
+                'error': 'Invalid request method.'
+            },
+            status=405
+        )
+
+    first_name = (request.POST.get('first_name') or '').strip()
+    last_name = (request.POST.get('last_name') or '').strip()
+    email = (request.POST.get('email') or '').strip()
+    mobile = (request.POST.get('mobile') or '').strip()
+    address = (request.POST.get('address') or '').strip()
+    city = (request.POST.get('city') or '').strip()
+    pincode = (request.POST.get('pincode') or '').strip()
+    state = (request.POST.get('state') or 'Uttar Pradesh').strip()
+    country = (request.POST.get('country') or 'India').strip()
+
+    if not first_name or not last_name or not email or not mobile:
+        return JsonResponse(
+            {
+                'error': 'First name, last name, email and mobile are required.'
+            },
+            status=400
+        )
+
+    if User.objects.filter(email=email).exists():
+        return JsonResponse(
+            {
+                'error': 'Email already exists.'
+            },
+            status=400
+        )
+
+    if User.objects.filter(mobile=mobile).exists():
+        return JsonResponse(
+            {
+                'error': 'Mobile already exists.'
+            },
+            status=400
+        )
+
+    full_name = f'{first_name} {last_name}'.strip()
+    password = generate_strong_password()
+    user = User.objects.create_user(
+        username=email,
+        email=email,
+        mobile=mobile,
+        first_name=first_name,
+        last_name=last_name,
+        full_name=full_name,
+        address=address,
+        city=city,
+        state=state,
+        pincode=pincode,
+        country=country,
+        user_type='reporter',
+        password=password
+    )
+    send_account_created_email(user, password)
+
+    return JsonResponse(
+        {
+            'message': 'Reporter account created successfully.',
+            'reporter': {
+                'name': full_name or user.username,
+                'mobile': mobile,
+            }
+        }
+    )
+
+
 def subscribe(request, plan_id):
     plan = get_object_or_404(
         SubscriptionPlan,

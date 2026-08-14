@@ -21,9 +21,17 @@ Register | Gargachary Times
 
                         <div class="row">
                             <div class="col-md-6 mb-4">
-                                <label class="fw-bold mb-2">Full name</label>
+                                <label class="fw-bold mb-2">First name</label>
                                 <input type="text"
-                                       name="full_name"
+                                       name="first_name"
+                                       class="form-control form-control-lg rounded-4"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="fw-bold mb-2">Last name</label>
+                                <input type="text"
+                                       name="last_name"
                                        class="form-control form-control-lg rounded-4"
                                        required>
                             </div>
@@ -34,6 +42,17 @@ Register | Gargachary Times
                                        name="email"
                                        class="form-control form-control-lg rounded-4"
                                        required>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="fw-bold mb-2">User type</label>
+                                <select name="user_type"
+                                        class="form-select form-select-lg rounded-4"
+                                        required>
+                                    <option value="">Select user type</option>
+                                    <option value="subscriber">Subscriber</option>
+                                    <option value="reporter">Reporter</option>
+                                </select>
                             </div>
 
                             <div class="col-md-6 mb-4">

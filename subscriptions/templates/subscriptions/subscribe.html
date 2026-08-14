@@ -89,7 +89,7 @@ Subscribe {{ plan.name }} | Gargachary Times
     }
 
     .reporter-search {
-        padding-right: 46px;
+        padding-right: 94px;
     }
 
     .reporter-picker.is-invalid .reporter-search {
@@ -100,7 +100,7 @@ Subscribe {{ plan.name }} | Gargachary Times
     .reporter-picker::after {
         content: "";
         position: absolute;
-        right: 18px;
+        right: 58px;
         top: 50%;
         width: 0;
         height: 0;
@@ -202,6 +202,79 @@ Subscribe {{ plan.name }} | Gargachary Times
         display: none;
     }
 
+    .reporter-add-btn {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 50%;
+        background: #b91c1c;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+    }
+
+    .reporter-add-btn:hover {
+        background: #991b1b;
+    }
+
+    .reporter-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1050;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        background: rgba(17, 24, 39, .55);
+    }
+
+    .reporter-modal-backdrop.is-open {
+        display: flex;
+    }
+
+    .reporter-modal {
+        width: min(760px, 100%);
+        max-height: calc(100vh - 36px);
+        overflow-y: auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 24px 70px rgba(17, 24, 39, .32);
+    }
+
+    .reporter-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 18px 22px;
+        border-bottom: 1px solid #e4ded6;
+    }
+
+    .reporter-modal-header h4 {
+        margin: 0;
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .reporter-modal-close {
+        border: 0;
+        background: #f3f4f6;
+        color: #111827;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+    }
+
+    .reporter-modal-body {
+        padding: 22px;
+    }
+
     @media (max-width: 991px) {
         .plan-summary {
             position: static;
@@ -294,6 +367,9 @@ Subscribe {{ plan.name }} | Gargachary Times
                                                readonly
                                                placeholder="Reporter name ya mobile search kare">
                                         <input type="hidden" name="reporter_mobile" class="reporter-mobile-value">
+                                        <button type="button" class="reporter-add-btn" title="Add reporter">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
                                         <div class="reporter-dropdown">
                                             {% for reporter in reporter_options %}
                                             <button type="button"
@@ -390,6 +466,9 @@ Subscribe {{ plan.name }} | Gargachary Times
                                            readonly
                                            placeholder="Reporter name ya mobile search kare">
                                     <input type="hidden" name="reporter_mobile" class="reporter-mobile-value" value="{{ reporter_mobile }}">
+                                    <button type="button" class="reporter-add-btn" title="Add reporter">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
                                     <div class="reporter-dropdown">
                                         {% for reporter in reporter_options %}
                                         <button type="button"
@@ -424,20 +503,129 @@ Subscribe {{ plan.name }} | Gargachary Times
         </div>
     </div>
 </section>
+<div class="reporter-modal-backdrop" id="reporter-create-modal" aria-hidden="true">
+    <div class="reporter-modal">
+        <div class="reporter-modal-header">
+            <h4>Add Reporter Account</h4>
+            <button type="button" class="reporter-modal-close" id="reporter-modal-close" aria-label="Close">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="reporter-modal-body">
+            <form id="reporter-create-form" data-no-loader="true">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">First name</label>
+                        <input type="text" name="first_name" class="form-control form-control-lg" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">Last name</label>
+                        <input type="text" name="last_name" class="form-control form-control-lg" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">Email</label>
+                        <input type="email" name="email" class="form-control form-control-lg" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">Mobile</label>
+                        <input type="text" name="mobile" class="form-control form-control-lg" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">City</label>
+                        <input type="text" name="city" class="form-control form-control-lg" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">PIN code</label>
+                        <input type="text" name="pincode" class="form-control form-control-lg" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">State</label>
+                        <select name="state" class="form-select form-select-lg" required>
+                            {% for state in account_states %}
+                            <option value="{{ state.name }}" {% if state.name == default_state %}selected{% endif %}>
+                                {{ state.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="fw-bold mb-2">Country</label>
+                        <input type="text" name="country" value="India" class="form-control form-control-lg" readonly>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="fw-bold mb-2">Address</label>
+                        <textarea name="address" class="form-control" rows="3" required></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger w-100" id="reporter-save-button">
+                    Save Reporter
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block js %}
 <script>
     (function () {
+        let activeReporterPicker = null;
+
+        function selectReporter(picker, name, mobile) {
+            const searchInput = picker.querySelector('.reporter-search');
+            const hiddenInput = picker.querySelector('.reporter-mobile-value');
+
+            searchInput.value = name + ' - ' + mobile;
+            hiddenInput.value = mobile;
+            picker.classList.remove('is-invalid');
+            picker.classList.remove('is-open');
+        }
+
+        function createReporterOption(name, mobile) {
+            const option = document.createElement('button');
+            option.type = 'button';
+            option.className = 'reporter-option';
+            option.dataset.name = name;
+            option.dataset.mobile = mobile;
+            option.innerHTML = (
+                '<span class="reporter-avatar"><i class="bi bi-person-badge"></i></span>' +
+                '<span class="reporter-info">' +
+                '<span class="reporter-name"></span>' +
+                '<span class="reporter-mobile"></span>' +
+                '</span>'
+            );
+            option.querySelector('.reporter-name').textContent = name;
+            option.querySelector('.reporter-mobile').textContent = mobile;
+            option.addEventListener('click', function () {
+                selectReporter(option.closest('.reporter-picker'), name, mobile);
+            });
+            return option;
+        }
+
+        function addReporterToPickers(name, mobile) {
+            document.querySelectorAll('.reporter-picker').forEach(function (picker) {
+                const dropdown = picker.querySelector('.reporter-dropdown');
+                const emptyState = picker.querySelector('.reporter-empty');
+                const existing = Array.from(dropdown.querySelectorAll('.reporter-option')).some(function (option) {
+                    return option.dataset.mobile === mobile;
+                });
+
+                if (!existing) {
+                    dropdown.insertBefore(createReporterOption(name, mobile), emptyState);
+                }
+            });
+        }
+
         function setupReporterPicker(picker) {
             const searchInput = picker.querySelector('.reporter-search');
             const hiddenInput = picker.querySelector('.reporter-mobile-value');
-            const options = Array.from(picker.querySelectorAll('.reporter-option'));
             const emptyState = picker.querySelector('.reporter-empty');
 
             function filterOptions() {
                 const query = searchInput.value.trim().toLowerCase();
                 let visibleCount = 0;
+                const options = Array.from(picker.querySelectorAll('.reporter-option'));
 
                 options.forEach(function (option) {
                     const label = (
@@ -458,6 +646,7 @@ Subscribe {{ plan.name }} | Gargachary Times
             }
 
             searchInput.addEventListener('focus', function () {
+                activeReporterPicker = picker;
                 setTimeout(function () {
                     searchInput.removeAttribute('readonly');
                 }, 80);
@@ -466,6 +655,7 @@ Subscribe {{ plan.name }} | Gargachary Times
             });
 
             searchInput.addEventListener('mousedown', function () {
+                activeReporterPicker = picker;
                 setTimeout(function () {
                     searchInput.removeAttribute('readonly');
                     searchInput.focus();
@@ -479,15 +669,22 @@ Subscribe {{ plan.name }} | Gargachary Times
                 filterOptions();
             });
 
-            options.forEach(function (option) {
+            Array.from(picker.querySelectorAll('.reporter-option')).forEach(function (option) {
                 option.addEventListener('click', function () {
-                    const displayValue = option.dataset.name + ' - ' + option.dataset.mobile;
-                    searchInput.value = displayValue;
-                    hiddenInput.value = option.dataset.mobile;
-                    picker.classList.remove('is-invalid');
-                    picker.classList.remove('is-open');
+                    selectReporter(picker, option.dataset.name, option.dataset.mobile);
                 });
             });
+
+            const addButton = picker.querySelector('.reporter-add-btn');
+
+            if (addButton) {
+                addButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    activeReporterPicker = picker;
+                    openReporterModal();
+                });
+            }
 
             document.addEventListener('click', function (event) {
                 if (!picker.contains(event.target)) {
@@ -498,6 +695,111 @@ Subscribe {{ plan.name }} | Gargachary Times
         }
 
         document.querySelectorAll('.reporter-picker').forEach(setupReporterPicker);
+
+        function openReporterModal() {
+            const modal = document.getElementById('reporter-create-modal');
+            const form = document.getElementById('reporter-create-form');
+
+            form.reset();
+            modal.classList.add('is-open');
+            modal.setAttribute('aria-hidden', 'false');
+            form.querySelector('[name="first_name"]').focus();
+        }
+
+        function closeReporterModal() {
+            const modal = document.getElementById('reporter-create-modal');
+
+            modal.classList.remove('is-open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        const reporterModalClose = document.getElementById('reporter-modal-close');
+        const reporterModal = document.getElementById('reporter-create-modal');
+        const reporterForm = document.getElementById('reporter-create-form');
+        const reporterSaveButton = document.getElementById('reporter-save-button');
+
+        reporterModalClose.addEventListener('click', closeReporterModal);
+        reporterModal.addEventListener('click', function (event) {
+            if (event.target === reporterModal) {
+                closeReporterModal();
+            }
+        });
+
+        reporterForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            if (reporterForm.checkValidity && !reporterForm.checkValidity()) {
+                reporterForm.reportValidity();
+                return;
+            }
+
+            const originalText = reporterSaveButton.innerHTML;
+            reporterSaveButton.disabled = true;
+            reporterSaveButton.innerHTML = 'Please wait...';
+
+            if (window.showSiteLoader) {
+                window.showSiteLoader();
+            }
+
+            fetch("{% url 'create_reporter_account' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': reporterForm.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Accept': 'application/json',
+                },
+                body: new FormData(reporterForm),
+            })
+                .then(function (response) {
+                    return response.json().then(function (data) {
+                        if (!response.ok) {
+                            throw new Error(data.error || 'Reporter account could not be created.');
+                        }
+
+                        return data;
+                    });
+                })
+                .then(function (data) {
+                    const reporter = data.reporter;
+                    addReporterToPickers(reporter.name, reporter.mobile);
+
+                    if (activeReporterPicker) {
+                        selectReporter(activeReporterPicker, reporter.name, reporter.mobile);
+                    }
+
+                    const alertPromise = window.Swal
+                        ? Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message || 'Reporter account created successfully.',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#b91c1c'
+                        })
+                        : Promise.resolve();
+
+                    alertPromise.then(closeReporterModal);
+                })
+                .catch(function (error) {
+                    if (window.Swal) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: error.message || 'Reporter account could not be created.',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#b91c1c'
+                        });
+                    } else {
+                        alert(error.message || 'Reporter account could not be created.');
+                    }
+                })
+                .finally(function () {
+                    reporterSaveButton.disabled = false;
+                    reporterSaveButton.innerHTML = originalText;
+
+                    if (window.hideSiteLoader) {
+                        window.hideSiteLoader();
+                    }
+                });
+        });
 
         window.validateReporterSelection = function (form) {
             const picker = form.querySelector('.reporter-picker');
