@@ -57,6 +57,59 @@ Login | Gargachary Times
         border: 1px solid #ddd;
     }
 
+    .password-field {
+
+        position: relative;
+    }
+
+    .password-field .login-input {
+
+        padding-right: 54px;
+    }
+
+    .password-toggle {
+
+        position: absolute;
+
+        top: 50%;
+
+        right: 14px;
+
+        transform: translateY(-50%);
+
+        width: 36px;
+
+        height: 36px;
+
+        border: none;
+
+        border-radius: 50%;
+
+        background: transparent;
+
+        color: #6b7280;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 20px;
+
+        cursor: pointer;
+    }
+
+    .password-toggle:hover,
+    .password-toggle:focus {
+
+        color: #c51b1f;
+
+        background: #fee2e2;
+
+        outline: none;
+    }
+
     .login-btn {
 
         background: linear-gradient(
@@ -204,11 +257,21 @@ Login | Gargachary Times
 
                                         </label>
 
-                                        <input type="password"
-                                               name="password"
-                                               class="form-control login-input"
-                                               placeholder="Enter password"
-                                               required>
+                                        <div class="password-field">
+                                            <input type="password"
+                                                   name="password"
+                                                   id="loginPassword"
+                                                   class="form-control login-input"
+                                                   placeholder="Enter password"
+                                                   required>
+                                            <button type="button"
+                                                    class="password-toggle"
+                                                    id="toggleLoginPassword"
+                                                    aria-label="Show password"
+                                                    aria-pressed="false">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
 
                                     </div>
 
@@ -259,3 +322,31 @@ Login | Gargachary Times
 </section>
 
 {% endblock %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.getElementById('loginPassword');
+        const toggleButton = document.getElementById('toggleLoginPassword');
+
+        if (!passwordInput || !toggleButton) {
+            return;
+        }
+
+        const icon = toggleButton.querySelector('i');
+
+        toggleButton.addEventListener('click', function () {
+            const isHidden = passwordInput.type === 'password';
+            passwordInput.type = isHidden ? 'text' : 'password';
+            toggleButton.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+            toggleButton.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+
+            if (icon) {
+                icon.className = isHidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+            }
+
+            passwordInput.focus();
+        });
+    });
+</script>
+{% endblock js %}
