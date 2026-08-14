@@ -23,7 +23,11 @@
         .sidebar-menu li.active > a,.sidebar-menu li.active .menu-parent{background:linear-gradient(135deg,#8e2de2,#4a00e0);color:white}
         .menu-parent{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-radius:16px;color:rgba(255,255,255,.75);font-weight:600}
         .menu-parent-left{display:flex;align-items:center;gap:15px}
-        .submenu{list-style:none;padding:4px 0 4px 38px;margin:0}
+        .submenu{list-style:none;padding:4px 0 4px 38px;margin:0;display:none}
+        .has-submenu.menu-open > .submenu{display:block}
+        .menu-parent{cursor:pointer}
+        .has-submenu.menu-open .menu-parent .fa-chevron-down{transform:rotate(180deg)}
+        .menu-parent .fa-chevron-down{transition:transform .2s ease}
         .submenu li{margin-bottom:6px}
         .submenu a{padding:8px 12px;border-radius:10px;font-size:14px;gap:10px}
         .main-content{margin-left:280px;width:100%;padding:30px}
@@ -51,7 +55,7 @@
             <h2>NewsPanel</h2>
         </div>
         <ul class="sidebar-menu">
-            <li>
+            <li class="has-submenu">
                 <a href="{% url 'dashboard' %}">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>Dashboard</span>
@@ -72,7 +76,7 @@
                     <li><a href="{% url 'download_visitors_data' 'monthly' %}">Monthly Report</a></li>
                 </ul>
             </li>
-            <li class="{% if active_menu == 'news' %}active{% endif %}">
+            <li class="has-submenu {% if active_menu == 'news' %}active menu-open{% endif %}">
                 <div class="menu-parent">
                     <div class="menu-parent-left">
                         <i class="fa-solid fa-newspaper"></i>
@@ -85,7 +89,7 @@
                     <li><a href="{% url 'dashboard_news_list' %}"><i class="fa-solid fa-list"></i><span>All News</span></a></li>
                 </ul>
             </li>
-            <li class="{% if active_menu == 'users' %}active{% endif %}">
+            <li class="has-submenu {% if active_menu == 'users' %}active menu-open{% endif %}">
                 <div class="menu-parent">
                     <div class="menu-parent-left">
                         <i class="fa-solid fa-user-group"></i>
@@ -112,5 +116,13 @@
         {% block content %}{% endblock %}
     </main>
 </div>
+<script>
+    document.querySelectorAll('.sidebar-menu .has-submenu .menu-parent').forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+            const item = trigger.closest('.has-submenu');
+            item.classList.toggle('menu-open');
+        });
+    });
+</script>
 </body>
 </html>

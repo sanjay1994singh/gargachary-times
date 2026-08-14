@@ -517,6 +517,28 @@
     padding:4px 0 4px 38px;
 
     margin:0;
+
+    display:none;
+}
+
+.sidebar-menu li.menu-open > .submenu{
+
+    display:block;
+}
+
+.sidebar-menu .menu-parent{
+
+    cursor:pointer;
+}
+
+.sidebar-menu li.menu-open .menu-parent .fa-chevron-down{
+
+    transform:rotate(180deg);
+}
+
+.sidebar-menu .menu-parent .fa-chevron-down{
+
+    transition:transform .2s ease;
 }
 
 .sidebar-menu .submenu li{
@@ -728,7 +750,7 @@
                 </a>
             </li>
 
-            <li>
+            <li class="has-submenu">
                 <div class="menu-parent">
                     <div class="menu-parent-left">
                         <i class="fa-solid fa-file-arrow-down"></i>
@@ -752,7 +774,7 @@
                 </ul>
             </li>
 
-            <li class="{% if active_menu == 'news' %}active{% endif %}">
+            <li class="has-submenu {% if active_menu == 'news' %}active menu-open{% endif %}">
                 <div class="menu-parent">
                     <div class="menu-parent-left">
                         <i class="fa-solid fa-newspaper"></i>
@@ -776,7 +798,7 @@
                 </ul>
             </li>
 
-            <li class="{% if active_menu == 'users' %}active{% endif %}">
+            <li class="has-submenu {% if active_menu == 'users' %}active menu-open{% endif %}">
                 <div class="menu-parent">
                     <div class="menu-parent-left">
                         <i class="fa-solid fa-user-group"></i>
@@ -1163,6 +1185,14 @@
     </main>
 
 </div>
+<script>
+    document.querySelectorAll('.sidebar-menu .has-submenu .menu-parent').forEach(function (trigger) {
+        trigger.addEventListener('click', function () {
+            const item = trigger.closest('.has-submenu');
+            item.classList.toggle('menu-open');
+        });
+    });
+</script>
 <script>
 
     const ctx = document.getElementById('visitorChart');

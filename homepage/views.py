@@ -141,6 +141,14 @@ def dashboard_news_list(request):
         .select_related('category', 'user')
         .order_by('-id')
     )
+    paginator = Paginator(news_items, 25)
+    page_obj = paginator.get_page(request.GET.get('page'))
+    current_page = page_obj.number
+    page_numbers = [
+        page_number
+        for page_number in paginator.page_range
+        if current_page - 2 <= page_number <= current_page + 2
+    ]
 
     return render(
         request,
@@ -148,7 +156,9 @@ def dashboard_news_list(request):
         {
             'active_menu': 'news',
             'page_title': 'All News',
-            'news_items': news_items,
+            'page_obj': page_obj,
+            'page_numbers': page_numbers,
+            'news_items': page_obj.object_list,
         }
     )
 
