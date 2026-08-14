@@ -83,6 +83,46 @@ def plans(request):
 
 # SUBSCRIBE PAGE
 
+def get_reporter_options():
+    reporters = (
+        User.objects
+        .filter(user_type='reporter')
+        .order_by('full_name', 'username', 'mobile')
+    )
+    reporter_options = []
+
+    for reporter in reporters:
+        mobile = (reporter.mobile or '').strip()
+
+        if not mobile:
+            continue
+
+        reporter_options.append({
+            'mobile': mobile,
+            'name': (
+                reporter.full_name or
+                reporter.username or
+                reporter.email or
+                mobile
+            ),
+        })
+
+    return reporter_options
+
+
+def get_subscribe_context(request, plan, **extra_context):
+    context = {
+        'plan': plan,
+        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+        'account_states': State.objects.filter(country__code='IN'),
+        'default_state': 'Uttar Pradesh',
+        'reporter_mobile': request.session.get('reporter_mobile', ''),
+        'reporter_options': get_reporter_options(),
+    }
+    context.update(extra_context)
+    return context
+
+
 def subscribe(request, plan_id):
     plan = get_object_or_404(
         SubscriptionPlan,
@@ -112,12 +152,11 @@ def subscribe(request, plan_id):
             return render(
                 request,
                 'subscriptions/subscribe.html',
-                {
-                    'plan': plan,
-                    'account_states': State.objects.filter(country__code='IN'),
-                    'default_state': 'Uttar Pradesh',
-                    'register_error': 'Email already exists. Please login with your existing account.',
-                }
+                get_subscribe_context(
+                    request,
+                    plan,
+                    register_error='Email already exists. Please login with your existing account.',
+                )
             )
 
         if mobile and User.objects.filter(mobile=mobile).exists():
@@ -128,12 +167,11 @@ def subscribe(request, plan_id):
             return render(
                 request,
                 'subscriptions/subscribe.html',
-                {
-                    'plan': plan,
-                    'account_states': State.objects.filter(country__code='IN'),
-                    'default_state': 'Uttar Pradesh',
-                    'register_error': 'Mobile already exists. Please login with your existing account.',
-                }
+                get_subscribe_context(
+                    request,
+                    plan,
+                    register_error='Mobile already exists. Please login with your existing account.',
+                )
             )
 
         password = generate_strong_password()
@@ -161,18 +199,10 @@ def subscribe(request, plan_id):
             'Account created successfully. Login details have been sent to your email.'
         )
 
-    context = {
-        'plan': plan,
-        'razorpay_key_id': settings.RAZORPAY_KEY_ID,
-        'account_states': State.objects.filter(country__code='IN'),
-        'default_state': 'Uttar Pradesh',
-        'reporter_mobile': request.session.get('reporter_mobile', ''),
-    }
-
     return render(
         request,
         'subscriptions/subscribe.html',
-        context
+        get_subscribe_context(request, plan)
     )
 
 

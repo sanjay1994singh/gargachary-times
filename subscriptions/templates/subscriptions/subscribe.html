@@ -169,6 +169,8 @@ Subscribe {{ plan.name }} | Gargachary Times
                                     <input type="text"
                                            name="reporter_mobile"
                                            class="form-control form-control-lg"
+                                           list="reporter-mobile-options"
+                                           autocomplete="off"
                                            placeholder="Reporter ka mobile number">
                                 </div>
 
@@ -241,6 +243,8 @@ Subscribe {{ plan.name }} | Gargachary Times
                                        id="reporter_mobile"
                                        class="form-control form-control-lg"
                                        value="{{ reporter_mobile }}"
+                                       list="reporter-mobile-options"
+                                       autocomplete="off"
                                        placeholder="Reporter ka mobile number">
                             </div>
 
@@ -258,6 +262,11 @@ Subscribe {{ plan.name }} | Gargachary Times
         </div>
     </div>
 </section>
+<datalist id="reporter-mobile-options">
+    {% for reporter in reporter_options %}
+    <option value="{{ reporter.mobile }}">{{ reporter.name }} - {{ reporter.mobile }}</option>
+    {% endfor %}
+</datalist>
 {% endblock %}
 
 {% block js %}
