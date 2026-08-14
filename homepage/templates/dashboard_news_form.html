@@ -69,10 +69,47 @@
         });
 
         if (window.CKEDITOR) {
-            CKEDITOR.replace('news_text', {
+            const editor = CKEDITOR.replace('news_text', {
                 height: 420,
                 width: '100%',
                 toolbar: 'Full'
+            });
+
+            editor.on('pluginsLoaded', function () {
+                editor.addCommand('image', {
+                    exec: function (activeEditor) {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.style.display = 'none';
+
+                        input.addEventListener('change', function () {
+                            const file = input.files && input.files[0];
+
+                            if (!file) {
+                                input.remove();
+                                return;
+                            }
+
+                            const reader = new FileReader();
+
+                            reader.onload = function (event) {
+                                const image = activeEditor.document.createElement('img');
+                                image.setAttribute('src', event.target.result);
+                                image.setAttribute('alt', file.name);
+                                image.setStyle('max-width', '100%');
+                                image.setStyle('height', 'auto');
+                                activeEditor.insertElement(image);
+                                input.remove();
+                            };
+
+                            reader.readAsDataURL(file);
+                        });
+
+                        document.body.appendChild(input);
+                        input.click();
+                    }
+                });
             });
         }
 
