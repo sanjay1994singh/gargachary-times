@@ -84,6 +84,102 @@ Subscribe {{ plan.name }} | Gargachary Times
         color: white;
     }
 
+    .reporter-picker {
+        position: relative;
+    }
+
+    .reporter-search {
+        padding-right: 46px;
+    }
+
+    .reporter-picker.is-invalid .reporter-search {
+        border-color: #dc2626;
+        box-shadow: 0 0 0 .25rem rgba(220, 38, 38, .18);
+    }
+
+    .reporter-picker::after {
+        content: "\f107";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        pointer-events: none;
+    }
+
+    .reporter-dropdown {
+        position: absolute;
+        z-index: 30;
+        top: calc(100% + 8px);
+        left: 0;
+        right: 0;
+        display: none;
+        max-height: 260px;
+        overflow-y: auto;
+        border: 1px solid #ead7d7;
+        border-radius: 12px;
+        background: #fff;
+        box-shadow: 0 18px 40px rgba(17, 24, 39, 0.16);
+    }
+
+    .reporter-picker.is-open .reporter-dropdown {
+        display: block;
+    }
+
+    .reporter-option {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        padding: 12px 14px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-align: left;
+        color: #111827;
+        border-bottom: 1px solid #f3e8e8;
+    }
+
+    .reporter-option:last-child {
+        border-bottom: 0;
+    }
+
+    .reporter-option:hover,
+    .reporter-option:focus {
+        background: #fff5f5;
+        outline: none;
+    }
+
+    .reporter-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #fee2e2;
+        color: #b91c1c;
+        flex: 0 0 36px;
+    }
+
+    .reporter-name {
+        font-weight: 800;
+        color: #111827;
+    }
+
+    .reporter-mobile {
+        color: #6b7280;
+        font-size: 13px;
+        margin-top: 2px;
+    }
+
+    .reporter-empty {
+        padding: 14px;
+        color: #6b7280;
+        display: none;
+    }
+
     @media (max-width: 991px) {
         .plan-summary {
             position: static;
@@ -166,12 +262,30 @@ Subscribe {{ plan.name }} | Gargachary Times
 
                                 <div class="col-md-6 mb-3">
                                     <label class="fw-bold mb-2">Reporter mobile</label>
-                                    <input type="text"
-                                           name="reporter_mobile"
-                                           class="form-control form-control-lg"
-                                           list="reporter-mobile-options"
-                                           autocomplete="off"
-                                           placeholder="Reporter ka mobile number">
+                                    <div class="reporter-picker">
+                                        <input type="text"
+                                               class="form-control form-control-lg reporter-search"
+                                               autocomplete="off"
+                                               placeholder="Reporter name ya mobile search kare">
+                                        <input type="hidden" name="reporter_mobile" class="reporter-mobile-value">
+                                        <div class="reporter-dropdown">
+                                            {% for reporter in reporter_options %}
+                                            <button type="button"
+                                                    class="reporter-option"
+                                                    data-name="{{ reporter.name }}"
+                                                    data-mobile="{{ reporter.mobile }}">
+                                                <span class="reporter-avatar">
+                                                    <i class="bi bi-person-badge"></i>
+                                                </span>
+                                                <span>
+                                                    <span class="reporter-name">{{ reporter.name }}</span>
+                                                    <span class="reporter-mobile">{{ reporter.mobile }}</span>
+                                                </span>
+                                            </button>
+                                            {% endfor %}
+                                            <div class="reporter-empty">No reporter found.</div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
@@ -238,14 +352,32 @@ Subscribe {{ plan.name }} | Gargachary Times
 
                             <div class="mb-3">
                                 <label class="fw-bold mb-2">Reporter mobile</label>
-                                <input type="text"
-                                       name="reporter_mobile"
-                                       id="reporter_mobile"
-                                       class="form-control form-control-lg"
-                                       value="{{ reporter_mobile }}"
-                                       list="reporter-mobile-options"
-                                       autocomplete="off"
-                                       placeholder="Reporter ka mobile number">
+                                <div class="reporter-picker">
+                                    <input type="text"
+                                           id="reporter_mobile"
+                                           class="form-control form-control-lg reporter-search"
+                                           value="{{ reporter_mobile }}"
+                                           autocomplete="off"
+                                           placeholder="Reporter name ya mobile search kare">
+                                    <input type="hidden" name="reporter_mobile" class="reporter-mobile-value" value="{{ reporter_mobile }}">
+                                    <div class="reporter-dropdown">
+                                        {% for reporter in reporter_options %}
+                                        <button type="button"
+                                                class="reporter-option"
+                                                data-name="{{ reporter.name }}"
+                                                data-mobile="{{ reporter.mobile }}">
+                                            <span class="reporter-avatar">
+                                                <i class="bi bi-person-badge"></i>
+                                            </span>
+                                            <span>
+                                                <span class="reporter-name">{{ reporter.name }}</span>
+                                                <span class="reporter-mobile">{{ reporter.mobile }}</span>
+                                            </span>
+                                        </button>
+                                        {% endfor %}
+                                        <div class="reporter-empty">No reporter found.</div>
+                                    </div>
+                                </div>
                             </div>
 
                             <button type="submit" id="razorpay-payment-button" class="btn pay-btn w-100">
@@ -262,14 +394,97 @@ Subscribe {{ plan.name }} | Gargachary Times
         </div>
     </div>
 </section>
-<datalist id="reporter-mobile-options">
-    {% for reporter in reporter_options %}
-    <option value="{{ reporter.mobile }}">{{ reporter.name }} - {{ reporter.mobile }}</option>
-    {% endfor %}
-</datalist>
 {% endblock %}
 
 {% block js %}
+<script>
+    (function () {
+        function setupReporterPicker(picker) {
+            const searchInput = picker.querySelector('.reporter-search');
+            const hiddenInput = picker.querySelector('.reporter-mobile-value');
+            const options = Array.from(picker.querySelectorAll('.reporter-option'));
+            const emptyState = picker.querySelector('.reporter-empty');
+
+            function filterOptions() {
+                const query = searchInput.value.trim().toLowerCase();
+                let visibleCount = 0;
+
+                options.forEach(function (option) {
+                    const label = (
+                        option.dataset.name + ' ' +
+                        option.dataset.mobile
+                    ).toLowerCase();
+                    const isVisible = !query || label.includes(query);
+                    option.style.display = isVisible ? 'flex' : 'none';
+
+                    if (isVisible) {
+                        visibleCount += 1;
+                    }
+                });
+
+                if (emptyState) {
+                    emptyState.style.display = visibleCount ? 'none' : 'block';
+                }
+            }
+
+            searchInput.addEventListener('focus', function () {
+                picker.classList.add('is-open');
+                filterOptions();
+            });
+
+            searchInput.addEventListener('input', function () {
+                hiddenInput.value = '';
+                picker.classList.remove('is-invalid');
+                picker.classList.add('is-open');
+                filterOptions();
+            });
+
+            options.forEach(function (option) {
+                option.addEventListener('click', function () {
+                    const displayValue = option.dataset.name + ' - ' + option.dataset.mobile;
+                    searchInput.value = displayValue;
+                    hiddenInput.value = option.dataset.mobile;
+                    picker.classList.remove('is-invalid');
+                    picker.classList.remove('is-open');
+                });
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!picker.contains(event.target)) {
+                    picker.classList.remove('is-open');
+                }
+            });
+        }
+
+        document.querySelectorAll('.reporter-picker').forEach(setupReporterPicker);
+
+        window.validateReporterSelection = function (form) {
+            const picker = form.querySelector('.reporter-picker');
+            const reporterValue = form.querySelector('.reporter-mobile-value');
+
+            if (!picker || !reporterValue) {
+                return true;
+            }
+
+            if (reporterValue.value) {
+                picker.classList.remove('is-invalid');
+                return true;
+            }
+
+            picker.classList.add('is-invalid');
+            picker.classList.add('is-open');
+            return false;
+        };
+
+        document.querySelectorAll('form:not(#razorpay-payment-form)').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (window.validateReporterSelection && !window.validateReporterSelection(form)) {
+                    event.preventDefault();
+                }
+            });
+        });
+    })();
+</script>
 {% if request.user.is_authenticated %}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
@@ -310,6 +525,12 @@ Subscribe {{ plan.name }} | Gargachary Times
 
         form.addEventListener('submit', function (event) {
             event.preventDefault();
+
+            if (window.validateReporterSelection && !window.validateReporterSelection(form)) {
+                showError('Please select a valid reporter from the list.');
+                return;
+            }
+
             errorBox.classList.add('d-none');
             setLoading(true);
 

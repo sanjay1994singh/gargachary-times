@@ -123,6 +123,16 @@ def get_subscribe_context(request, plan, **extra_context):
     return context
 
 
+def is_reporter_mobile_allowed(reporter_mobile):
+    if not reporter_mobile:
+        return False
+
+    return User.objects.filter(
+        user_type='reporter',
+        mobile=reporter_mobile
+    ).exists()
+
+
 def subscribe(request, plan_id):
     plan = get_object_or_404(
         SubscriptionPlan,
@@ -143,6 +153,21 @@ def subscribe(request, plan_id):
         email = request.POST.get('email')
         mobile = request.POST.get('mobile')
         reporter_mobile = (request.POST.get('reporter_mobile') or '').strip()
+
+        if not is_reporter_mobile_allowed(reporter_mobile):
+            messages.error(
+                request,
+                'Please select a valid reporter from the list.'
+            )
+            return render(
+                request,
+                'subscriptions/subscribe.html',
+                get_subscribe_context(
+                    request,
+                    plan,
+                    register_error='Please select a valid reporter from the list.',
+                )
+            )
 
         if User.objects.filter(email=email).exists():
             messages.error(
@@ -401,6 +426,14 @@ def razorpay_create_order(request, plan_id):
         is_active=True
     )
     reporter_mobile = (request.POST.get('reporter_mobile') or '').strip()
+
+    if not is_reporter_mobile_allowed(reporter_mobile):
+        return JsonResponse(
+            {
+                'error': 'Please select a valid reporter from the list.'
+            },
+            status=400
+        )
 
     active_subscription_exists = (
         UserSubscription.objects
