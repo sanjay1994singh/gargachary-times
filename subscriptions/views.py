@@ -273,11 +273,18 @@ def subscribe(request, plan_id):
             )
 
         password = generate_strong_password()
+        full_name = (request.POST.get('full_name') or '').strip()
+        name_parts = full_name.split(' ', 1)
+        first_name = name_parts[0] if name_parts else ''
+        last_name = name_parts[1] if len(name_parts) > 1 else ''
         user = User.objects.create_user(
             username=email or mobile,
             email=email,
             mobile=mobile,
-            full_name=request.POST.get('full_name'),
+            first_name=first_name,
+            last_name=last_name,
+            full_name=full_name,
+            user_type='subscriber',
             address=request.POST.get('address'),
             city=request.POST.get('city'),
             state=request.POST.get('state') or 'Uttar Pradesh',

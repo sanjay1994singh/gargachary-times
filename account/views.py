@@ -231,6 +231,7 @@ def login_view(request):
         username_input = request.POST.get(
             'username'
         )
+        username_input = (username_input or '').strip()
 
         password = request.POST.get(
             'password'
@@ -245,14 +246,14 @@ def login_view(request):
         if not user_obj:
             user_obj = User.objects.filter(
 
-                email=username_input
+                email__iexact=username_input
 
             ).first()
 
         if not user_obj:
             user_obj = User.objects.filter(
 
-                username=username_input
+                username__iexact=username_input
 
             ).first()
 

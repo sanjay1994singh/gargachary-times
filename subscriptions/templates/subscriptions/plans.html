@@ -8,47 +8,18 @@ Premium Subscription Plans | Gargachary Times
 
 <style>
 
-    .hero-section {
-
-        background: linear-gradient(
-            135deg,
-            #0f172a,
-            #1e293b
-        );
-
-        color: white;
-
-        padding: 100px 0;
-
-        position: relative;
-
-        overflow: hidden;
-    }
-
-    .hero-section::before {
-
-        content: '';
-
-        position: absolute;
-
-        width: 300px;
-
-        height: 300px;
-
-        background: rgba(255,255,255,0.05);
-
-        border-radius: 50%;
-
-        top: -100px;
-
-        right: -100px;
+    .plans-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 24px;
+        align-items: stretch;
     }
 
     .plan-card {
 
         border: none;
 
-        border-radius: 25px;
+        border-radius: 10px;
 
         overflow: hidden;
 
@@ -57,6 +28,8 @@ Premium Subscription Plans | Gargachary Times
         height: 100%;
 
         background: white;
+
+        min-width: 0;
     }
 
     .plan-card:hover {
@@ -68,13 +41,17 @@ Premium Subscription Plans | Gargachary Times
 
     .plan-top {
 
-        padding: 18px;
+        padding: 12px 14px;
 
         font-weight: bold;
 
         text-align: center;
 
         color: white;
+
+        font-size: 13px;
+
+        line-height: 1.25;
     }
 
     .news-plan {
@@ -97,11 +74,45 @@ Premium Subscription Plans | Gargachary Times
 
     .price {
 
-        font-size: 55px;
+        font-size: clamp(30px, 3vw, 44px);
 
-        font-weight: 700;
+        font-weight: 800;
 
         color: #dc2626;
+
+        line-height: 1.1;
+
+        white-space: nowrap;
+
+        overflow-wrap: normal;
+    }
+
+    .plan-title {
+        font-size: 20px;
+        line-height: 1.2;
+        min-height: 48px;
+    }
+
+    .plan-duration {
+        font-size: 13px;
+    }
+
+    .plan-features {
+        color: #4b5563;
+        font-size: 13px;
+        line-height: 1.45;
+        min-height: 136px;
+    }
+
+    .plan-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 7px;
+    }
+
+    .plan-features i {
+        margin-top: 3px;
+        flex: 0 0 auto;
     }
 
     .subscribe-btn {
@@ -118,7 +129,7 @@ Premium Subscription Plans | Gargachary Times
 
         padding: 14px 25px;
 
-        border-radius: 50px;
+        border-radius: 7px;
 
         font-weight: 600;
 
@@ -152,41 +163,37 @@ Premium Subscription Plans | Gargachary Times
         box-shadow: 0 15px 30px rgba(0,0,0,0.08);
     }
 
+    @media (max-width: 1199.98px) {
+        .plans-grid {
+            grid-template-columns: repeat(2, minmax(260px, 1fr));
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .plans-grid {
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        .plan-card {
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        .plan-title {
+            min-height: auto;
+        }
+
+        .plan-features {
+            min-height: auto;
+        }
+    }
+
 </style>
 
 {% endblock %}
 
 {% block content %}
-
-<section class="hero-section">
-
-    <div class="container text-center">
-
-        <h1 class="display-3 fw-bold mb-4">
-
-            Premium Membership
-
-        </h1>
-
-        <p class="lead mb-5">
-
-            Unlock premium Hindi journalism,
-            E-Paper access, exclusive reports,
-            and magazine subscriptions.
-
-        </p>
-
-        <a href="#plans"
-           class="btn btn-danger btn-lg px-5 py-3 rounded-pill">
-
-            View Plans
-
-        </a>
-
-    </div>
-
-</section>
-
 
 <section class="py-5 bg-light" id="plans">
 
@@ -208,13 +215,11 @@ Premium Subscription Plans | Gargachary Times
 
         </div>
 
-        <div class="row g-4">
+        <div class="plans-grid">
 
             {% for plan in plans %}
 
-            <div class="col-lg-3 col-md-6">
-
-                <div class="card shadow-lg plan-card">
+            <div class="card shadow-lg plan-card">
 
                     {% if plan.subscription_type == 'news' %}
 
@@ -238,9 +243,9 @@ Premium Subscription Plans | Gargachary Times
 
                     {% endif %}
 
-                    <div class="card-body p-2 text-center">
+                    <div class="card-body p-4 text-center d-flex flex-column">
 
-                        <h3 class="fw-bold mb-3">
+                        <h3 class="fw-bold mb-3 plan-title">
 
                             {{ plan.name }}
 
@@ -248,11 +253,11 @@ Premium Subscription Plans | Gargachary Times
 
                         <div class="price mb-3">
 
-                            ₹{{ plan.price }}
+                            &#8377;{{ plan.price }}
 
                         </div>
 
-                        <p class="text-muted mb-4">
+                        <p class="text-muted mb-4 plan-duration">
 
                             {{ plan.duration }}
                             {{ plan.duration_type }}
@@ -261,7 +266,7 @@ Premium Subscription Plans | Gargachary Times
 
                         </p>
 
-                        <ul class="list-unstyled text-start mb-4">
+                        <ul class="list-unstyled text-start mb-4 plan-features">
 
                             <li class="mb-3">
 
@@ -298,15 +303,13 @@ Premium Subscription Plans | Gargachary Times
                         </ul>
 
                         <a href="{% url 'subscribe' plan.id %}"
-                           class="subscribe-btn text-decoration-none d-inline-block">
+                           class="subscribe-btn text-decoration-none d-inline-block mt-auto">
 
                             Subscribe Now
 
                         </a>
 
                     </div>
-
-                </div>
 
             </div>
 
