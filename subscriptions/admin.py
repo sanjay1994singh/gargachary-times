@@ -31,6 +31,7 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'user',
         'user_email',
         'user_mobile',
+        'reporter_mobile_display',
         'plan',
         'amount',
         'payment_status',
@@ -45,6 +46,7 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'payment_status',
         'is_active',
         'plan',
+        'reporter_mobile',
         'invoice__delivery_status'
     )
 
@@ -52,6 +54,7 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'user__username',
         'user__email',
         'user__mobile',
+        'reporter_mobile',
         'invoice__invoice_number',
         'transaction_id'
     )
@@ -65,6 +68,11 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
 
     def user_mobile(self, obj):
         return obj.user.mobile
+
+    def reporter_mobile_display(self, obj):
+        return obj.reporter_mobile or '-'
+
+    reporter_mobile_display.short_description = 'Reporter mobile'
 
     def invoice_number(self, obj):
         return getattr(obj.invoice, 'invoice_number', '-')

@@ -102,11 +102,12 @@ def subscribe(request, plan_id):
     if not request.user.is_authenticated and request.method == 'POST':
         email = request.POST.get('email')
         mobile = request.POST.get('mobile')
+        reporter_mobile = (request.POST.get('reporter_mobile') or '').strip()
 
         if User.objects.filter(email=email).exists():
             messages.error(
                 request,
-                'Email already exists. Please login or use Google.'
+                'Email already exists. Please login with your existing account.'
             )
             return render(
                 request,
@@ -115,14 +116,14 @@ def subscribe(request, plan_id):
                     'plan': plan,
                     'account_states': State.objects.filter(country__code='IN'),
                     'default_state': 'Uttar Pradesh',
-                    'register_error': 'Email already exists. Please login or use Google.',
+                    'register_error': 'Email already exists. Please login with your existing account.',
                 }
             )
 
         if mobile and User.objects.filter(mobile=mobile).exists():
             messages.error(
                 request,
-                'Mobile already exists. Please login or use Google.'
+                'Mobile already exists. Please login with your existing account.'
             )
             return render(
                 request,
@@ -131,7 +132,7 @@ def subscribe(request, plan_id):
                     'plan': plan,
                     'account_states': State.objects.filter(country__code='IN'),
                     'default_state': 'Uttar Pradesh',
-                    'register_error': 'Mobile already exists. Please login or use Google.',
+                    'register_error': 'Mobile already exists. Please login with your existing account.',
                 }
             )
 
@@ -154,6 +155,7 @@ def subscribe(request, plan_id):
             user,
             backend='django.contrib.auth.backends.ModelBackend'
         )
+        request.session['reporter_mobile'] = reporter_mobile
         messages.success(
             request,
             'Account created successfully. Login details have been sent to your email.'
@@ -164,6 +166,7 @@ def subscribe(request, plan_id):
         'razorpay_key_id': settings.RAZORPAY_KEY_ID,
         'account_states': State.objects.filter(country__code='IN'),
         'default_state': 'Uttar Pradesh',
+        'reporter_mobile': request.session.get('reporter_mobile', ''),
     }
 
     return render(
@@ -191,6 +194,11 @@ def mark_subscription_success(subscription):
     subscription.payment_status = 'SUCCESS'
     subscription.is_active = True
     subscription.save()
+
+    if subscription.user.user_type != 'subscriber':
+        subscription.user.user_type = 'subscriber'
+        subscription.user.save(update_fields=['user_type'])
+
     invoice = get_or_create_invoice(subscription)
 
     if not was_success:
@@ -362,6 +370,7 @@ def razorpay_create_order(request, plan_id):
         id=plan_id,
         is_active=True
     )
+    reporter_mobile = (request.POST.get('reporter_mobile') or '').strip()
 
     active_subscription_exists = (
         UserSubscription.objects
@@ -399,6 +408,10 @@ def razorpay_create_order(request, plan_id):
     )
 
     if pending_subscription:
+        if reporter_mobile and pending_subscription.reporter_mobile != reporter_mobile:
+            pending_subscription.reporter_mobile = reporter_mobile
+            pending_subscription.save(update_fields=['reporter_mobile'])
+
         return JsonResponse(
             {
                 'key': settings.RAZORPAY_KEY_ID,
@@ -457,6 +470,7 @@ def razorpay_create_order(request, plan_id):
         plan=plan,
         amount=plan.price,
         transaction_id=order['id'],
+        reporter_mobile=reporter_mobile,
         payment_status='PENDING'
     )
 

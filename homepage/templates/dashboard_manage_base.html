@@ -1,0 +1,116 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} | NewsPanel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Poppins',sans-serif;background:linear-gradient(135deg,#0f172a,#111827,#1e293b);min-height:100vh;color:white}
+        .dashboard-wrapper{display:flex;min-height:100vh}
+        .sidebar{width:280px;background:linear-gradient(180deg,#0f172a,#111827);padding:30px 20px;border-right:1px solid rgba(255,255,255,.05);position:fixed;height:100vh;overflow-y:auto}
+        .logo-area{margin-bottom:40px}
+        .logo-area h2{color:white;font-weight:700;font-size:28px}
+        .sidebar-menu{list-style:none;padding:0}
+        .sidebar-menu li{margin-bottom:12px}
+        .sidebar-menu a{display:flex;align-items:center;gap:15px;padding:14px 18px;border-radius:16px;text-decoration:none;color:rgba(255,255,255,.75);transition:.3s;font-weight:500}
+        .sidebar-menu a:hover{background:linear-gradient(135deg,#00c6ff,#0072ff);color:white;transform:translateX(5px)}
+        .sidebar-menu li.active > a,.sidebar-menu li.active .menu-parent{background:linear-gradient(135deg,#8e2de2,#4a00e0);color:white}
+        .menu-parent{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-radius:16px;color:rgba(255,255,255,.75);font-weight:600}
+        .menu-parent-left{display:flex;align-items:center;gap:15px}
+        .submenu{list-style:none;padding:4px 0 4px 38px;margin:0}
+        .submenu li{margin-bottom:6px}
+        .submenu a{padding:8px 12px;border-radius:10px;font-size:14px;gap:10px}
+        .main-content{margin-left:280px;width:100%;padding:30px}
+        .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;gap:20px;flex-wrap:wrap}
+        .topbar-title{font-size:30px;font-weight:700;color:white}
+        .panel-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:24px;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+        .form-control,.form-select{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:white}
+        .form-control:focus,.form-select:focus{background:rgba(255,255,255,.1);border-color:#00c6ff;color:white;box-shadow:none}
+        .form-control::placeholder{color:rgba(255,255,255,.5)}
+        .form-select option{color:#111827}
+        .table{color:white;vertical-align:middle}
+        .table thead{background:rgba(255,255,255,.1)}
+        .table tbody tr{border-color:rgba(255,255,255,.1)}
+        .table tbody tr:hover{background:rgba(255,255,255,.05)}
+        .thumb{width:74px;height:54px;object-fit:cover;border-radius:8px;background:rgba(255,255,255,.08)}
+        .action-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+        @media(max-width:992px){.sidebar{width:90px}.logo-area h2,.sidebar-menu span,.menu-parent .fa-chevron-down{display:none}.main-content{margin-left:90px}.submenu{padding-left:0}}
+        @media(max-width:768px){.sidebar{display:none}.main-content{margin-left:0;padding:20px}}
+    </style>
+</head>
+<body>
+<div class="dashboard-wrapper">
+    <aside class="sidebar">
+        <div class="logo-area">
+            <h2>NewsPanel</h2>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'dashboard' %}">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <div class="menu-parent">
+                    <div class="menu-parent-left">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span>Reports</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <ul class="submenu">
+                    <li><a href="{% url 'download_visitors_data' 'today' %}">Today Report</a></li>
+                    <li><a href="{% url 'download_visitors_data' 'yesterday' %}">Yesterday Report</a></li>
+                    <li><a href="{% url 'download_visitors_data' 'weekly' %}">Weekly Report</a></li>
+                    <li><a href="{% url 'download_visitors_data' 'monthly' %}">Monthly Report</a></li>
+                </ul>
+            </li>
+            <li class="{% if active_menu == 'news' %}active{% endif %}">
+                <div class="menu-parent">
+                    <div class="menu-parent-left">
+                        <i class="fa-solid fa-newspaper"></i>
+                        <span>News</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <ul class="submenu">
+                    <li><a href="{% url 'dashboard_news_add' %}"><i class="fa-solid fa-plus"></i><span>Add News</span></a></li>
+                    <li><a href="{% url 'dashboard_news_list' %}"><i class="fa-solid fa-list"></i><span>All News</span></a></li>
+                </ul>
+            </li>
+            <li class="{% if active_menu == 'users' %}active{% endif %}">
+                <div class="menu-parent">
+                    <div class="menu-parent-left">
+                        <i class="fa-solid fa-user-group"></i>
+                        <span>Users</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <ul class="submenu">
+                    <li><a href="{% url 'dashboard_users' 'subscriber' %}"><i class="fa-solid fa-id-card"></i><span>Subscriber</span></a></li>
+                    <li><a href="{% url 'dashboard_users' 'reporter' %}"><i class="fa-solid fa-microphone-lines"></i><span>Reporter Account</span></a></li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
+    <main class="main-content">
+        <div class="topbar">
+            <h3 class="topbar-title">{{ page_title }}</h3>
+        </div>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
+</body>
+</html>

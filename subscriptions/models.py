@@ -124,6 +124,12 @@ class UserSubscription(models.Model):
         unique=True
     )
 
+    reporter_mobile = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text='Mobile number of the reporter who sold this subscription.'
+    )
+
     payment_status = models.CharField(
         max_length=20,
         choices=PAYMENT_STATUS,

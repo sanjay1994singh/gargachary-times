@@ -64,7 +64,7 @@ def google_oauth_complete(request):
     except SocialAuthBaseException:
         messages.warning(
             request,
-            'This Gmail is already registered. Please login with your email/mobile password, or choose another Google account.'
+            'This email is already registered. Please login with your email/mobile password.'
         )
         return redirect('login')
 

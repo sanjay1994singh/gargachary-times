@@ -4,6 +4,11 @@ from . import views
 urlpatterns = [
     path('', views.homepage, name='homepage'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/news/add/', views.dashboard_news_form, name='dashboard_news_add'),
+    path('dashboard/news/all/', views.dashboard_news_list, name='dashboard_news_list'),
+    path('dashboard/news/<int:news_id>/edit/', views.dashboard_news_form, name='dashboard_news_edit'),
+    path('dashboard/news/<int:news_id>/delete/', views.dashboard_news_delete, name='dashboard_news_delete'),
+    path('dashboard/users/<str:user_type>/', views.dashboard_users, name='dashboard_users'),
     path('download-visitors-data/<str:report_type>/', views.download_visitors_data, name='download_visitors_data'),
     path('contact/', views.contact, name='contact'),
     path('video/', views.video, name='video'),

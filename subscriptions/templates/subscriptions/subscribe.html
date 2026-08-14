@@ -84,26 +84,6 @@ Subscribe {{ plan.name }} | Gargachary Times
         color: white;
     }
 
-    .google-panel {
-        background: #fff;
-    }
-
-    .divider-line {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: #6b7280;
-        font-weight: 700;
-    }
-
-    .divider-line::before,
-    .divider-line::after {
-        content: "";
-        height: 1px;
-        background: #e4ded6;
-        flex: 1;
-    }
-
     @media (max-width: 991px) {
         .plan-summary {
             position: static;
@@ -185,6 +165,14 @@ Subscribe {{ plan.name }} | Gargachary Times
                                 </div>
 
                                 <div class="col-md-6 mb-3">
+                                    <label class="fw-bold mb-2">Reporter mobile</label>
+                                    <input type="text"
+                                           name="reporter_mobile"
+                                           class="form-control form-control-lg"
+                                           placeholder="Reporter ka mobile number">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
                                     <label class="fw-bold mb-2">City</label>
                                     <input type="text" name="city" class="form-control form-control-lg" required>
                                 </div>
@@ -223,22 +211,6 @@ Subscribe {{ plan.name }} | Gargachary Times
                     </div>
                 </div>
 
-                <div class="subscribe-panel google-panel">
-                    <div class="panel-title">
-                        <div class="flow-step">
-                            <span class="step-number">2</span>
-                            <span>Continue with another Google account</span>
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="divider-line mb-3">or</div>
-                        <a href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}"
-                           class="btn btn-light border w-100 d-flex align-items-center justify-content-center gap-2 shadow-sm">
-                            <img src="https://www.svgrepo.com/show/355037/google.svg" width="20" height="20" alt="Google">
-                            <span class="fw-semibold text-dark">Continue with another Google account</span>
-                        </a>
-                    </div>
-                </div>
                 {% else %}
                 <div class="subscribe-panel">
                     <div class="panel-title">
@@ -261,6 +233,16 @@ Subscribe {{ plan.name }} | Gargachary Times
                             <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
                             <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
                             <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+
+                            <div class="mb-3">
+                                <label class="fw-bold mb-2">Reporter mobile</label>
+                                <input type="text"
+                                       name="reporter_mobile"
+                                       id="reporter_mobile"
+                                       class="form-control form-control-lg"
+                                       value="{{ reporter_mobile }}"
+                                       placeholder="Reporter ka mobile number">
+                            </div>
 
                             <button type="submit" id="razorpay-payment-button" class="btn pay-btn w-100">
                                 <i class="bi bi-shield-lock"></i>
@@ -328,6 +310,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                     'X-CSRFToken': csrfToken,
                     'Accept': 'application/json',
                 },
+                body: new FormData(form),
             })
                 .then(function (response) {
                     return response.json().then(function (data) {

@@ -1,7 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 from video.models import Video
 
@@ -71,6 +73,112 @@ def dashboard(request):
     }
 
     return render(request, 'dashboard.html', context)
+
+
+def get_dashboard_user_queryset(user_type):
+    if user_type == 'subscriber':
+        return (
+            User.objects
+            .filter(user_type='subscriber')
+            .order_by('-created_at')
+        )
+
+    if user_type == 'reporter':
+        return (
+            User.objects
+            .filter(user_type='reporter')
+            .order_by('-created_at')
+        )
+
+    return User.objects.none()
+
+
+def dashboard_news_form(request, news_id=None):
+    news_obj = None
+
+    if news_id:
+        news_obj = get_object_or_404(News, id=news_id)
+
+    if request.method == 'POST':
+        category_id = request.POST.get('news_category')
+        title = request.POST.get('title')
+        text = request.POST.get('news_text')
+        reporter = request.POST.get('reporter') or 'Gargachary Times'
+        image = request.FILES.get('file_image')
+
+        if not news_obj:
+            news_obj = News()
+
+        news_obj.category_id = category_id or None
+        news_obj.title = title
+        news_obj.text = text
+        news_obj.reporter = reporter
+
+        if image:
+            news_obj.featured_image = image
+
+        if request.user.is_authenticated:
+            news_obj.user = request.user
+
+        news_obj.save()
+
+        messages.success(request, 'News saved successfully.')
+        return redirect('dashboard_news_list')
+
+    context = {
+        'active_menu': 'news',
+        'page_title': 'Edit News' if news_obj else 'Add News',
+        'news_obj': news_obj,
+        'category': Category.objects.all().order_by('-id'),
+    }
+
+    return render(request, 'dashboard_news_form.html', context)
+
+
+def dashboard_news_list(request):
+    news_items = (
+        News.objects
+        .select_related('category', 'user')
+        .order_by('-id')
+    )
+
+    return render(
+        request,
+        'dashboard_news_list.html',
+        {
+            'active_menu': 'news',
+            'page_title': 'All News',
+            'news_items': news_items,
+        }
+    )
+
+
+@require_POST
+def dashboard_news_delete(request, news_id):
+    news_obj = get_object_or_404(News, id=news_id)
+    news_obj.delete()
+    messages.success(request, 'News deleted successfully.')
+    return redirect('dashboard_news_list')
+
+
+def dashboard_users(request, user_type):
+    title_map = {
+        'subscriber': 'Subscriber Accounts',
+        'reporter': 'Reporter Accounts',
+    }
+
+    users = get_dashboard_user_queryset(user_type)
+
+    return render(
+        request,
+        'dashboard_users.html',
+        {
+            'active_menu': 'users',
+            'page_title': title_map.get(user_type, 'User Accounts'),
+            'users': users,
+            'user_type': user_type,
+        }
+    )
 
 
 def download_visitors_data(request, report_type):

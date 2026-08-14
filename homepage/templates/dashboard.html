@@ -482,6 +482,71 @@
     color:white;
 }
 
+.sidebar-menu .menu-parent{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:12px;
+
+    padding:14px 18px;
+
+    border-radius:16px;
+
+    color:rgba(255,255,255,0.75);
+
+    font-weight:600;
+}
+
+.sidebar-menu .menu-parent-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+}
+
+.sidebar-menu .submenu{
+
+    list-style:none;
+
+    padding:4px 0 4px 38px;
+
+    margin:0;
+}
+
+.sidebar-menu .submenu li{
+
+    margin-bottom:6px;
+}
+
+.sidebar-menu .submenu a{
+
+    padding:8px 12px;
+
+    border-radius:10px;
+
+    font-size:14px;
+
+    gap:10px;
+}
+
+.sidebar-menu li.active .menu-parent{
+
+    background:
+    linear-gradient(
+        135deg,
+        #8e2de2,
+        #4a00e0
+    );
+
+    color:white;
+}
+
 /* Main Content */
 
 .main-content{
@@ -657,51 +722,82 @@
         <ul class="sidebar-menu">
 
             <li class="active">
-                <a href="#">
+                <a href="{% url 'dashboard' %}">
                     <i class="fa-solid fa-chart-pie"></i>
                     Dashboard
                 </a>
             </li>
 
             <li>
-                <div class="download-buttons">
-
-                    <a href="{% url 'download_visitors_data' 'today' %}"
-                       class="report-btn">
-
-                        Today Report
-
-                    </a>
-
-                    <a href="{% url 'download_visitors_data' 'yesterday' %}"
-                       class="report-btn">
-
-                        Yesterday Report
-
-                    </a>
-
-                    <a href="{% url 'download_visitors_data' 'weekly' %}"
-                       class="report-btn">
-
-                        Weekly Report
-
-                    </a>
-
-                    <a href="{% url 'download_visitors_data' 'monthly' %}"
-                       class="report-btn">
-
-                        Monthly Report
-
-                    </a>
-
+                <div class="menu-parent">
+                    <div class="menu-parent-left">
+                        <i class="fa-solid fa-file-arrow-down"></i>
+                        <span>Reports</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
                 </div>
+                <ul class="submenu">
+                    <li>
+                        <a href="{% url 'download_visitors_data' 'today' %}">Today Report</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'download_visitors_data' 'yesterday' %}">Yesterday Report</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'download_visitors_data' 'weekly' %}">Weekly Report</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'download_visitors_data' 'monthly' %}">Monthly Report</a>
+                    </li>
+                </ul>
             </li>
 
-            <li>
-                <a href="#">
-                    <i class="fa-solid fa-newspaper"></i>
-                    News
-                </a>
+            <li class="{% if active_menu == 'news' %}active{% endif %}">
+                <div class="menu-parent">
+                    <div class="menu-parent-left">
+                        <i class="fa-solid fa-newspaper"></i>
+                        <span>News</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <ul class="submenu">
+                    <li>
+                        <a href="{% url 'dashboard_news_add' %}">
+                            <i class="fa-solid fa-plus"></i>
+                            Add News
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dashboard_news_list' %}">
+                            <i class="fa-solid fa-list"></i>
+                            All News
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li class="{% if active_menu == 'users' %}active{% endif %}">
+                <div class="menu-parent">
+                    <div class="menu-parent-left">
+                        <i class="fa-solid fa-user-group"></i>
+                        <span>Users</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <ul class="submenu">
+                    <li>
+                        <a href="{% url 'dashboard_users' 'subscriber' %}">
+                            <i class="fa-solid fa-id-card"></i>
+                            Subscriber
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'dashboard_users' 'reporter' %}">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                            Reporter Account
+                        </a>
+                    </li>
+                </ul>
             </li>
 
             <li>
