@@ -211,7 +211,7 @@ Subscribe {{ plan.name }} | Gargachary Times
         height: 34px;
         border: 0;
         border-radius: 50%;
-        background: #b91c1c;
+        background: #16a34a;
         color: #fff;
         display: inline-flex;
         align-items: center;
@@ -220,7 +220,7 @@ Subscribe {{ plan.name }} | Gargachary Times
     }
 
     .reporter-add-btn:hover {
-        background: #991b1b;
+        background: #15803d;
     }
 
     .reporter-modal-backdrop {
@@ -531,6 +531,10 @@ Subscribe {{ plan.name }} | Gargachary Times
                         <label class="fw-bold mb-2">Mobile</label>
                         <input type="text" name="mobile" class="form-control form-control-lg" required>
                     </div>
+                    <div class="col-12 mb-3">
+                        <label class="fw-bold mb-2">Address</label>
+                        <textarea name="address" class="form-control" rows="3" required></textarea>
+                    </div>
                     <div class="col-md-6 mb-3">
                         <label class="fw-bold mb-2">City</label>
                         <input type="text" name="city" class="form-control form-control-lg" required>
@@ -552,10 +556,6 @@ Subscribe {{ plan.name }} | Gargachary Times
                     <div class="col-md-6 mb-3">
                         <label class="fw-bold mb-2">Country</label>
                         <input type="text" name="country" value="India" class="form-control form-control-lg" readonly>
-                    </div>
-                    <div class="col-12 mb-3">
-                        <label class="fw-bold mb-2">Address</label>
-                        <textarea name="address" class="form-control" rows="3" required></textarea>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-danger w-100" id="reporter-save-button">
