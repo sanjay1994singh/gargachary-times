@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Pay Subscription | Gargachary Times
+{% endblock title %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 p-md-5">
+                        <h1 class="h3 fw-bold mb-3">Complete Subscription Payment</h1>
+                        <p class="text-muted mb-4">
+                            {{ subscription.user.full_name|default:subscription.user.username }} ke subscription payment ke liye Razorpay open kare.
+                        </p>
+
+                        <div class="border rounded p-3 mb-4">
+                            <div class="d-flex justify-content-between gap-3 mb-2">
+                                <span class="text-muted">Plan</span>
+                                <strong>{{ plan.name }}</strong>
+                            </div>
+                            <div class="d-flex justify-content-between gap-3">
+                                <span class="text-muted">Amount</span>
+                                <strong>₹{{ subscription.amount }}</strong>
+                            </div>
+                        </div>
+
+                        <form id="shared-razorpay-form"
+                              action="{% url 'razorpay_payment_callback' %}"
+                              method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                            <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+                            <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+
+                            <button type="button" id="shared-pay-button" class="btn btn-danger btn-lg w-100">
+                                Pay ₹{{ subscription.amount }} with Razorpay
+                            </button>
+                        </form>
+
+                        <div id="shared-payment-error" class="alert alert-danger mt-3 d-none" role="alert"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block js %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    (function () {
+        const form = document.getElementById('shared-razorpay-form');
+        const button = document.getElementById('shared-pay-button');
+        const errorBox = document.getElementById('shared-payment-error');
+
+        function showError(message) {
+            errorBox.textContent = message;
+            errorBox.classList.remove('d-none');
+        }
+
+        function setLoading(isLoading) {
+            button.disabled = isLoading;
+            button.textContent = isLoading
+                ? 'Please wait...'
+                : 'Pay ₹{{ subscription.amount }} with Razorpay';
+        }
+
+        button.addEventListener('click', function () {
+            errorBox.classList.add('d-none');
+            setLoading(true);
+
+            const razorpay = new Razorpay({
+                key: '{{ key }}',
+                amount: '{{ amount }}',
+                currency: '{{ currency }}',
+                name: '{{ name|escapejs }}',
+                description: '{{ description|escapejs }}',
+                order_id: '{{ order_id }}',
+                prefill: {
+                    name: '{{ prefill.name|escapejs }}',
+                    email: '{{ prefill.email|escapejs }}',
+                    contact: '{{ prefill.contact|escapejs }}'
+                },
+                callback_url: '{{ callback_url }}',
+                handler: function (response) {
+                    document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                    document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                    document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                    form.submit();
+                },
+                modal: {
+                    ondismiss: function () {
+                        setLoading(false);
+                    }
+                },
+                theme: {
+                    color: '#dc2626'
+                }
+            });
+
+            razorpay.open();
+            setLoading(false);
+        });
+    })();
+</script>
+{% endblock js %}

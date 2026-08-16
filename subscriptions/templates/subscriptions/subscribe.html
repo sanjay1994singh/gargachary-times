@@ -329,16 +329,22 @@ Subscribe {{ plan.name }} | Gargachary Times
             </div>
 
             <div class="col-lg-8">
-                {% if not request.user.is_authenticated %}
+                {% if show_account_form %}
                 <div class="subscribe-panel mb-4">
                     <div class="panel-title">
                         <div class="flow-step">
                             <span class="step-number">1</span>
-                            <span>Create your account</span>
+                            <span>{% if request.user.user_type == 'reporter' %}Create subscriber account{% else %}Create your account{% endif %}</span>
                         </div>
                     </div>
 
                     <div class="panel-body">
+                        {% if request.user.user_type == 'reporter' %}
+                        <div class="alert alert-info rounded-4">
+                            Subscriber details fill kare. Payment link subscriber ke account ke liye banega.
+                        </div>
+                        {% endif %}
+
                         {% if register_error %}
                         <div class="alert alert-danger rounded-4">
                             {{ register_error }}
@@ -449,7 +455,11 @@ Subscribe {{ plan.name }} | Gargachary Times
 
                     <div class="panel-body">
                         <p class="text-muted">
+                            {% if subscription_customer %}
+                            Payment link {{ subscription_customer.full_name|default:subscription_customer.username }} ke account ke liye banega.
+                            {% else %}
                             Payment ke baad subscription active hogi, invoice generate hoga, aur confirmation email jayega.
+                            {% endif %}
                         </p>
 
                         <form id="razorpay-payment-form"
@@ -505,6 +515,18 @@ Subscribe {{ plan.name }} | Gargachary Times
                         </form>
 
                         <div id="razorpay-payment-error" class="alert alert-danger mt-3 d-none" role="alert"></div>
+                        <div id="razorpay-share-box" class="alert alert-light border mt-3 d-none" role="status">
+                            <label for="razorpay-share-link" class="fw-bold mb-2">Subscriber payment link</label>
+                            <div class="input-group">
+                                <input type="text" id="razorpay-share-link" class="form-control" readonly>
+                                <button type="button" class="btn btn-outline-danger" id="razorpay-copy-link">
+                                    Copy
+                                </button>
+                            </div>
+                            <a href="#" target="_blank" rel="noopener" class="btn btn-success w-100 mt-2" id="razorpay-whatsapp-link">
+                                Share on WhatsApp
+                            </a>
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -850,6 +872,10 @@ Subscribe {{ plan.name }} | Gargachary Times
         const form = document.getElementById('razorpay-payment-form');
         const button = document.getElementById('razorpay-payment-button');
         const errorBox = document.getElementById('razorpay-payment-error');
+        const shareBox = document.getElementById('razorpay-share-box');
+        const shareInput = document.getElementById('razorpay-share-link');
+        const copyButton = document.getElementById('razorpay-copy-link');
+        const whatsappLink = document.getElementById('razorpay-whatsapp-link');
         const createOrderUrl = "{% url 'razorpay_create_order' plan.id %}";
         const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
 
@@ -881,6 +907,34 @@ Subscribe {{ plan.name }} | Gargachary Times
             }
         }
 
+        function showPaymentLink(link) {
+            if (!link) {
+                return;
+            }
+
+            const message = 'Gargachary Times subscription payment link: ' + link;
+
+            shareInput.value = link;
+            whatsappLink.href = 'https://wa.me/?text=' + encodeURIComponent(message);
+            shareBox.classList.remove('d-none');
+        }
+
+        copyButton.addEventListener('click', function () {
+            shareInput.select();
+            shareInput.setSelectionRange(0, shareInput.value.length);
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(shareInput.value);
+            } else {
+                document.execCommand('copy');
+            }
+
+            copyButton.textContent = 'Copied';
+            setTimeout(function () {
+                copyButton.textContent = 'Copy';
+            }, 1500);
+        });
+
         form.addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -910,6 +964,8 @@ Subscribe {{ plan.name }} | Gargachary Times
                     });
                 })
                 .then(function (data) {
+                    showPaymentLink(data.payment_link);
+
                     const razorpay = new Razorpay({
                         key: data.key,
                         amount: data.amount,

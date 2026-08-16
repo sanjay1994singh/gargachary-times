@@ -111,6 +111,21 @@ def get_reporter_options():
 
 
 def get_subscribe_context(request, plan, **extra_context):
+    subscription_customer = None
+    subscription_customer_id = request.session.get('subscription_customer_id')
+
+    if subscription_customer_id:
+        subscription_customer = (
+            User.objects
+            .filter(id=subscription_customer_id, user_type='subscriber')
+            .first()
+        )
+
+    is_reporter = (
+        request.user.is_authenticated and
+        request.user.user_type == 'reporter'
+    )
+
     context = {
         'plan': plan,
         'razorpay_key_id': settings.RAZORPAY_KEY_ID,
@@ -118,6 +133,11 @@ def get_subscribe_context(request, plan, **extra_context):
         'default_state': 'Uttar Pradesh',
         'reporter_mobile': request.session.get('reporter_mobile', ''),
         'reporter_options': get_reporter_options(),
+        'subscription_customer': subscription_customer,
+        'show_account_form': (
+            not request.user.is_authenticated or
+            (is_reporter and not subscription_customer)
+        ),
     }
     context.update(extra_context)
     return context
@@ -222,7 +242,13 @@ def subscribe(request, plan_id):
         )
         return redirect('profile')
 
-    if not request.user.is_authenticated and request.method == 'POST':
+    if (
+        request.method == 'POST' and
+        (
+            not request.user.is_authenticated or
+            request.user.user_type == 'reporter'
+        )
+    ):
         email = request.POST.get('email')
         mobile = request.POST.get('mobile')
         reporter_mobile = (request.POST.get('reporter_mobile') or '').strip()
@@ -293,11 +319,15 @@ def subscribe(request, plan_id):
             password=password
         )
         send_account_created_email(user, password)
-        login(
-            request,
-            user,
-            backend='django.contrib.auth.backends.ModelBackend'
-        )
+
+        if not request.user.is_authenticated:
+            login(
+                request,
+                user,
+                backend='django.contrib.auth.backends.ModelBackend'
+            )
+
+        request.session['subscription_customer_id'] = user.id
         request.session['reporter_mobile'] = reporter_mobile
         messages.success(
             request,
@@ -309,6 +339,26 @@ def subscribe(request, plan_id):
         'subscriptions/subscribe.html',
         get_subscribe_context(request, plan)
     )
+
+
+def get_payment_user(request):
+    subscription_customer_id = request.session.get('subscription_customer_id')
+
+    if (
+        subscription_customer_id and
+        request.user.is_authenticated and
+        request.user.user_type == 'reporter'
+    ):
+        customer = (
+            User.objects
+            .filter(id=subscription_customer_id, user_type='subscriber')
+            .first()
+        )
+
+        if customer:
+            return customer
+
+    return request.user
 
 
 def verify_razorpay_signature(message, signature, secret):
@@ -505,6 +555,7 @@ def razorpay_create_order(request, plan_id):
         id=plan_id,
         is_active=True
     )
+    payment_user = get_payment_user(request)
     reporter_mobile = (request.POST.get('reporter_mobile') or '').strip()
 
     if not is_reporter_mobile_allowed(reporter_mobile):
@@ -518,7 +569,7 @@ def razorpay_create_order(request, plan_id):
     active_subscription_exists = (
         UserSubscription.objects
         .filter(
-            user=request.user,
+            user=payment_user,
             plan=plan,
             is_active=True,
             payment_status='SUCCESS'
@@ -541,7 +592,7 @@ def razorpay_create_order(request, plan_id):
     pending_subscription = (
         UserSubscription.objects
         .filter(
-            user=request.user,
+            user=payment_user,
             plan=plan,
             payment_status='PENDING',
             transaction_id__startswith='order_'
@@ -559,14 +610,20 @@ def razorpay_create_order(request, plan_id):
             {
                 'key': settings.RAZORPAY_KEY_ID,
                 'order_id': pending_subscription.transaction_id,
+                'payment_link': request.build_absolute_uri(
+                    reverse(
+                        'razorpay_shared_payment',
+                        args=[pending_subscription.transaction_id]
+                    )
+                ),
                 'amount': int(pending_subscription.amount * 100),
                 'currency': 'INR',
                 'name': 'Gargachary Times',
                 'description': plan.name,
                 'prefill': {
-                    'name': request.user.full_name or request.user.username,
-                    'email': request.user.email,
-                    'contact': getattr(request.user, 'mobile', '') or '',
+                    'name': payment_user.full_name or payment_user.username,
+                    'email': payment_user.email,
+                    'contact': getattr(payment_user, 'mobile', '') or '',
                 },
                 'callback_url': request.build_absolute_uri(
                     reverse('razorpay_payment_callback')
@@ -574,7 +631,7 @@ def razorpay_create_order(request, plan_id):
             }
         )
 
-    receipt = f"sub_{request.user.id}_{uuid.uuid4().hex[:24]}"
+    receipt = f"sub_{payment_user.id}_{uuid.uuid4().hex[:24]}"
 
     payload = {
         'amount': int(plan.price * 100),
@@ -583,6 +640,7 @@ def razorpay_create_order(request, plan_id):
         'payment_capture': 1,
         'notes': {
             'user_id': str(request.user.id),
+            'subscription_user_id': str(payment_user.id),
             'plan_id': str(plan.id),
             'plan_name': plan.name,
         }
@@ -609,7 +667,7 @@ def razorpay_create_order(request, plan_id):
     order = response.json()
 
     UserSubscription.objects.create(
-        user=request.user,
+        user=payment_user,
         plan=plan,
         amount=plan.price,
         transaction_id=order['id'],
@@ -621,14 +679,20 @@ def razorpay_create_order(request, plan_id):
         {
             'key': settings.RAZORPAY_KEY_ID,
             'order_id': order['id'],
+            'payment_link': request.build_absolute_uri(
+                reverse(
+                    'razorpay_shared_payment',
+                    args=[order['id']]
+                )
+            ),
             'amount': order['amount'],
             'currency': order['currency'],
             'name': 'Gargachary Times',
             'description': plan.name,
             'prefill': {
-                'name': request.user.get_full_name() or request.user.username,
-                'email': request.user.email,
-                'contact': getattr(request.user, 'mobile', '') or '',
+                'name': payment_user.full_name or payment_user.get_full_name() or payment_user.username,
+                'email': payment_user.email,
+                'contact': getattr(payment_user, 'mobile', '') or '',
             },
             'callback_url': request.build_absolute_uri(
                 reverse('razorpay_payment_callback')
@@ -637,25 +701,76 @@ def razorpay_create_order(request, plan_id):
     )
 
 
-@login_required
+def razorpay_shared_payment(request, order_id):
+    subscription = get_object_or_404(
+        UserSubscription,
+        transaction_id=order_id
+    )
+
+    if subscription.payment_status == 'SUCCESS':
+        return render(
+            request,
+            'subscriptions/payment_success.html'
+        )
+
+    if subscription.payment_status == 'FAILED':
+        return render(
+            request,
+            'subscriptions/payment_failed.html'
+        )
+
+    context = {
+        'subscription': subscription,
+        'plan': subscription.plan,
+        'key': settings.RAZORPAY_KEY_ID,
+        'order_id': subscription.transaction_id,
+        'amount': int(subscription.amount * 100),
+        'currency': 'INR',
+        'name': 'Gargachary Times',
+        'description': subscription.plan.name,
+        'prefill': {
+            'name': subscription.user.full_name or subscription.user.username,
+            'email': subscription.user.email,
+            'contact': getattr(subscription.user, 'mobile', '') or '',
+        },
+        'callback_url': request.build_absolute_uri(
+            reverse('razorpay_payment_callback')
+        ),
+    }
+
+    return render(
+        request,
+        'subscriptions/shared_payment.html',
+        context
+    )
+
+
 def razorpay_payment_callback(request):
     if request.method != 'POST':
-        return redirect('payment_failed')
+        return render(
+            request,
+            'subscriptions/payment_failed.html'
+        )
 
     payment_id = request.POST.get('razorpay_payment_id')
     order_id = request.POST.get('razorpay_order_id')
     signature = request.POST.get('razorpay_signature')
 
     if not payment_id or not order_id or not signature:
-        return redirect('payment_failed')
+        return render(
+            request,
+            'subscriptions/payment_failed.html'
+        )
 
     try:
         subscription = UserSubscription.objects.get(
-            transaction_id=order_id,
-            user=request.user
+            transaction_id=order_id
         )
     except UserSubscription.DoesNotExist:
-        return redirect('payment_failed')
+        return render(
+            request,
+            'subscriptions/payment_failed.html'
+        )
 
     message = f'{order_id}|{payment_id}'
     if verify_razorpay_signature(
@@ -664,10 +779,16 @@ def razorpay_payment_callback(request):
         settings.RAZORPAY_KEY_SECRET
     ):
         mark_subscription_success(subscription)
-        return redirect('payment_success')
+        return render(
+            request,
+            'subscriptions/payment_success.html'
+        )
 
     mark_subscription_failed(subscription)
-    return redirect('payment_failed')
+    return render(
+        request,
+        'subscriptions/payment_failed.html'
+    )
 
 
 @csrf_exempt

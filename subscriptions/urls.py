@@ -35,6 +35,12 @@ urlpatterns = [
     ),
 
     path(
+        'pay/<str:order_id>/',
+        views.razorpay_shared_payment,
+        name='razorpay_shared_payment'
+    ),
+
+    path(
         'razorpay/callback/',
         views.razorpay_payment_callback,
         name='razorpay_payment_callback'
