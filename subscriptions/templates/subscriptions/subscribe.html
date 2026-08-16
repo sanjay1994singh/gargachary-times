@@ -509,8 +509,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                             </div>
 
                             <button type="submit" id="razorpay-payment-button" class="btn pay-btn w-100">
-                                <i class="bi bi-shield-lock"></i>
-                                Pay ₹{{ plan.price }} with Razorpay
+                                Generate payment link
                             </button>
                         </form>
 
@@ -526,6 +525,9 @@ Subscribe {{ plan.name }} | Gargachary Times
                             <a href="#" target="_blank" rel="noopener" class="btn btn-success w-100 mt-2" id="razorpay-whatsapp-link">
                                 Share on WhatsApp
                             </a>
+                            <button type="button" class="btn btn-danger w-100 mt-2" id="razorpay-pay-now">
+                                Pay now on this device
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -876,8 +878,10 @@ Subscribe {{ plan.name }} | Gargachary Times
         const shareInput = document.getElementById('razorpay-share-link');
         const copyButton = document.getElementById('razorpay-copy-link');
         const whatsappLink = document.getElementById('razorpay-whatsapp-link');
+        const payNowButton = document.getElementById('razorpay-pay-now');
         const createOrderUrl = "{% url 'razorpay_create_order' plan.id %}";
         const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+        let paymentData = null;
 
         function showError(message) {
             errorBox.textContent = message;
@@ -896,7 +900,7 @@ Subscribe {{ plan.name }} | Gargachary Times
             button.disabled = isLoading;
             button.innerHTML = isLoading
                 ? 'Please wait...'
-                : '<i class="bi bi-shield-lock"></i> Pay with Razorpay';
+                : 'Generate payment link';
 
             if (isLoading && window.showSiteLoader) {
                 window.showSiteLoader();
@@ -919,6 +923,38 @@ Subscribe {{ plan.name }} | Gargachary Times
             shareBox.classList.remove('d-none');
         }
 
+        function openRazorpay(data) {
+            const razorpay = new Razorpay({
+                key: data.key,
+                amount: data.amount,
+                currency: data.currency,
+                name: data.name,
+                description: data.description,
+                order_id: data.order_id,
+                prefill: data.prefill,
+                callback_url: data.callback_url,
+                handler: function (response) {
+                    document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                    document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                    document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                    if (window.showSiteLoader) {
+                        window.showSiteLoader();
+                    }
+                    form.submit();
+                },
+                modal: {
+                    ondismiss: function () {
+                        setLoading(false);
+                    }
+                },
+                theme: {
+                    color: '#dc2626'
+                }
+            });
+
+            razorpay.open();
+        }
+
         copyButton.addEventListener('click', function () {
             shareInput.select();
             shareInput.setSelectionRange(0, shareInput.value.length);
@@ -933,6 +969,15 @@ Subscribe {{ plan.name }} | Gargachary Times
             setTimeout(function () {
                 copyButton.textContent = 'Copy';
             }, 1500);
+        });
+
+        payNowButton.addEventListener('click', function () {
+            if (!paymentData) {
+                showError('Please generate payment link first.');
+                return;
+            }
+
+            openRazorpay(paymentData);
         });
 
         form.addEventListener('submit', function (event) {
@@ -964,40 +1009,9 @@ Subscribe {{ plan.name }} | Gargachary Times
                     });
                 })
                 .then(function (data) {
+                    paymentData = data;
                     showPaymentLink(data.payment_link);
-
-                    const razorpay = new Razorpay({
-                        key: data.key,
-                        amount: data.amount,
-                        currency: data.currency,
-                        name: data.name,
-                        description: data.description,
-                        order_id: data.order_id,
-                        prefill: data.prefill,
-                        callback_url: data.callback_url,
-                        handler: function (response) {
-                            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
-                            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
-                            document.getElementById('razorpay_signature').value = response.razorpay_signature;
-                            if (window.showSiteLoader) {
-                                window.showSiteLoader();
-                            }
-                            form.submit();
-                        },
-                        modal: {
-                            ondismiss: function () {
-                                setLoading(false);
-                            }
-                        },
-                        theme: {
-                            color: '#dc2626'
-                        }
-                    });
-
-                    razorpay.open();
-                    if (window.hideSiteLoader) {
-                        window.hideSiteLoader();
-                    }
+                    setLoading(false);
                 })
                 .catch(function (error) {
                     setLoading(false);
