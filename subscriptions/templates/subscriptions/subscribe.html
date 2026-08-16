@@ -365,7 +365,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="fw-bold mb-2">Reporter mobile</label>
+                                    <label class="fw-bold mb-2">Reporter mobile <span class="text-muted fw-normal">(optional)</span></label>
                                     <div class="reporter-picker">
                                         <input type="text"
                                                class="form-control form-control-lg reporter-search"
@@ -462,7 +462,7 @@ Subscribe {{ plan.name }} | Gargachary Times
                             <input type="hidden" name="razorpay_signature" id="razorpay_signature">
 
                             <div class="mb-3">
-                                <label class="fw-bold mb-2">Reporter mobile</label>
+                                <label class="fw-bold mb-2">Reporter mobile <span class="text-muted fw-normal">(optional)</span></label>
                                 <div class="reporter-picker">
                                     <input type="text"
                                            id="reporter_mobile"
@@ -813,12 +813,18 @@ Subscribe {{ plan.name }} | Gargachary Times
         window.validateReporterSelection = function (form) {
             const picker = form.querySelector('.reporter-picker');
             const reporterValue = form.querySelector('.reporter-mobile-value');
+            const searchInput = form.querySelector('.reporter-search');
 
             if (!picker || !reporterValue) {
                 return true;
             }
 
             if (reporterValue.value) {
+                picker.classList.remove('is-invalid');
+                return true;
+            }
+
+            if (!searchInput || !searchInput.value.trim()) {
                 picker.classList.remove('is-invalid');
                 return true;
             }

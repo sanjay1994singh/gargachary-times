@@ -125,7 +125,7 @@ def get_subscribe_context(request, plan, **extra_context):
 
 def is_reporter_mobile_allowed(reporter_mobile):
     if not reporter_mobile:
-        return False
+        return True
 
     return User.objects.filter(
         user_type='reporter',
@@ -551,7 +551,7 @@ def razorpay_create_order(request, plan_id):
     )
 
     if pending_subscription:
-        if reporter_mobile and pending_subscription.reporter_mobile != reporter_mobile:
+        if pending_subscription.reporter_mobile != reporter_mobile:
             pending_subscription.reporter_mobile = reporter_mobile
             pending_subscription.save(update_fields=['reporter_mobile'])
 
