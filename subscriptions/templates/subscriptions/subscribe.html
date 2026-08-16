@@ -1105,11 +1105,12 @@ Subscribe {{ plan.name }} | Gargachary Times
                 })
                 .then(function (data) {
                     paymentData = data;
-                    showPaymentLink(data.payment_link);
                     setLoading(false);
 
                     if (openAfterCreate) {
                         openRazorpay(data);
+                    } else {
+                        showPaymentLink(data.payment_link);
                     }
                 })
                 .catch(function (error) {
