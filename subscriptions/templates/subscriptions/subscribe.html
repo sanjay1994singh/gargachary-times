@@ -91,7 +91,7 @@ Subscribe {{ plan.name }} | Gargachary Times
     }
 
     .direct-pay-btn {
-        background: #b91c1c;
+        background: #0d6efd;
         border: none;
         color: #fff;
         min-height: 56px;
@@ -105,7 +105,7 @@ Subscribe {{ plan.name }} | Gargachary Times
     }
 
     .direct-pay-btn:hover {
-        background: #991b1b;
+        background: #0b5ed7;
         color: #fff;
     }
 
@@ -159,7 +159,7 @@ Subscribe {{ plan.name }} | Gargachary Times
 
     .payment-actions {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 10px;
         margin-top: 12px;
     }
@@ -640,10 +640,6 @@ Subscribe {{ plan.name }} | Gargachary Times
                                     <i class="bi bi-whatsapp"></i>
                                     Share on WhatsApp
                                 </a>
-                                <button type="button" class="btn btn-primary" id="razorpay-pay-now">
-                                    <i class="bi bi-shield-lock"></i>
-                                    Pay now
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -996,7 +992,6 @@ Subscribe {{ plan.name }} | Gargachary Times
         const shareInput = document.getElementById('razorpay-share-link');
         const copyButton = document.getElementById('razorpay-copy-link');
         const whatsappLink = document.getElementById('razorpay-whatsapp-link');
-        const payNowButton = document.getElementById('razorpay-pay-now');
         const createOrderUrl = "{% url 'razorpay_create_order' plan.id %}";
         const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
         let paymentData = null;
@@ -1133,15 +1128,6 @@ Subscribe {{ plan.name }} | Gargachary Times
             setTimeout(function () {
                 copyButton.textContent = 'Copy';
             }, 1500);
-        });
-
-        payNowButton.addEventListener('click', function () {
-            if (!paymentData) {
-                showError('Please generate payment link first.');
-                return;
-            }
-
-            openRazorpay(paymentData);
         });
 
         directPayButton.addEventListener('click', function () {
