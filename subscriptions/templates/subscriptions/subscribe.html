@@ -355,23 +355,32 @@ Subscribe {{ plan.name }} | Gargachary Times
         color: #111827;
     }
 
-    .reporter-modal-close {
+    .reporter-modal-cancel {
         border: 0;
         background: #f3f4f6;
         color: #111827;
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        font-size: 22px;
-        font-weight: 900;
-        line-height: 1;
+        min-height: 48px;
+        border-radius: 8px;
+        font-weight: 800;
         display: inline-flex;
         align-items: center;
         justify-content: center;
     }
 
+    .reporter-modal-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
     .reporter-modal-body {
         padding: 22px;
+    }
+
+    @media (max-width: 575px) {
+        .reporter-modal-actions {
+            grid-template-columns: 1fr;
+        }
     }
 
     @media (max-width: 991px) {
@@ -653,9 +662,6 @@ Subscribe {{ plan.name }} | Gargachary Times
     <div class="reporter-modal">
         <div class="reporter-modal-header">
             <h4>Add Reporter Account</h4>
-            <button type="button" class="reporter-modal-close" id="reporter-modal-close" aria-label="Close">
-                ×
-            </button>
         </div>
         <div class="reporter-modal-body">
             <form id="reporter-create-form" data-no-loader="true">
@@ -704,9 +710,14 @@ Subscribe {{ plan.name }} | Gargachary Times
                         <input type="text" name="country" value="India" class="form-control form-control-lg" readonly>
                     </div>
                 </div>
-                <button type="submit" class="btn btn-danger w-100" id="reporter-save-button">
-                    Save Reporter
-                </button>
+                <div class="reporter-modal-actions">
+                    <button type="button" class="reporter-modal-cancel" id="reporter-modal-cancel">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-danger" id="reporter-save-button">
+                        Save Reporter
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -859,17 +870,11 @@ Subscribe {{ plan.name }} | Gargachary Times
             modal.setAttribute('aria-hidden', 'true');
         }
 
-        const reporterModalClose = document.getElementById('reporter-modal-close');
-        const reporterModal = document.getElementById('reporter-create-modal');
+        const reporterModalCancel = document.getElementById('reporter-modal-cancel');
         const reporterForm = document.getElementById('reporter-create-form');
         const reporterSaveButton = document.getElementById('reporter-save-button');
 
-        reporterModalClose.addEventListener('click', closeReporterModal);
-        reporterModal.addEventListener('click', function (event) {
-            if (event.target === reporterModal) {
-                closeReporterModal();
-            }
-        });
+        reporterModalCancel.addEventListener('click', closeReporterModal);
 
         reporterForm.addEventListener('submit', function (event) {
             event.preventDefault();
@@ -912,17 +917,15 @@ Subscribe {{ plan.name }} | Gargachary Times
                         selectReporter(activeReporterPicker, reporter.name, reporter.mobile);
                     }
 
-                    const alertPromise = window.Swal
-                        ? Swal.fire({
+                    if (window.Swal) {
+                        Swal.fire({
                             icon: 'success',
                             title: 'Success',
                             text: data.message || 'Reporter account created successfully.',
                             confirmButtonText: 'OK',
                             confirmButtonColor: '#b91c1c'
-                        })
-                        : Promise.resolve();
-
-                    alertPromise.then(closeReporterModal);
+                        });
+                    }
                 })
                 .catch(function (error) {
                     if (window.Swal) {
@@ -980,7 +983,7 @@ Subscribe {{ plan.name }} | Gargachary Times
         });
     })();
 </script>
-{% if request.user.is_authenticated %}
+{% if can_start_payment %}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     (function () {

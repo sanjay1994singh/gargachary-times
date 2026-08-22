@@ -20,7 +20,6 @@ from django.shortcuts import (
 from django.contrib.auth.decorators import (
     login_required
 )
-from django.contrib.auth import login
 from django.contrib import messages
 
 from django.urls import reverse
@@ -134,9 +133,16 @@ def get_subscribe_context(request, plan, **extra_context):
         'reporter_mobile': request.session.get('reporter_mobile', ''),
         'reporter_options': get_reporter_options(),
         'subscription_customer': subscription_customer,
+        'can_start_payment': (
+            request.user.is_authenticated or
+            bool(subscription_customer)
+        ),
         'show_account_form': (
-            not request.user.is_authenticated or
-            (is_reporter and not subscription_customer)
+            (
+                not request.user.is_authenticated or
+                is_reporter
+            ) and
+            not subscription_customer
         ),
     }
     context.update(extra_context)
@@ -320,13 +326,6 @@ def subscribe(request, plan_id):
         )
         send_account_created_email(user, password)
 
-        if not request.user.is_authenticated:
-            login(
-                request,
-                user,
-                backend='django.contrib.auth.backends.ModelBackend'
-            )
-
         request.session['subscription_customer_id'] = user.id
         request.session['reporter_mobile'] = reporter_mobile
         messages.success(
@@ -344,11 +343,7 @@ def subscribe(request, plan_id):
 def get_payment_user(request):
     subscription_customer_id = request.session.get('subscription_customer_id')
 
-    if (
-        subscription_customer_id and
-        request.user.is_authenticated and
-        request.user.user_type == 'reporter'
-    ):
+    if subscription_customer_id:
         customer = (
             User.objects
             .filter(id=subscription_customer_id, user_type='subscriber')
@@ -359,6 +354,21 @@ def get_payment_user(request):
             return customer
 
     return request.user
+
+
+def checkout_has_payment_user(request):
+    if request.user.is_authenticated:
+        return True
+
+    subscription_customer_id = request.session.get('subscription_customer_id')
+
+    if not subscription_customer_id:
+        return False
+
+    return User.objects.filter(
+        id=subscription_customer_id,
+        user_type='subscriber'
+    ).exists()
 
 
 def verify_razorpay_signature(message, signature, secret):
@@ -529,12 +539,22 @@ def send_account_updated_email(user):
     email.send(fail_silently=True)
 
 
-@login_required
 def razorpay_create_order(request, plan_id):
     if request.method != 'POST':
         return HttpResponseBadRequest('Invalid request method')
 
-    if request.user.is_staff or request.user.is_superuser:
+    if not checkout_has_payment_user(request):
+        return JsonResponse(
+            {
+                'error': 'Please create the subscriber account before starting payment.'
+            },
+            status=403
+        )
+
+    if (
+        request.user.is_authenticated and
+        (request.user.is_staff or request.user.is_superuser)
+    ):
         return JsonResponse(
             {
                 'error': 'Admin users cannot purchase subscriptions. Please use a normal user account.'
@@ -639,7 +659,12 @@ def razorpay_create_order(request, plan_id):
         'receipt': receipt,
         'payment_capture': 1,
         'notes': {
-            'user_id': str(request.user.id),
+            'user_id': str(payment_user.id),
+            'created_by_user_id': (
+                str(request.user.id)
+                if request.user.is_authenticated
+                else ''
+            ),
             'subscription_user_id': str(payment_user.id),
             'plan_id': str(plan.id),
             'plan_name': plan.name,
