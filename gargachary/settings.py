@@ -80,6 +80,7 @@ FACEBOOK_ACCESS_TOKEN = "EAAO3ZAQYMxCMBRmKBUZC8CDtuTcBEeNb1m0UForAsGLTJPHE6OLRan
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'gargachary.middleware.HtmlNoCacheMiddleware',
     'reader.middleware.EpaperMediaCacheMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -107,6 +108,7 @@ TEMPLATES = [
 
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
+                'gargachary.context_processors.static_asset_version',
             ],
         },
     },
@@ -169,6 +171,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ASSET_VERSION = os.getenv('STATIC_ASSET_VERSION', '')
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 

@@ -356,6 +356,19 @@ def get_payment_user(request):
     return request.user
 
 
+def clear_subscription_customer_session(request, user_id=None):
+    subscription_customer_id = request.session.get('subscription_customer_id')
+
+    if not subscription_customer_id:
+        return
+
+    if user_id is not None and str(subscription_customer_id) != str(user_id):
+        return
+
+    request.session.pop('subscription_customer_id', None)
+    request.session.pop('reporter_mobile', None)
+
+
 def checkout_has_payment_user(request):
     if request.user.is_authenticated:
         return True
@@ -420,26 +433,50 @@ def mark_subscription_failed(subscription):
 def get_or_create_invoice(subscription):
     user = subscription.user
     invoice_number = f'GT-{timezone.now().strftime("%Y%m%d")}-{subscription.id:06d}'
+    billing_defaults = {
+        'invoice_number': invoice_number,
+        'billing_name': (
+            user.full_name or
+            user.get_full_name() or
+            user.username
+        ),
+        'billing_email': user.email or '',
+        'billing_mobile': user.mobile or '',
+        'billing_address': user.address or '',
+        'billing_city': user.city or '',
+        'billing_state': user.state or '',
+        'billing_pincode': user.pincode or '',
+        'billing_country': user.country or 'India',
+        'amount': subscription.amount,
+    }
 
     invoice, _ = Invoice.objects.get_or_create(
         subscription=subscription,
-        defaults={
-            'invoice_number': invoice_number,
-            'billing_name': (
-                user.full_name or
-                user.get_full_name() or
-                user.username
-            ),
-            'billing_email': user.email or '',
-            'billing_mobile': user.mobile or '',
-            'billing_address': user.address or '',
-            'billing_city': user.city or '',
-            'billing_state': user.state or '',
-            'billing_pincode': user.pincode or '',
-            'billing_country': user.country or 'India',
-            'amount': subscription.amount,
-        }
+        defaults=billing_defaults
     )
+
+    invoice_fields = [
+        'billing_name',
+        'billing_email',
+        'billing_mobile',
+        'billing_address',
+        'billing_city',
+        'billing_state',
+        'billing_pincode',
+        'billing_country',
+        'amount',
+    ]
+    changed_fields = []
+
+    for field in invoice_fields:
+        value = billing_defaults[field]
+
+        if getattr(invoice, field) != value:
+            setattr(invoice, field, value)
+            changed_fields.append(field)
+
+    if changed_fields:
+        invoice.save(update_fields=changed_fields)
 
     return invoice
 
@@ -626,6 +663,11 @@ def razorpay_create_order(request, plan_id):
             pending_subscription.reporter_mobile = reporter_mobile
             pending_subscription.save(update_fields=['reporter_mobile'])
 
+        clear_subscription_customer_session(
+            request,
+            pending_subscription.user_id
+        )
+
         return JsonResponse(
             {
                 'key': settings.RAZORPAY_KEY_ID,
@@ -691,7 +733,7 @@ def razorpay_create_order(request, plan_id):
 
     order = response.json()
 
-    UserSubscription.objects.create(
+    subscription = UserSubscription.objects.create(
         user=payment_user,
         plan=plan,
         amount=plan.price,
@@ -699,6 +741,7 @@ def razorpay_create_order(request, plan_id):
         reporter_mobile=reporter_mobile,
         payment_status='PENDING'
     )
+    clear_subscription_customer_session(request, subscription.user_id)
 
     return JsonResponse(
         {
@@ -804,6 +847,7 @@ def razorpay_payment_callback(request):
         settings.RAZORPAY_KEY_SECRET
     ):
         mark_subscription_success(subscription)
+        clear_subscription_customer_session(request, subscription.user_id)
         return render(
             request,
             'subscriptions/payment_success.html'

@@ -57,7 +57,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="/static/ckeditor/ckeditor/ckeditor.js"></script>
+<script src="/static/ckeditor/ckeditor/ckeditor.js?v={{ static_asset_version }}"></script>
 <script>
     $(function () {
         $('.searchable-select').select2({

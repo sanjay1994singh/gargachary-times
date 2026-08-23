@@ -30,7 +30,7 @@
 {% endblock metatags %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v=20260616-share-5">
+    <link rel="stylesheet" href="{% static 'reader/css/styles.css' %}?v={{ static_asset_version }}">
     <style>
         .social-follow {
             display: none !important;
@@ -483,7 +483,7 @@
 {% endblock content %}
 
 {% block js %}
-    <script src="{% static 'reader/js/reader.js' %}?v=20260616-share-5"></script>
+    <script src="{% static 'reader/js/reader.js' %}?v={{ static_asset_version }}"></script>
     <script>
         (function () {
             if (window.readerSwipeReady) {
