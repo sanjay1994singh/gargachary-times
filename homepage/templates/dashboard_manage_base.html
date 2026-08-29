@@ -57,8 +57,9 @@
         .table tbody tr:hover{background:rgba(255,255,255,.05)}
         .thumb{width:74px;height:54px;object-fit:cover;border-radius:8px;background:rgba(255,255,255,.08)}
         .action-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-        @media(max-width:992px){.dashboard-wrapper{display:block}.sidebar{position:static;width:100%;height:auto;padding:16px;overflow:visible}.logo-area{margin-bottom:16px}.sidebar-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sidebar-menu li{margin-bottom:0}.sidebar-menu a,.menu-parent{padding:10px 12px;border-radius:10px}.submenu{padding:4px 0 0 28px}.main-content{margin-left:0;padding:20px}.topbar-title{font-size:24px}.panel-card{padding:16px;border-radius:12px}.table{min-width:760px}}
-        @media(max-width:575px){.sidebar-menu{grid-template-columns:1fr}.main-content{padding:14px}.topbar-title{font-size:22px}.panel-card{padding:12px}.action-row,.d-flex.gap-2{gap:6px!important}.btn{white-space:normal}.input-group{display:block}.input-group .form-control,.input-group .btn{width:100%;margin-bottom:8px;border-radius:.375rem!important}}
+        .mobile-card-table .mobile-label{display:none}
+        @media(max-width:992px){.site-navbar .navbar-brand img{height:42px}.dashboard-wrapper{display:block}.sidebar{position:static;width:100%;height:auto;padding:14px 12px;overflow:visible}.logo-area{margin-bottom:12px}.logo-area h2{font-size:24px}.sidebar-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sidebar-menu li{margin-bottom:0}.sidebar-menu a,.menu-parent{padding:10px 12px;border-radius:10px}.sidebar-menu a:hover{transform:none}.submenu{padding:4px 0 0 28px}.main-content{margin-left:0;padding:20px}.topbar{margin-bottom:18px}.topbar-title{font-size:24px}.panel-card{padding:16px;border-radius:12px}.table{min-width:760px}}
+        @media(max-width:575px){.site-navbar .container{padding-left:14px;padding-right:14px}.site-navbar .navbar-brand img{height:38px}.site-navbar .navbar-collapse{padding-top:10px}.site-navbar .nav-link{padding:8px 10px}.sidebar{padding:12px}.logo-area h2{font-size:22px}.sidebar-menu{grid-template-columns:1fr}.sidebar-menu a{gap:10px}.main-content{padding:14px}.topbar-title{font-size:22px}.panel-card{padding:12px}.action-row,.d-flex.gap-2{gap:6px!important}.btn{white-space:normal}.input-group{display:block}.input-group .form-control,.input-group .btn{width:100%;margin-bottom:8px;border-radius:.375rem!important}.mobile-card-table{min-width:0!important;border:0!important}.mobile-card-table thead{display:none}.mobile-card-table tbody,.mobile-card-table tr,.mobile-card-table td{display:block;width:100%}.mobile-card-table tbody tr{background:#fff;color:#111827;border:1px solid rgba(15,23,42,.12);border-radius:12px;margin-bottom:12px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.12)}.mobile-card-table tbody tr:hover{background:#fff}.mobile-card-table td{border:0!important;text-align:left!important;padding:7px 0!important;font-size:14px;line-height:1.35}.mobile-card-table td:first-child{display:none}.mobile-card-table td:last-child{padding-top:12px!important}.mobile-card-table .mobile-label{display:block;color:#64748b;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px}.mobile-card-table .btn{width:100%;padding:10px 12px}.mobile-card-table .empty-row{padding:0}.mobile-card-table .empty-row td{display:block;text-align:center!important;padding:16px!important}}
     </style>
 </head>
 <body>
@@ -115,7 +116,7 @@
                 {% if request.user.is_authenticated %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-dark fw-bold" href="#" data-bs-toggle="dropdown">
-                        <i class="bi bi-person-circle"></i> {{ request.user.username }}
+                        <i class="bi bi-person-circle"></i> Account
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                         <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="bi bi-person"></i> My Profile</a></li>
@@ -123,7 +124,6 @@
                         <li><a class="dropdown-item" href="{% url 'reporter_unpaid_subscribers' %}"><i class="bi bi-people"></i> Subscriber Records</a></li>
                         {% endif %}
                         <li><a class="dropdown-item" href="{% url 'my_subscription' %}"><i class="bi bi-credit-card"></i> My Subscription</a></li>
-                        <li><a class="dropdown-item" href="{% url 'new_news_pdf' %}"><i class="bi bi-newspaper"></i> E-Paper</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
                     </ul>

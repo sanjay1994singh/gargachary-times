@@ -3,7 +3,7 @@
 {% block content %}
 <div class="panel-card">
     <div class="table-responsive">
-        <table class="table table-bordered text-center">
+        <table class="table table-bordered text-center mobile-card-table">
             <thead>
             <tr>
                 <th>#</th>
@@ -21,13 +21,13 @@
             {% for subscriber in subscribers %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ subscriber.full_name|default:subscriber.username }}</td>
-                <td>{{ subscriber.email|default:'-' }}</td>
-                <td>{{ subscriber.mobile|default:'-' }}</td>
-                <td>{{ subscriber.city|default:'-' }}</td>
-                <td>{{ subscriber.latest_reporter_subscription.plan.name|default:'-' }}</td>
-                <td>{{ subscriber.latest_reporter_subscription.payment_status|default:'-' }}</td>
-                <td>{{ subscriber.created_at|date:"d M Y" }}</td>
+                <td><span class="mobile-label">Name</span>{{ subscriber.full_name|default:subscriber.username }}</td>
+                <td><span class="mobile-label">Email</span>{{ subscriber.email|default:'-' }}</td>
+                <td><span class="mobile-label">Mobile</span>{{ subscriber.mobile|default:'-' }}</td>
+                <td><span class="mobile-label">City</span>{{ subscriber.city|default:'-' }}</td>
+                <td><span class="mobile-label">Plan</span>{{ subscriber.latest_reporter_subscription.plan.name|default:'-' }}</td>
+                <td><span class="mobile-label">Payment</span>{{ subscriber.latest_reporter_subscription.payment_status|default:'-' }}</td>
+                <td><span class="mobile-label">Created</span>{{ subscriber.created_at|date:"d M Y" }}</td>
                 <td>
                     <a class="btn btn-sm btn-primary" href="{% url 'reporter_unpaid_subscriber_detail' subscriber.id %}">
                         <i class="fa-solid fa-eye"></i> Detail
@@ -35,7 +35,7 @@
                 </td>
             </tr>
             {% empty %}
-            <tr>
+            <tr class="empty-row">
                 <td colspan="9">{{ empty_message|default:'No subscriber records found.' }}</td>
             </tr>
             {% endfor %}

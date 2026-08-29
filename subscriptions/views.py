@@ -166,6 +166,33 @@ def is_reporter_mobile_allowed(reporter_mobile):
     ).exists()
 
 
+def create_pending_subscription_record(user, plan, reporter_mobile=''):
+    subscription, created = UserSubscription.objects.get_or_create(
+        user=user,
+        plan=plan,
+        payment_status='PENDING',
+        defaults={
+            'amount': plan.price,
+            'transaction_id': f'pending_{user.id}_{plan.id}',
+            'reporter_mobile': reporter_mobile,
+        }
+    )
+
+    update_fields = []
+    if subscription.amount != plan.price:
+        subscription.amount = plan.price
+        update_fields.append('amount')
+
+    if reporter_mobile and subscription.reporter_mobile != reporter_mobile:
+        subscription.reporter_mobile = reporter_mobile
+        update_fields.append('reporter_mobile')
+
+    if update_fields:
+        subscription.save(update_fields=update_fields)
+
+    return subscription
+
+
 def create_reporter_account(request):
     if request.method != 'POST':
         return JsonResponse(
@@ -257,6 +284,9 @@ def subscribe(request, plan_id):
         )
         return redirect('profile')
 
+    if request.GET.get('new') == '1':
+        clear_subscription_customer_session(request)
+
     clear_stale_subscription_customer_session(request, plan)
 
     if (
@@ -266,9 +296,40 @@ def subscribe(request, plan_id):
             request.user.user_type == 'reporter'
         )
     ):
-        email = request.POST.get('email')
-        mobile = request.POST.get('mobile')
+        email = (request.POST.get('email') or '').strip()
+        mobile = (request.POST.get('mobile') or '').strip()
+        full_name = (request.POST.get('full_name') or '').strip()
+        address = (request.POST.get('address') or '').strip()
+        city = (request.POST.get('city') or '').strip()
+        district = (request.POST.get('district') or '').strip()
+        pincode = (request.POST.get('pincode') or '').strip()
+        state = (request.POST.get('state') or 'Uttar Pradesh').strip()
+        country = (request.POST.get('country') or 'India').strip()
         reporter_mobile = (request.POST.get('reporter_mobile') or '').strip()
+
+        if not all([
+            full_name,
+            mobile,
+            city,
+            district,
+            address,
+            pincode,
+            state,
+            country,
+        ]):
+            messages.error(
+                request,
+                'Full name, mobile, city, district, address, PIN code, state and country are required.'
+            )
+            return render(
+                request,
+                'subscriptions/subscribe.html',
+                get_subscribe_context(
+                    request,
+                    plan,
+                    register_error='Full name, mobile, city, district, address, PIN code, state and country are required.',
+                )
+            )
 
         if not is_reporter_mobile_allowed(reporter_mobile):
             messages.error(
@@ -285,7 +346,7 @@ def subscribe(request, plan_id):
                 )
             )
 
-        if User.objects.filter(email=email).exists():
+        if email and User.objects.filter(email=email).exists():
             messages.error(
                 request,
                 'Email already exists. Please login with your existing account.'
@@ -316,7 +377,6 @@ def subscribe(request, plan_id):
             )
 
         password = generate_strong_password()
-        full_name = (request.POST.get('full_name') or '').strip()
         name_parts = full_name.split(' ', 1)
         first_name = name_parts[0] if name_parts else ''
         last_name = name_parts[1] if len(name_parts) > 1 else ''
@@ -328,15 +388,16 @@ def subscribe(request, plan_id):
             last_name=last_name,
             full_name=full_name,
             user_type='subscriber',
-            address=request.POST.get('address'),
-            city=request.POST.get('city'),
-            district=request.POST.get('district'),
-            state=request.POST.get('state') or 'Uttar Pradesh',
-            pincode=request.POST.get('pincode'),
-            country=request.POST.get('country') or 'India',
+            address=address,
+            city=city,
+            district=district,
+            state=state,
+            pincode=pincode,
+            country=country,
             password=password
         )
         send_account_created_email(user, password)
+        create_pending_subscription_record(user, plan, reporter_mobile)
 
         request.session['subscription_customer_id'] = user.id
         request.session['subscription_customer_plan_id'] = plan.id
@@ -680,14 +741,16 @@ def razorpay_create_order(request, plan_id):
         .filter(
             user=payment_user,
             plan=plan,
-            payment_status='PENDING',
-            transaction_id__startswith='order_'
+            payment_status='PENDING'
         )
         .order_by('-created_at')
         .first()
     )
 
-    if pending_subscription:
+    if (
+        pending_subscription and
+        pending_subscription.transaction_id.startswith('order_')
+    ):
         if pending_subscription.reporter_mobile != reporter_mobile:
             pending_subscription.reporter_mobile = reporter_mobile
             pending_subscription.save(update_fields=['reporter_mobile'])
@@ -762,14 +825,27 @@ def razorpay_create_order(request, plan_id):
 
     order = response.json()
 
-    subscription = UserSubscription.objects.create(
-        user=payment_user,
-        plan=plan,
-        amount=plan.price,
-        transaction_id=order['id'],
-        reporter_mobile=reporter_mobile,
-        payment_status='PENDING'
-    )
+    if pending_subscription:
+        subscription = pending_subscription
+        subscription.amount = plan.price
+        subscription.transaction_id = order['id']
+        subscription.reporter_mobile = reporter_mobile
+        subscription.save(
+            update_fields=[
+                'amount',
+                'transaction_id',
+                'reporter_mobile',
+            ]
+        )
+    else:
+        subscription = UserSubscription.objects.create(
+            user=payment_user,
+            plan=plan,
+            amount=plan.price,
+            transaction_id=order['id'],
+            reporter_mobile=reporter_mobile,
+            payment_status='PENDING'
+        )
     clear_subscription_customer_session(request, subscription.user_id)
 
     return JsonResponse(
@@ -848,14 +924,16 @@ def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobil
         .filter(
             user=subscriber,
             plan=plan,
-            payment_status='PENDING',
-            transaction_id__startswith='order_'
+            payment_status='PENDING'
         )
         .order_by('-created_at')
         .first()
     )
 
-    if pending_subscription:
+    if (
+        pending_subscription and
+        pending_subscription.transaction_id.startswith('order_')
+    ):
         if pending_subscription.reporter_mobile != reporter_mobile:
             pending_subscription.reporter_mobile = reporter_mobile
             pending_subscription.save(update_fields=['reporter_mobile'])
@@ -891,6 +969,19 @@ def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobil
         raise requests.RequestException('Unable to create Razorpay order.')
 
     order = response.json()
+
+    if pending_subscription:
+        pending_subscription.amount = plan.price
+        pending_subscription.transaction_id = order['id']
+        pending_subscription.reporter_mobile = reporter_mobile
+        pending_subscription.save(
+            update_fields=[
+                'amount',
+                'transaction_id',
+                'reporter_mobile',
+            ]
+        )
+        return pending_subscription
 
     return UserSubscription.objects.create(
         user=subscriber,
