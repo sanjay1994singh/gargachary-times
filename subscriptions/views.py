@@ -113,8 +113,14 @@ def get_reporter_options():
 def get_subscribe_context(request, plan, **extra_context):
     subscription_customer = None
     subscription_customer_id = request.session.get('subscription_customer_id')
+    subscription_customer_plan_id = request.session.get(
+        'subscription_customer_plan_id'
+    )
 
-    if subscription_customer_id:
+    if (
+        subscription_customer_id and
+        str(subscription_customer_plan_id) == str(plan.id)
+    ):
         subscription_customer = (
             User.objects
             .filter(id=subscription_customer_id, user_type='subscriber')
@@ -251,6 +257,8 @@ def subscribe(request, plan_id):
         )
         return redirect('profile')
 
+    clear_stale_subscription_customer_session(request, plan)
+
     if (
         request.method == 'POST' and
         (
@@ -331,6 +339,7 @@ def subscribe(request, plan_id):
         send_account_created_email(user, password)
 
         request.session['subscription_customer_id'] = user.id
+        request.session['subscription_customer_plan_id'] = plan.id
         request.session['reporter_mobile'] = reporter_mobile
         messages.success(
             request,
@@ -370,7 +379,23 @@ def clear_subscription_customer_session(request, user_id=None):
         return
 
     request.session.pop('subscription_customer_id', None)
+    request.session.pop('subscription_customer_plan_id', None)
     request.session.pop('reporter_mobile', None)
+
+
+def clear_stale_subscription_customer_session(request, plan):
+    subscription_customer_id = request.session.get('subscription_customer_id')
+    subscription_customer_plan_id = request.session.get(
+        'subscription_customer_plan_id'
+    )
+
+    if not subscription_customer_id:
+        return
+
+    if str(subscription_customer_plan_id) == str(plan.id):
+        return
+
+    clear_subscription_customer_session(request)
 
 
 def checkout_has_payment_user(request):

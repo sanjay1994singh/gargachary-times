@@ -23,6 +23,14 @@ class RazorpaySubscriptionTests(TestCase):
             duration_type='months',
             description='Monthly premium news access',
         )
+        self.yearly_plan = SubscriptionPlan.objects.create(
+            name='Yearly News',
+            subscription_type='news',
+            price=Decimal('500.00'),
+            duration=1,
+            duration_type='years',
+            description='Yearly premium news access',
+        )
         self.reporter = User.objects.create_user(
             username='reporter@example.com',
             email='reporter@example.com',
@@ -81,6 +89,48 @@ class RazorpaySubscriptionTests(TestCase):
                 payment_status='PENDING',
             ).exists()
         )
+
+    def test_different_plan_clears_selected_subscriber_checkout_session(self):
+        self.client.force_login(self.reporter)
+        session = self.client.session
+        session['subscription_customer_id'] = self.subscriber.id
+        session['subscription_customer_plan_id'] = self.plan.id
+        session['reporter_mobile'] = self.reporter.mobile
+        session.save()
+
+        response = self.client.get(
+            reverse('subscribe', args=[self.yearly_plan.id])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(
+            'subscription_customer_id',
+            self.client.session
+        )
+        self.assertNotIn(
+            'subscription_customer_plan_id',
+            self.client.session
+        )
+        self.assertNotIn('reporter_mobile', self.client.session)
+        self.assertIsNone(response.context['subscription_customer'])
+        self.assertTrue(response.context['show_account_form'])
+
+    def test_same_plan_keeps_selected_subscriber_checkout_session(self):
+        self.client.force_login(self.reporter)
+        session = self.client.session
+        session['subscription_customer_id'] = self.subscriber.id
+        session['subscription_customer_plan_id'] = self.plan.id
+        session['reporter_mobile'] = self.reporter.mobile
+        session.save()
+
+        response = self.client.get(reverse('subscribe', args=[self.plan.id]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.context['subscription_customer'],
+            self.subscriber
+        )
+        self.assertFalse(response.context['show_account_form'])
 
     def test_invoice_syncs_latest_subscriber_details_on_success(self):
         subscription = UserSubscription.objects.create(
