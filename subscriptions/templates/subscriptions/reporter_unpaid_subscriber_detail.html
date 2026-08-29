@@ -1,0 +1,152 @@
+{% extends 'dashboard_manage_base.html' %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="panel-card h-100">
+            <h5 class="mb-3">Subscriber Details</h5>
+            <div class="mb-2"><strong>Name:</strong> {{ subscriber.full_name|default:subscriber.username }}</div>
+            <div class="mb-2"><strong>Email:</strong> {{ subscriber.email|default:'-' }}</div>
+            <div class="mb-2"><strong>Mobile:</strong> {{ subscriber.mobile|default:'-' }}</div>
+            <div class="mb-2"><strong>City:</strong> {{ subscriber.city|default:'-' }}</div>
+            <div class="mb-2"><strong>State:</strong> {{ subscriber.state|default:'-' }}</div>
+            <div class="mb-2"><strong>PIN code:</strong> {{ subscriber.pincode|default:'-' }}</div>
+            <div class="mb-2"><strong>Country:</strong> {{ subscriber.country|default:'India' }}</div>
+            <div class="mb-0"><strong>Address:</strong> {{ subscriber.address|default:'-' }}</div>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="panel-card mb-4">
+            <h5 class="mb-3">Generate Payment</h5>
+            <form method="post" action="{% url 'reporter_generate_subscriber_payment' subscriber.id %}" class="row g-3 align-items-end">
+                {% csrf_token %}
+                <div class="col-md-8">
+                    <label class="form-label">Plan</label>
+                    <select name="plan_id" class="form-select" required>
+                        <option value="">Select plan</option>
+                        {% for plan in plans %}
+                            <option value="{{ plan.id }}" {% if plan.id == selected_plan_id %}selected{% endif %}>
+                                {{ plan.name }} - ₹{{ plan.price }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fa-solid fa-link"></i> Generate
+                    </button>
+                </div>
+            </form>
+
+            {% for subscription in pending_subscriptions %}
+                {% if subscription.transaction_id|slice:":6" == "order_" %}
+                    <div class="mt-4 p-3 rounded border border-success">
+                        <label class="form-label fw-semibold">Payment link</label>
+                        <div class="input-group mb-3">
+                            <input type="text"
+                                   class="form-control payment-link-text"
+                                   value="{{ request.scheme }}://{{ request.get_host }}{% url 'razorpay_shared_payment' subscription.transaction_id %}"
+                                   readonly>
+                            <button type="button"
+                                    class="btn btn-info copy-payment-link"
+                                    data-link="{{ request.scheme }}://{{ request.get_host }}{% url 'razorpay_shared_payment' subscription.transaction_id %}">
+                                <i class="fa-solid fa-copy"></i> Copy
+                            </button>
+                        </div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a class="btn btn-success"
+                               target="_blank"
+                               href="{% url 'razorpay_shared_payment' subscription.transaction_id %}">
+                                <i class="fa-solid fa-credit-card"></i> Pay
+                            </a>
+                            <a class="btn btn-success"
+                               target="_blank"
+                               href="https://wa.me/?text={{ 'Gargachary Times subscription payment link: '|urlencode }}{{ request.scheme|urlencode }}%3A//{{ request.get_host|urlencode }}{% url 'razorpay_shared_payment' subscription.transaction_id %}">
+                                <i class="fa-brands fa-whatsapp"></i> WhatsApp Share
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="panel-card">
+            <h5 class="mb-3">Payment History</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead>
+                    <tr>
+                        <th>Plan</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Payment</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for subscription in subscriptions %}
+                    <tr>
+                        <td>{{ subscription.plan.name }}</td>
+                        <td>₹{{ subscription.amount }}</td>
+                        <td>{{ subscription.payment_status }}</td>
+                        <td>{{ subscription.created_at|date:"d M Y" }}</td>
+                        <td>
+                            {% if subscription.payment_status == 'PENDING' and subscription.transaction_id|slice:":6" == "order_" %}
+                                <a class="btn btn-sm btn-success" target="_blank" href="{% url 'razorpay_shared_payment' subscription.transaction_id %}">
+                                    <i class="fa-solid fa-credit-card"></i> Pay
+                                </a>
+                                <button type="button" class="btn btn-sm btn-info copy-payment-link" data-link="{{ request.scheme }}://{{ request.get_host }}{% url 'razorpay_shared_payment' subscription.transaction_id %}">
+                                    <i class="fa-solid fa-copy"></i> Copy
+                                </button>
+                                <a class="btn btn-sm btn-success"
+                                   target="_blank"
+                                   href="https://wa.me/?text={{ 'Gargachary Times subscription payment link: '|urlencode }}{{ request.scheme|urlencode }}%3A//{{ request.get_host|urlencode }}{% url 'razorpay_shared_payment' subscription.transaction_id %}">
+                                    <i class="fa-brands fa-whatsapp"></i> Share
+                                </a>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No payment generated yet.</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <a class="btn btn-outline-light" href="{% url 'reporter_unpaid_subscribers' %}">
+                <i class="fa-solid fa-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.querySelectorAll('.copy-payment-link').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const originalText = button.innerHTML;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(button.dataset.link);
+            } else {
+                const input = document.createElement('input');
+                input.value = button.dataset.link;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                input.remove();
+            }
+
+            button.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+
+            setTimeout(function () {
+                button.innerHTML = originalText;
+            }, 1500);
+        });
+    });
+</script>
+{% endblock %}

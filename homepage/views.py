@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.contrib.auth.decorators import login_required
 
 from video.models import Video
 
@@ -20,8 +21,32 @@ from django.utils import timezone
 from datetime import timedelta
 
 
+def is_admin_user(user):
+    return (
+        user.is_authenticated and
+        (
+            user.is_staff or
+            user.is_superuser
+        )
+    )
+
+
+def redirect_non_admin_dashboard_user(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+
+    if request.user.user_type == 'reporter':
+        return redirect('reporter_unpaid_subscribers')
+
+    return redirect('profile')
+
+
 # Create your views here.
+@login_required
 def dashboard(request):
+    if not is_admin_user(request.user):
+        return redirect_non_admin_dashboard_user(request)
+
     today = timezone.now().date()
 
     daily_visitors = Visitor.objects.filter(
@@ -75,7 +100,16 @@ def dashboard(request):
     return render(request, 'dashboard.html', context)
 
 
-def get_dashboard_user_queryset(user_type):
+def get_dashboard_user_queryset(user_type, current_user=None):
+    if current_user and not (
+        current_user.is_staff or
+        current_user.is_superuser
+    ):
+        if current_user.user_type == user_type:
+            return User.objects.filter(id=current_user.id)
+
+        return User.objects.none()
+
     if user_type == 'subscriber':
         return (
             User.objects
@@ -94,6 +128,9 @@ def get_dashboard_user_queryset(user_type):
 
 
 def dashboard_news_form(request, news_id=None):
+    if not is_admin_user(request.user):
+        return redirect_non_admin_dashboard_user(request)
+
     news_obj = None
 
     if news_id:
@@ -160,6 +197,9 @@ def dashboard_news_form(request, news_id=None):
 
 
 def dashboard_news_list(request):
+    if not is_admin_user(request.user):
+        return redirect_non_admin_dashboard_user(request)
+
     news_items = (
         News.objects
         .select_related('category', 'user')
@@ -188,20 +228,31 @@ def dashboard_news_list(request):
 
 
 @require_POST
+@login_required
 def dashboard_news_delete(request, news_id):
+    if not is_admin_user(request.user):
+        return redirect_non_admin_dashboard_user(request)
+
     news_obj = get_object_or_404(News, id=news_id)
     news_obj.delete()
     messages.success(request, 'News deleted successfully.')
     return redirect('dashboard_news_list')
 
 
+@login_required
 def dashboard_users(request, user_type):
+    if not is_admin_user(request.user):
+        if request.user.user_type == 'reporter':
+            return redirect('reporter_unpaid_subscribers')
+
+        return redirect('profile')
+
     title_map = {
         'subscriber': 'Subscriber Accounts',
         'reporter': 'Reporter Accounts',
     }
 
-    users = get_dashboard_user_queryset(user_type)
+    users = get_dashboard_user_queryset(user_type, request.user)
 
     return render(
         request,
@@ -216,6 +267,9 @@ def dashboard_users(request, user_type):
 
 
 def download_visitors_data(request, report_type):
+    if not is_admin_user(request.user):
+        return redirect_non_admin_dashboard_user(request)
+
     response = HttpResponse(
         content_type='text/csv'
     )

@@ -13,6 +13,19 @@ from social_core.exceptions import SocialAuthBaseException
 from social_django.views import complete
 
 
+def normalize_mobile_login(value):
+    digits = ''.join(
+        char
+        for char in (value or '')
+        if char.isdigit()
+    )
+
+    if len(digits) >= 10:
+        return digits[-10:]
+
+    return digits
+
+
 def generate_strong_password(length=14):
     alphabet = string.ascii_letters + string.digits + '!@#$%^&*'
 
@@ -236,12 +249,20 @@ def login_view(request):
         password = request.POST.get(
             'password'
         )
+        mobile_login = normalize_mobile_login(username_input)
 
         user_obj = User.objects.filter(
 
             mobile=username_input
 
         ).first()
+
+        if not user_obj and mobile_login:
+            user_obj = (
+                User.objects
+                .filter(mobile__endswith=mobile_login)
+                .first()
+            )
 
         if not user_obj:
             user_obj = User.objects.filter(
@@ -273,6 +294,13 @@ def login_view(request):
                     request,
                     user
                 )
+
+                if user.user_type == 'reporter':
+                    return redirect(
+                        request.POST.get('next') or
+                        request.GET.get('next') or
+                        'reporter_unpaid_subscribers'
+                    )
 
                 return redirect(
                     request.POST.get('next') or

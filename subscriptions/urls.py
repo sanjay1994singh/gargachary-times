@@ -23,6 +23,30 @@ urlpatterns = [
     ),
 
     path(
+        'reporter/unpaid-subscribers/',
+        views.reporter_unpaid_subscribers,
+        name='reporter_unpaid_subscribers'
+    ),
+
+    path(
+        'reporter/success-subscribers/',
+        views.reporter_success_subscribers,
+        name='reporter_success_subscribers'
+    ),
+
+    path(
+        'reporter/unpaid-subscribers/<int:user_id>/',
+        views.reporter_unpaid_subscriber_detail,
+        name='reporter_unpaid_subscriber_detail'
+    ),
+
+    path(
+        'reporter/unpaid-subscribers/<int:user_id>/generate-payment/',
+        views.reporter_generate_subscriber_payment,
+        name='reporter_generate_subscriber_payment'
+    ),
+
+    path(
         'payment/<int:plan_id>/',
         views.phonepe_payment,
         name='phonepe_payment'

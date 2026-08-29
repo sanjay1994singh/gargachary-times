@@ -31,6 +31,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_POST
 
 from account.models import State, User
 from account.views import (
@@ -174,6 +175,7 @@ def create_reporter_account(request):
     mobile = (request.POST.get('mobile') or '').strip()
     address = (request.POST.get('address') or '').strip()
     city = (request.POST.get('city') or '').strip()
+    district = (request.POST.get('district') or '').strip()
     pincode = (request.POST.get('pincode') or '').strip()
     state = (request.POST.get('state') or 'Uttar Pradesh').strip()
     country = (request.POST.get('country') or 'India').strip()
@@ -213,6 +215,7 @@ def create_reporter_account(request):
         full_name=full_name,
         address=address,
         city=city,
+        district=district,
         state=state,
         pincode=pincode,
         country=country,
@@ -319,6 +322,7 @@ def subscribe(request, plan_id):
             user_type='subscriber',
             address=request.POST.get('address'),
             city=request.POST.get('city'),
+            district=request.POST.get('district'),
             state=request.POST.get('state') or 'Uttar Pradesh',
             pincode=request.POST.get('pincode'),
             country=request.POST.get('country') or 'India',
@@ -810,6 +814,338 @@ def razorpay_shared_payment(request, order_id):
         request,
         'subscriptions/shared_payment.html',
         context
+    )
+
+
+def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobile=''):
+    pending_subscription = (
+        UserSubscription.objects
+        .filter(
+            user=subscriber,
+            plan=plan,
+            payment_status='PENDING',
+            transaction_id__startswith='order_'
+        )
+        .order_by('-created_at')
+        .first()
+    )
+
+    if pending_subscription:
+        if pending_subscription.reporter_mobile != reporter_mobile:
+            pending_subscription.reporter_mobile = reporter_mobile
+            pending_subscription.save(update_fields=['reporter_mobile'])
+
+        return pending_subscription
+
+    receipt = f"sub_{subscriber.id}_{uuid.uuid4().hex[:24]}"
+    payload = {
+        'amount': int(plan.price * 100),
+        'currency': 'INR',
+        'receipt': receipt,
+        'payment_capture': 1,
+        'notes': {
+            'user_id': str(subscriber.id),
+            'created_by_user_id': str(request.user.id),
+            'subscription_user_id': str(subscriber.id),
+            'plan_id': str(plan.id),
+            'plan_name': plan.name,
+        }
+    }
+
+    response = requests.post(
+        RAZORPAY_ORDERS_URL,
+        auth=(
+            settings.RAZORPAY_KEY_ID,
+            settings.RAZORPAY_KEY_SECRET
+        ),
+        json=payload,
+        timeout=15
+    )
+
+    if response.status_code >= 400:
+        raise requests.RequestException('Unable to create Razorpay order.')
+
+    order = response.json()
+
+    return UserSubscription.objects.create(
+        user=subscriber,
+        plan=plan,
+        amount=plan.price,
+        transaction_id=order['id'],
+        reporter_mobile=reporter_mobile,
+        payment_status='PENDING'
+    )
+
+
+def is_reporter_user(user):
+    return (
+        user.is_authenticated and
+        user.user_type == 'reporter'
+    )
+
+
+def get_mobile_last10(value):
+    digits = ''.join(
+        char
+        for char in (value or '')
+        if char.isdigit()
+    )
+
+    if len(digits) >= 10:
+        return digits[-10:]
+
+    return digits
+
+
+@login_required
+def reporter_unpaid_subscribers(request):
+    if not is_reporter_user(request.user):
+        messages.error(
+            request,
+            'Only reporter accounts can view unpaid subscribers.'
+        )
+        return redirect('profile')
+
+    reporter_mobile = get_mobile_last10(request.user.mobile)
+
+    if not reporter_mobile:
+        messages.error(
+            request,
+            'Reporter mobile number is missing on your account.'
+        )
+        return redirect('profile')
+
+    reporter_subscriptions = (
+        UserSubscription.objects
+        .select_related('user', 'plan')
+        .exclude(payment_status='SUCCESS')
+        .exclude(reporter_mobile='')
+        .order_by('-created_at')
+    )
+    subscribers = []
+    seen_user_ids = set()
+
+    for subscription in reporter_subscriptions:
+        if get_mobile_last10(subscription.reporter_mobile) != reporter_mobile:
+            continue
+
+        if subscription.user_id in seen_user_ids:
+            continue
+
+        subscription.user.latest_reporter_subscription = subscription
+        subscribers.append(subscription.user)
+        seen_user_ids.add(subscription.user_id)
+
+    return render(
+        request,
+        'subscriptions/reporter_unpaid_subscribers.html',
+        {
+            'active_menu': 'reporter_subscribers',
+            'page_title': 'Unpaid Subscribers',
+            'subscribers': subscribers,
+            'empty_message': 'No unpaid subscriber records found.',
+        }
+    )
+
+
+@login_required
+def reporter_success_subscribers(request):
+    if not is_reporter_user(request.user):
+        messages.error(
+            request,
+            'Only reporter accounts can view successful subscribers.'
+        )
+        return redirect('profile')
+
+    reporter_mobile = get_mobile_last10(request.user.mobile)
+
+    if not reporter_mobile:
+        messages.error(
+            request,
+            'Reporter mobile number is missing on your account.'
+        )
+        return redirect('profile')
+
+    reporter_subscriptions = (
+        UserSubscription.objects
+        .select_related('user', 'plan')
+        .filter(payment_status='SUCCESS')
+        .exclude(reporter_mobile='')
+        .order_by('-created_at')
+    )
+    subscribers = []
+    seen_user_ids = set()
+
+    for subscription in reporter_subscriptions:
+        if get_mobile_last10(subscription.reporter_mobile) != reporter_mobile:
+            continue
+
+        if subscription.user_id in seen_user_ids:
+            continue
+
+        subscription.user.latest_reporter_subscription = subscription
+        subscribers.append(subscription.user)
+        seen_user_ids.add(subscription.user_id)
+
+    return render(
+        request,
+        'subscriptions/reporter_unpaid_subscribers.html',
+        {
+            'active_menu': 'reporter_success_subscribers',
+            'page_title': 'Success Subscribers',
+            'subscribers': subscribers,
+            'empty_message': 'No successful subscriber records found.',
+        }
+    )
+
+
+@login_required
+def reporter_unpaid_subscriber_detail(request, user_id):
+    if not is_reporter_user(request.user):
+        messages.error(
+            request,
+            'Only reporter accounts can view subscriber details.'
+        )
+        return redirect('profile')
+
+    subscriber = get_object_or_404(
+        User,
+        id=user_id,
+        user_type='subscriber'
+    )
+    reporter_mobile = get_mobile_last10(request.user.mobile)
+
+    if not reporter_mobile:
+        messages.error(
+            request,
+            'Reporter mobile number is missing on your account.'
+        )
+        return redirect('profile')
+
+    reporter_link_exists = UserSubscription.objects.filter(
+        user=subscriber,
+        reporter_mobile__endswith=reporter_mobile
+    ).exists()
+
+    if not reporter_link_exists:
+        messages.error(
+            request,
+            'This subscriber is not linked with your reporter account.'
+        )
+        return redirect('reporter_unpaid_subscribers')
+
+    subscriptions = (
+        UserSubscription.objects
+        .select_related('plan', 'invoice')
+        .filter(user=subscriber, reporter_mobile__endswith=reporter_mobile)
+        .order_by('-created_at')
+    )
+    pending_subscriptions = subscriptions.filter(payment_status='PENDING')
+    selected_subscription = pending_subscriptions.first() or subscriptions.first()
+    selected_plan_id = (
+        selected_subscription.plan_id
+        if selected_subscription
+        else None
+    )
+    plans = SubscriptionPlan.objects.filter(is_active=True).order_by(
+        'subscription_type',
+        'price'
+    )
+
+    return render(
+        request,
+        'subscriptions/reporter_unpaid_subscriber_detail.html',
+        {
+            'active_menu': 'reporter_subscribers',
+            'page_title': 'Subscriber Detail',
+            'subscriber': subscriber,
+            'subscriptions': subscriptions,
+            'pending_subscriptions': pending_subscriptions,
+            'plans': plans,
+            'selected_plan_id': selected_plan_id,
+        }
+    )
+
+
+@login_required
+@require_POST
+def reporter_generate_subscriber_payment(request, user_id):
+    if not is_reporter_user(request.user):
+        messages.error(
+            request,
+            'Only reporter accounts can generate subscriber payments.'
+        )
+        return redirect('profile')
+
+    subscriber = get_object_or_404(
+        User,
+        id=user_id,
+        user_type='subscriber'
+    )
+    reporter_mobile = get_mobile_last10(request.user.mobile)
+
+    if not reporter_mobile:
+        messages.error(
+            request,
+            'Reporter mobile number is missing on your account.'
+        )
+        return redirect('profile')
+
+    if UserSubscription.objects.filter(
+        user=subscriber,
+        reporter_mobile__endswith=reporter_mobile
+    ).exists() is False:
+        messages.error(
+            request,
+            'This subscriber is not linked with your reporter account.'
+        )
+        return redirect('reporter_unpaid_subscribers')
+
+    plan = get_object_or_404(
+        SubscriptionPlan,
+        id=request.POST.get('plan_id'),
+        is_active=True
+    )
+
+    if UserSubscription.objects.filter(
+        user=subscriber,
+        plan=plan,
+        payment_status='SUCCESS'
+    ).exists():
+        messages.error(
+            request,
+            'This plan is already paid for this subscriber.'
+        )
+        return redirect(
+            'reporter_unpaid_subscriber_detail',
+            user_id=subscriber.id
+        )
+
+    if not settings.RAZORPAY_KEY_ID or not settings.RAZORPAY_KEY_SECRET:
+        messages.error(request, 'Razorpay keys are not configured.')
+        return redirect(
+            'reporter_unpaid_subscriber_detail',
+            user_id=subscriber.id
+        )
+
+    try:
+        create_razorpay_subscription_order(
+            request,
+            subscriber,
+            plan,
+            request.user.mobile or ''
+        )
+    except requests.RequestException:
+        messages.error(request, 'Unable to create Razorpay order.')
+        return redirect(
+            'reporter_unpaid_subscriber_detail',
+            user_id=subscriber.id
+        )
+
+    messages.success(request, 'Payment link generated successfully.')
+    return redirect(
+        'reporter_unpaid_subscriber_detail',
+        user_id=subscriber.id
     )
 
 

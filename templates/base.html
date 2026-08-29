@@ -376,6 +376,19 @@
                             </a>
                         </li>
 
+                        {% if request.user.user_type == 'reporter' %}
+                        <li>
+                            <a class="dropdown-item"
+                               href="{% url 'reporter_unpaid_subscribers' %}">
+
+                                <i class="bi bi-people"></i>
+
+                                Subscriber Records
+
+                            </a>
+                        </li>
+                        {% endif %}
+
                         <li>
                             <a class="dropdown-item"
                                href="{% url 'my_subscription' %}">
@@ -547,6 +560,54 @@
     };
 
     document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('form').forEach(function (form) {
+            form.setAttribute('autocomplete', 'off');
+        });
+
+        document.querySelectorAll('form').forEach(function (form) {
+            var dummyUser = document.createElement('input');
+            var dummyPass = document.createElement('input');
+
+            dummyUser.type = 'text';
+            dummyUser.name = 'fake_user_' + Math.random().toString(36).slice(2);
+            dummyUser.autocomplete = 'username';
+            dummyUser.tabIndex = -1;
+            dummyUser.setAttribute('aria-hidden', 'true');
+            dummyUser.style.cssText = 'position:absolute;left:-10000px;top:auto;width:1px;height:1px;opacity:0;';
+
+            dummyPass.type = 'password';
+            dummyPass.name = 'fake_pass_' + Math.random().toString(36).slice(2);
+            dummyPass.autocomplete = 'new-password';
+            dummyPass.tabIndex = -1;
+            dummyPass.setAttribute('aria-hidden', 'true');
+            dummyPass.style.cssText = dummyUser.style.cssText;
+
+            form.insertBefore(dummyPass, form.firstChild);
+            form.insertBefore(dummyUser, form.firstChild);
+        });
+
+        document.querySelectorAll('input, textarea, select').forEach(function (field, index) {
+            if (field.type === 'hidden' || field.type === 'file' || field.type === 'submit' || field.type === 'button') {
+                return;
+            }
+
+            field.setAttribute('autocomplete', field.type === 'password' ? 'new-password' : 'section-no-autofill-' + index + ' no-autofill');
+            field.setAttribute('autocapitalize', 'off');
+            field.setAttribute('autocorrect', 'off');
+            field.setAttribute('spellcheck', 'false');
+            field.setAttribute('data-lpignore', 'true');
+            field.setAttribute('data-1p-ignore', 'true');
+
+            if (!field.readOnly && field.type !== 'password') {
+                field.setAttribute('readonly', 'readonly');
+                field.addEventListener('focus', function () {
+                    setTimeout(function () {
+                        field.removeAttribute('readonly');
+                    }, 120);
+                }, { once: true });
+            }
+        });
+
         document.addEventListener('submit', function (event) {
             var form = event.target;
 
