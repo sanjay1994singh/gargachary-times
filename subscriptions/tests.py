@@ -61,6 +61,65 @@ class RazorpaySubscriptionTests(TestCase):
             password='secret123',
         )
 
+    def test_subscribe_duplicate_email_shows_form_error(self):
+        response = self.client.post(
+            reverse('subscribe', args=[self.plan.id]),
+            {
+                'full_name': 'New Subscriber',
+                'email': 'SUBSCRIBER@example.com',
+                'mobile': '9222222222',
+                'city': 'Mathura',
+                'district': 'Mathura',
+                'address': 'Fresh Address',
+                'pincode': '281001',
+                'state': 'Uttar Pradesh',
+                'country': 'India',
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            'Email already exists. Please login with your existing account.'
+        )
+        self.assertEqual(
+            User.objects.filter(email__iexact='subscriber@example.com').count(),
+            1
+        )
+
+    @patch('subscriptions.views.send_account_created_email')
+    def test_subscribe_allows_multiple_blank_optional_emails(self, mocked_email):
+        base_data = {
+            'full_name': 'Blank Email Subscriber',
+            'email': '',
+            'city': 'Mathura',
+            'district': 'Mathura',
+            'address': 'Fresh Address',
+            'pincode': '281001',
+            'state': 'Uttar Pradesh',
+            'country': 'India',
+        }
+
+        first_response = self.client.post(
+            reverse('subscribe', args=[self.plan.id]),
+            {**base_data, 'mobile': '9333333333'}
+        )
+        second_response = self.client.post(
+            reverse('subscribe', args=[self.plan.id,]),
+            {**base_data, 'mobile': '9444444444'}
+        )
+
+        self.assertEqual(first_response.status_code, 200)
+        self.assertEqual(second_response.status_code, 200)
+        self.assertEqual(
+            User.objects.filter(
+                mobile__in=['9333333333', '9444444444'],
+                email__isnull=True,
+            ).count(),
+            2
+        )
+        self.assertEqual(mocked_email.call_count, 2)
+
     def test_create_order_clears_selected_subscriber_session(self):
         self.client.force_login(self.reporter)
         session = self.client.session

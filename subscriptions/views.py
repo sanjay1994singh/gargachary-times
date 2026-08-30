@@ -30,6 +30,7 @@ from django.utils import timezone
 
 from django.views.decorators.csrf import csrf_exempt
 
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ObjectDoesNotExist
@@ -246,7 +247,7 @@ def create_reporter_account(request):
 
     first_name = (request.POST.get('first_name') or '').strip()
     last_name = (request.POST.get('last_name') or '').strip()
-    email = (request.POST.get('email') or '').strip()
+    email = (request.POST.get('email') or '').strip().lower()
     mobile = (request.POST.get('mobile') or '').strip()
     address = (request.POST.get('address') or '').strip()
     city = (request.POST.get('city') or '').strip()
@@ -263,7 +264,7 @@ def create_reporter_account(request):
             status=400
         )
 
-    if User.objects.filter(email=email).exists():
+    if User.objects.filter(email__iexact=email).exists():
         return JsonResponse(
             {
                 'error': 'Email already exists.'
@@ -281,23 +282,32 @@ def create_reporter_account(request):
 
     full_name = f'{first_name} {last_name}'.strip()
     password = generate_strong_password()
-    user = User.objects.create_user(
-        username=email,
-        email=email,
-        mobile=mobile,
-        first_name=first_name,
-        last_name=last_name,
-        full_name=full_name,
-        address=address,
-        city=city,
-        district=district,
-        state=state,
-        pincode=pincode,
-        country=country,
-        user_type='reporter',
-        password=password
-    )
-    send_account_created_email(user, password)
+    try:
+        with transaction.atomic():
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                mobile=mobile,
+                first_name=first_name,
+                last_name=last_name,
+                full_name=full_name,
+                address=address,
+                city=city,
+                district=district,
+                state=state,
+                pincode=pincode,
+                country=country,
+                user_type='reporter',
+                password=password
+            )
+        send_account_created_email(user, password)
+    except IntegrityError:
+        return JsonResponse(
+            {
+                'error': 'This email or mobile number is already registered.'
+            },
+            status=400
+        )
 
     return JsonResponse(
         {
@@ -338,7 +348,7 @@ def subscribe(request, plan_id):
             request.user.user_type == 'reporter'
         )
     ):
-        email = (request.POST.get('email') or '').strip()
+        email = (request.POST.get('email') or '').strip().lower() or None
         mobile = (request.POST.get('mobile') or '').strip()
         full_name = (request.POST.get('full_name') or '').strip()
         address = (request.POST.get('address') or '').strip()
@@ -388,7 +398,7 @@ def subscribe(request, plan_id):
                 )
             )
 
-        if email and User.objects.filter(email=email).exists():
+        if email and User.objects.filter(email__iexact=email).exists():
             messages.error(
                 request,
                 'Email already exists. Please login with your existing account.'
@@ -422,24 +432,42 @@ def subscribe(request, plan_id):
         name_parts = full_name.split(' ', 1)
         first_name = name_parts[0] if name_parts else ''
         last_name = name_parts[1] if len(name_parts) > 1 else ''
-        user = User.objects.create_user(
-            username=email or mobile,
-            email=email,
-            mobile=mobile,
-            first_name=first_name,
-            last_name=last_name,
-            full_name=full_name,
-            user_type='subscriber',
-            address=address,
-            city=city,
-            district=district,
-            state=state,
-            pincode=pincode,
-            country=country,
-            password=password
-        )
+        try:
+            with transaction.atomic():
+                user = User(
+                    username=email or mobile,
+                    email=email,
+                    mobile=mobile,
+                    first_name=first_name,
+                    last_name=last_name,
+                    full_name=full_name,
+                    user_type='subscriber',
+                    address=address,
+                    city=city,
+                    district=district,
+                    state=state,
+                    pincode=pincode,
+                    country=country,
+                )
+                user.set_password(password)
+                user.save()
+                create_pending_subscription_record(user, plan, reporter_mobile)
+        except IntegrityError:
+            messages.error(
+                request,
+                'This email or mobile number is already registered. Please login with your existing account.'
+            )
+            return render(
+                request,
+                'subscriptions/subscribe.html',
+                get_subscribe_context(
+                    request,
+                    plan,
+                    register_error='This email or mobile number is already registered. Please login with your existing account.',
+                )
+            )
+
         send_account_created_email(user, password)
-        create_pending_subscription_record(user, plan, reporter_mobile)
 
         request.session['subscription_customer_id'] = user.id
         request.session['subscription_customer_plan_id'] = plan.id
