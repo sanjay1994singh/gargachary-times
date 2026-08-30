@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    <style>
+        body {
+            margin: 0;
+            background: #f3f4f6;
+            color: #111827;
+            font-family: Arial, sans-serif;
+        }
+
+        .invoice-page {
+            max-width: 840px;
+            margin: 24px auto;
+            background: #fff;
+            padding: 34px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .header,
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        h1,
+        h2,
+        p {
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+        }
+
+        th,
+        td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #f9fafb;
+        }
+
+        .text-end {
+            text-align: right;
+        }
+
+        .muted {
+            color: #6b7280;
+        }
+
+        .actions {
+            max-width: 840px;
+            margin: 20px auto 0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn {
+            border: 1px solid #b91c1c;
+            background: #b91c1c;
+            color: #fff;
+            padding: 10px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .invoice-page {
+                margin: 0;
+                max-width: none;
+                border: 0;
+                padding: 0;
+            }
+
+            .actions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="actions">
+    <button type="button" class="btn" onclick="window.print()">Print / Save PDF</button>
+</div>
+
+<main class="invoice-page">
+    <div class="header">
+        <div>
+            <h1>Invoice</h1>
+            <p class="muted">{{ invoice.invoice_number }}</p>
+        </div>
+        <div class="text-end">
+            <h2>Gargachary Times</h2>
+            <p>Mathura, Uttar Pradesh, India</p>
+        </div>
+    </div>
+
+    <div class="summary-row">
+        <section>
+            <h3>Bill To</h3>
+            <p>{{ invoice.billing_name }}</p>
+            <p>{{ invoice.billing_email|default:"-" }}</p>
+            <p>{{ invoice.billing_mobile|default:"-" }}</p>
+            <p>{{ invoice.billing_address }}</p>
+            <p>
+                {{ invoice.billing_city }},
+                {{ invoice.billing_state }}
+                {{ invoice.billing_pincode }}
+            </p>
+            <p>{{ invoice.billing_country }}</p>
+        </section>
+
+        <section class="text-end">
+            <p><strong>Date:</strong> {{ invoice.created_at|date:"d M Y" }}</p>
+            <p><strong>Status:</strong> {{ invoice.subscription.payment_status }}</p>
+            <p><strong>Order ID:</strong> {{ invoice.subscription.razorpay_order_id|default:invoice.subscription.transaction_id }}</p>
+            {% if invoice.subscription.razorpay_payment_id %}
+            <p><strong>Payment ID:</strong> {{ invoice.subscription.razorpay_payment_id }}</p>
+            {% endif %}
+            <p><strong>Delivery:</strong> {{ invoice.get_delivery_status_display }}</p>
+        </section>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Plan</th>
+            <th>Duration</th>
+            <th class="text-end">Tax/GST</th>
+            <th class="text-end">Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>{{ invoice.subscription.plan.name }}</td>
+            <td>
+                {{ invoice.subscription.plan.duration }}
+                {{ invoice.subscription.plan.duration_type }}
+            </td>
+            <td class="text-end">Rs. {{ invoice.tax_amount }}</td>
+            <td class="text-end">Rs. {{ invoice.amount }}</td>
+        </tr>
+        </tbody>
+        <tfoot>
+        <tr>
+            <th colspan="3" class="text-end">Total</th>
+            <th class="text-end">Rs. {{ invoice.amount }}</th>
+        </tr>
+        </tfoot>
+    </table>
+
+    {% if invoice.delivery_note %}
+    <p style="margin-top:24px;"><strong>Delivery Note:</strong> {{ invoice.delivery_note }}</p>
+    {% endif %}
+</main>
+</body>
+</html>

@@ -184,6 +184,38 @@ class RazorpaySubscriptionTests(TestCase):
         self.assertEqual(invoice.billing_pincode, '333333')
         self.assertEqual(invoice.amount, self.plan.price)
 
+    def test_invoice_pdf_view_renders_for_subscription_owner(self):
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_invoice_pdf',
+            payment_status='SUCCESS',
+            is_active=True,
+        )
+        invoice = Invoice.objects.create(
+            subscription=subscription,
+            invoice_number='GT-PDF-001',
+            billing_name='PDF Subscriber',
+            billing_email='pdf@example.com',
+            billing_mobile='9000000001',
+            billing_address='Invoice Address',
+            billing_city='Mathura',
+            billing_state='Uttar Pradesh',
+            billing_pincode='281001',
+            billing_country='India',
+            amount=Decimal('99.00'),
+        )
+
+        self.client.force_login(self.subscriber)
+        response = self.client.get(
+            reverse('invoice_pdf', args=[invoice.invoice_number])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Print / Save PDF')
+        self.assertContains(response, invoice.invoice_number)
+
     def test_razorpay_callback_activates_only_captured_payment(self):
         subscription = UserSubscription.objects.create(
             user=self.subscriber,

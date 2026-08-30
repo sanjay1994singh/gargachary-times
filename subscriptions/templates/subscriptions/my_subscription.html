@@ -201,6 +201,17 @@ My Subscription | Gargachary Times
                         <a href="{% url 'invoice_detail' subscription.invoice.invoice_number %}">
                             {{ subscription.invoice.invoice_number }}
                         </a>
+                        <div class="mt-2">
+                            <a href="{% url 'invoice_detail' subscription.invoice.invoice_number %}"
+                               class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                                View Invoice
+                            </a>
+                            <a href="{% url 'invoice_pdf' subscription.invoice.invoice_number %}"
+                               target="_blank"
+                               class="btn btn-outline-danger btn-sm rounded-pill px-3 ms-1">
+                                PDF
+                            </a>
+                        </div>
                     </div>
 
                     <div class="mb-4">
@@ -229,6 +240,13 @@ My Subscription | Gargachary Times
                        class="btn btn-outline-dark rounded-pill px-4 ms-2">
 
                         Invoice
+
+                    </a>
+                    <a href="{% url 'invoice_pdf' subscription.invoice.invoice_number %}"
+                       target="_blank"
+                       class="btn btn-outline-danger rounded-pill px-4 ms-2">
+
+                        PDF
 
                     </a>
                     {% endif %}

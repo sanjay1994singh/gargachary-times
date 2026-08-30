@@ -1986,6 +1986,30 @@ def invoice_detail(request, invoice_number):
     )
 
 
+@login_required
+def invoice_pdf(request, invoice_number):
+    invoice = get_object_or_404(
+        Invoice.objects.select_related(
+            'subscription',
+            'subscription__plan',
+            'subscription__user'
+        ),
+        invoice_number=invoice_number,
+        subscription__user=request.user
+    )
+    response = render(
+        request,
+        'subscriptions/invoice_pdf.html',
+        {
+            'invoice': invoice
+        }
+    )
+    response['Content-Disposition'] = (
+        f'inline; filename="{invoice.invoice_number}.html"'
+    )
+    return response
+
+
 # USER PROFILE PAGE
 
 @login_required

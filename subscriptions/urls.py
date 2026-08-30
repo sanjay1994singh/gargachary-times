@@ -101,6 +101,12 @@ urlpatterns = [
     ),
 
     path(
+        'invoice/<str:invoice_number>/pdf/',
+        views.invoice_pdf,
+        name='invoice_pdf'
+    ),
+
+    path(
         'profile/',
         views.profile,
         name='profile'

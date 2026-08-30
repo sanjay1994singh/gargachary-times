@@ -209,9 +209,19 @@ My Profile | Gargachary Times
                                 </td>
                                 <td>
                                     {% if item.invoice %}
-                                    <a href="{% url 'invoice_detail' item.invoice.invoice_number %}" class="fw-bold">
-                                        {{ item.invoice.invoice_number }}
-                                    </a>
+                                    <div class="d-flex flex-column gap-1">
+                                        <a href="{% url 'invoice_detail' item.invoice.invoice_number %}" class="fw-bold">
+                                            {{ item.invoice.invoice_number }}
+                                        </a>
+                                        <div>
+                                            <a href="{% url 'invoice_detail' item.invoice.invoice_number %}" class="btn btn-sm btn-outline-dark me-1">
+                                                View
+                                            </a>
+                                            <a href="{% url 'invoice_pdf' item.invoice.invoice_number %}" class="btn btn-sm btn-outline-danger" target="_blank">
+                                                PDF
+                                            </a>
+                                        </div>
+                                    </div>
                                     {% else %}
                                     <span class="text-muted">Pending</span>
                                     {% endif %}

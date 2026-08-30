@@ -14,9 +14,10 @@ from social_django.views import complete
 
 
 def normalize_mobile_login(value):
+    value = ''.join((value or '').split())
     digits = ''.join(
         char
-        for char in (value or '')
+        for char in value
         if char.isdigit()
     )
 
@@ -244,7 +245,7 @@ def login_view(request):
         username_input = request.POST.get(
             'username'
         )
-        username_input = (username_input or '').strip()
+        username_input = ''.join((username_input or '').split())
 
         password = request.POST.get(
             'password'
