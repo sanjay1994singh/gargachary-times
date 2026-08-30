@@ -47,8 +47,7 @@ from .models import (
     Invoice,
     RefundRecord,
     SubscriptionPlan,
-    UserSubscription,
-    EPaper
+    UserSubscription
 )
 
 merchant_id = settings.PHONEPE_MERCHANT_ID
@@ -2151,25 +2150,4 @@ def epaper(request):
     if not active_subscription:
         return redirect('plans')
 
-    papers = (
-
-        EPaper.objects.all()
-
-        .order_by('-published_date')
-
-    )
-
-    context = {
-
-        'papers': papers
-
-    }
-
-    return render(
-
-        request,
-
-        'subscriptions/epaper.html',
-
-        context
-    )
+    return redirect('/epaper/')

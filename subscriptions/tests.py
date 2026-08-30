@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 
 from account.models import User
 
@@ -215,6 +216,27 @@ class RazorpaySubscriptionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Print / Save PDF')
         self.assertContains(response, invoice.invoice_number)
+
+    def test_subscription_epaper_view_redirects_to_reader(self):
+        UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            payment_status='SUCCESS',
+            access_status='ACTIVE',
+            is_active=True,
+            start_date=timezone.now(),
+            end_date=timezone.now() + timezone.timedelta(days=30),
+        )
+        self.client.force_login(self.subscriber)
+
+        response = self.client.get(reverse('epaper'))
+
+        self.assertRedirects(
+            response,
+            '/epaper/',
+            fetch_redirect_response=False,
+        )
 
     def test_razorpay_callback_activates_only_captured_payment(self):
         subscription = UserSubscription.objects.create(
