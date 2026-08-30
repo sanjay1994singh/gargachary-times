@@ -18,7 +18,9 @@ import threading
 from category.models import Category
 import requests
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from datetime import timedelta
+from defusedxml import ElementTree
 
 
 def is_admin_user(user):
@@ -345,9 +347,11 @@ def download_visitors_data(request, report_type):
     return response
 
 
-API_KEY = 'AIzaSyCJQ2WoCt9gMmdKlkaRS_NqEyNeNyxDm9k'
 CHANNEL_HANDLE = 'Samachar24newschannel'
 CHANNEL_ID = 'UC8eaQTAUBKj_OrNmXThrvbQ'
+YOUTUBE_FEED_URL = (
+    'https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}'
+)
 YOUTUBE_CACHE_SECONDS = 60 * 15
 YOUTUBE_TIMEOUT_SECONDS = 4
 HOMEPAGE_NEWS_CACHE_SECONDS = 60
@@ -357,36 +361,8 @@ HOMEPAGE_LEFT_COLUMN_COUNT = 10
 HOMEPAGE_RIGHT_COLUMN_PER_PAGE = 10
 
 
-def get_youtube_channel_id():
-    cache_key = f'youtube_channel_id:{CHANNEL_HANDLE}'
-    cached_channel_id = cache.get(cache_key)
-
-    if cached_channel_id:
-        return cached_channel_id
-
-    try:
-        response = requests.get(
-            'https://www.googleapis.com/youtube/v3/channels',
-            params={
-                'key': API_KEY,
-                'part': 'id',
-                'forHandle': CHANNEL_HANDLE,
-            },
-            timeout=YOUTUBE_TIMEOUT_SECONDS
-        )
-        response.raise_for_status()
-        data = response.json()
-        channel_id = data.get('items', [{}])[0].get('id')
-    except (IndexError, requests.RequestException):
-        channel_id = None
-
-    channel_id = channel_id or CHANNEL_ID
-    cache.set(cache_key, channel_id, YOUTUBE_CACHE_SECONDS)
-    return channel_id
-
-
 def get_youtube_videos(max_results=20, video_duration=None):
-    channel_id = get_youtube_channel_id()
+    channel_id = CHANNEL_ID
     cache_key = get_youtube_video_cache_key(
         channel_id,
         max_results,
@@ -397,41 +373,33 @@ def get_youtube_videos(max_results=20, video_duration=None):
     if cached_videos is not None:
         return cached_videos
 
-    url = 'https://www.googleapis.com/youtube/v3/search'
-    params = {
-        'key': API_KEY,
-        'channelId': channel_id,
-        'part': 'snippet',
-        'order': 'date',
-        'maxResults': max_results,
-        'type': 'video'
-    }
-
-    if video_duration:
-        params['videoDuration'] = video_duration
-
     try:
         response = requests.get(
-            url,
-            params=params,
+            YOUTUBE_FEED_URL.format(channel_id=channel_id),
             timeout=YOUTUBE_TIMEOUT_SECONDS
         )
         response.raise_for_status()
-        data = response.json()
-    except requests.RequestException:
+        root = ElementTree.fromstring(response.content)
+    except (ElementTree.ParseError, requests.RequestException):
         return []
 
+    atom_namespace = '{http://www.w3.org/2005/Atom}'
+    media_namespace = '{http://search.yahoo.com/mrss/}'
+    yt_namespace = '{http://www.youtube.com/xml/schemas/2015}'
     videos = []
-    for item in data.get('items', []):
-        video_id = item.get('id', {}).get('videoId')
-        snippet = item.get('snippet', {})
-        title = snippet.get('title')
-        thumbnail = (
-                snippet.get('thumbnails', {}).get('high', {}).get('url')
-                or snippet.get('thumbnails', {}).get('medium', {}).get('url')
-                or snippet.get('thumbnails', {}).get('default', {}).get('url')
-        )
-        published = snippet.get('publishedAt')
+    entries = root.findall(f'{atom_namespace}entry')
+
+    for item in entries[:max_results]:
+        video_id = get_xml_text(item, f'{yt_namespace}videoId')
+        title = get_xml_text(item, f'{atom_namespace}title')
+        published = get_xml_text(item, f'{atom_namespace}published')
+        media_group = item.find(f'{media_namespace}group')
+        thumbnail = ''
+
+        if media_group is not None:
+            thumbnail_element = media_group.find(f'{media_namespace}thumbnail')
+            if thumbnail_element is not None:
+                thumbnail = thumbnail_element.attrib.get('url', '')
 
         if not video_id or not title or not thumbnail:
             continue
@@ -440,8 +408,9 @@ def get_youtube_videos(max_results=20, video_duration=None):
             'video_id': video_id,
             'title': title,
             'thumbnail': thumbnail,
-            'publishedAt': published or '',
-            'url': f'https://www.youtube.com/watch?v={video_id}'
+            'publishedAt': parse_datetime(published) if published else None,
+            'url': f'https://www.youtube.com/watch?v={video_id}',
+            'embed_url': f'https://www.youtube.com/embed/{video_id}',
         })
 
     cache.set(cache_key, videos, YOUTUBE_CACHE_SECONDS)
@@ -452,9 +421,16 @@ def get_youtube_video_cache_key(channel_id, max_results, video_duration=None):
     return f'youtube_videos:{channel_id}:{max_results}:{video_duration or "all"}'
 
 
+def get_xml_text(element, path):
+    child = element.find(path)
+    if child is None or child.text is None:
+        return ''
+
+    return child.text.strip()
+
+
 def get_cached_youtube_videos(max_results=4, video_duration=None):
     channel_ids = [
-        cache.get(f'youtube_channel_id:{CHANNEL_HANDLE}'),
         CHANNEL_ID,
     ]
 
@@ -490,6 +466,8 @@ def video(request):
     videos = get_youtube_videos()
     context = {
         'videos': videos,
+        'latest_video': videos[0] if videos else None,
+        'channel_url': f'https://www.youtube.com/@{CHANNEL_HANDLE}',
     }
     return render(request, 'video.html', context)
 

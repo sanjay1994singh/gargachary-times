@@ -22,9 +22,53 @@ Videos | Gargachary Times
     }
 
 
+    .latest-video-player {
+        max-width: 980px;
+        margin-bottom: 30px;
+    }
+
+    .video-frame {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16/9;
+        background: #111;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,.12);
+    }
+
+    .video-frame iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+    .latest-video-heading {
+        margin-top: 14px;
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1.35;
+    }
+
+    .channel-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 8px;
+        color: #b91c1c;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .channel-link:hover {
+        color: #8f1515;
+    }
+
     .video-card{
         background:#fff;
-        border-radius:15px;
+        border-radius:8px;
         overflow:hidden;
         box-shadow:0 5px 20px rgba(0,0,0,.12);
         transition:.3s;
@@ -75,6 +119,12 @@ Videos | Gargachary Times
         text-decoration:none;
         font-size:14px;
 
+    }
+
+    .section-subtitle {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 18px;
     }
 
 
@@ -130,6 +180,37 @@ Videos | Gargachary Times
         Latest Videos
     </h1>
 
+    {% if latest_video %}
+
+    <section class="latest-video-player">
+        <div class="video-frame">
+            <iframe
+                    src="{{ latest_video.embed_url }}"
+                    title="{{ latest_video.title }}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen>
+            </iframe>
+        </div>
+
+        <h2 class="latest-video-heading">
+            {{ latest_video.title }}
+        </h2>
+
+        <a href="{{ channel_url }}"
+           target="_blank"
+           rel="noopener"
+           class="channel-link">
+            <i class="fab fa-youtube"></i>
+            Samachar24 YouTube Channel
+        </a>
+    </section>
+
+    <h2 class="section-subtitle">
+        More Videos
+    </h2>
+
+    {% endif %}
+
 
     <div class="row g-4">
 
@@ -145,7 +226,10 @@ Videos | Gargachary Times
 
                 <a href="{{ video.url }}"
                    target="_blank"
-                   rel="noopener">
+                   rel="noopener"
+                   class="video-select"
+                   data-embed-url="{{ video.embed_url }}"
+                   data-title="{{ video.title }}">
 
 
                     <img
@@ -165,17 +249,21 @@ Videos | Gargachary Times
                     </h3>
 
 
+                    {% if video.publishedAt %}
                     <p class="video-date">
 
                         {{ video.publishedAt|date:"d M Y" }}
 
                     </p>
+                    {% endif %}
 
 
                     <a href="{{ video.url }}"
                        target="_blank"
                        rel="noopener"
-                       class="play-btn">
+                       class="play-btn video-select"
+                       data-embed-url="{{ video.embed_url }}"
+                       data-title="{{ video.title }}">
 
                         ▶ Watch Video
 
@@ -197,7 +285,7 @@ Videos | Gargachary Times
         <div class="text-center">
 
             <h4>
-                No Videos Available
+                Videos abhi load nahi ho pa rahe hain. Please thodi der baad refresh karein.
             </h4>
 
         </div>
@@ -213,3 +301,40 @@ Videos | Gargachary Times
 
 
 {% endblock content %}
+
+{% block js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var player = document.querySelector('.video-frame iframe');
+        var heading = document.querySelector('.latest-video-heading');
+
+        if (!player) {
+            return;
+        }
+
+        document.querySelectorAll('.video-select').forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                var embedUrl = link.getAttribute('data-embed-url');
+                var title = link.getAttribute('data-title') || 'Samachar24 video';
+
+                if (!embedUrl) {
+                    return;
+                }
+
+                event.preventDefault();
+                player.src = embedUrl + '?autoplay=1';
+                player.title = title;
+
+                if (heading) {
+                    heading.textContent = title;
+                }
+
+                player.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            });
+        });
+    });
+</script>
+{% endblock js %}
