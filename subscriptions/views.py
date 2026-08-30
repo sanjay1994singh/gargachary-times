@@ -43,6 +43,7 @@ from account.views import (
 
 from .models import (
     PaymentWebhookLog,
+    DisputeEvidence,
     Invoice,
     RefundRecord,
     SubscriptionPlan,
@@ -526,6 +527,10 @@ def update_subscription_payment_details(
 
     if payment_entity.get('captured') or payment_entity.get('status') == 'captured':
         field_values['captured_at'] = created_at or timezone.now()
+        field_values['payment_status'] = 'CAPTURED'
+
+    elif payment_entity.get('status') == 'authorized':
+        field_values['payment_status'] = 'AUTHORIZED'
 
     if payment_entity:
         field_values['gateway_response'] = payment_entity
@@ -573,16 +578,24 @@ def mark_subscription_success(
     )
     subscription.payment_status = 'SUCCESS'
     subscription.is_active = True
+    subscription.access_status = 'ACTIVE'
     if not subscription.paid_at:
         subscription.paid_at = timezone.now()
     if not subscription.captured_at:
         subscription.captured_at = subscription.paid_at
+    if not subscription.activated_at:
+        subscription.activated_at = timezone.now()
+    if not subscription.delivered_at:
+        subscription.delivered_at = subscription.activated_at
     subscription.save(
         update_fields=[
             'payment_status',
             'is_active',
+            'access_status',
             'paid_at',
             'captured_at',
+            'activated_at',
+            'delivered_at',
             'updated_at',
         ]
     )
@@ -631,7 +644,15 @@ def mark_subscription_success(
 def mark_subscription_failed(subscription):
     subscription.payment_status = 'FAILED'
     subscription.is_active = False
-    subscription.save(update_fields=['payment_status', 'is_active', 'updated_at'])
+    subscription.access_status = 'PENDING'
+    subscription.save(
+        update_fields=[
+            'payment_status',
+            'is_active',
+            'access_status',
+            'updated_at',
+        ]
+    )
 
 
 def get_or_create_invoice(subscription):
@@ -1569,6 +1590,11 @@ def razorpay_webhook(request):
         .get('refund', {})
         .get('entity', {})
     )
+    dispute = (
+        event.get('payload', {})
+        .get('dispute', {})
+        .get('entity', {})
+    )
     order_id = payment.get('order_id') or order.get('id')
     payment_id = payment.get('id')
     subscription = None
@@ -1583,7 +1609,12 @@ def razorpay_webhook(request):
     webhook_log = PaymentWebhookLog.objects.create(
         event_id=event_id,
         event_name=event_name or '',
-        razorpay_payment_id=payment_id or refund.get('payment_id') or '',
+        razorpay_payment_id=(
+            payment_id or
+            refund.get('payment_id') or
+            dispute.get('payment_id') or
+            ''
+        ),
         razorpay_order_id=order_id or '',
         subscription=subscription,
         signature=signature or '',
@@ -1653,6 +1684,16 @@ def razorpay_webhook(request):
                 'gateway_response': refund,
             }
 
+            if event_name == 'refund.created':
+                refund_defaults['requested_at'] = get_razorpay_datetime(
+                    refund.get('created_at')
+                ) or timezone.now()
+
+            if event_name == 'refund.processed':
+                refund_defaults['processed_at'] = get_razorpay_datetime(
+                    refund.get('created_at')
+                ) or timezone.now()
+
             if refund_id:
                 refund_record, _ = RefundRecord.objects.update_or_create(
                     razorpay_refund_id=refund_id,
@@ -1680,6 +1721,64 @@ def razorpay_webhook(request):
             webhook_log.processing_note = 'Refund record updated.'
         else:
             webhook_log.processing_note = 'No subscription found for refund.'
+
+    elif event_name in (
+        'payment.dispute.created',
+        'payment.dispute.closed',
+        'payment.dispute.under_review',
+        'payment.dispute.won',
+        'payment.dispute.lost',
+    ):
+        payment_id = dispute.get('payment_id') or payment_id
+        subscription = (
+            UserSubscription.objects
+            .filter(razorpay_payment_id=payment_id)
+            .first()
+        )
+
+        if subscription:
+            status_map = {
+                'payment.dispute.created': 'EVIDENCE_REQUIRED',
+                'payment.dispute.under_review': 'EVIDENCE_SUBMITTED',
+                'payment.dispute.won': 'WON',
+                'payment.dispute.lost': 'LOST',
+                'payment.dispute.closed': 'ACCEPTED',
+            }
+            dispute_amount = (
+                Decimal(dispute.get('amount') or 0) /
+                Decimal('100')
+            )
+            dispute_id = dispute.get('id') or ''
+            dispute_defaults = {
+                'subscription': subscription,
+                'amount': dispute_amount,
+                'status': status_map.get(event_name, 'OPEN'),
+                'reason': dispute.get('reason') or dispute.get('description') or '',
+                'notice_received_at': get_razorpay_datetime(
+                    dispute.get('created_at')
+                ) or timezone.now(),
+                'response_due_at': get_razorpay_datetime(
+                    dispute.get('respond_by')
+                ),
+                'final_result': dispute.get('status') or '',
+            }
+
+            if dispute_id:
+                DisputeEvidence.objects.update_or_create(
+                    razorpay_dispute_id=dispute_id,
+                    defaults=dispute_defaults
+                )
+            else:
+                DisputeEvidence.objects.create(
+                    razorpay_dispute_id='',
+                    **dispute_defaults
+                )
+
+            webhook_log.subscription = subscription
+            webhook_log.processed = True
+            webhook_log.processing_note = 'Dispute evidence record updated.'
+        else:
+            webhook_log.processing_note = 'No subscription found for dispute.'
 
     webhook_log.save(
         update_fields=[

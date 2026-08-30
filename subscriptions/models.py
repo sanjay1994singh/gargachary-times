@@ -29,7 +29,13 @@ DURATION_TYPES = (
 
 PAYMENT_STATUS = (
 
+    ('CREATED', 'Created'),
+
     ('PENDING', 'Pending'),
+
+    ('AUTHORIZED', 'Authorized'),
+
+    ('CAPTURED', 'Captured'),
 
     ('SUCCESS', 'Success'),
 
@@ -46,6 +52,14 @@ DELIVERY_STATUS = (
     ('PROCESSING', 'Processing'),
     ('SHIPPED', 'Shipped'),
     ('DELIVERED', 'Delivered'),
+    ('CANCELLED', 'Cancelled'),
+)
+
+
+ACCESS_STATUS = (
+    ('PENDING', 'Pending'),
+    ('ACTIVE', 'Active'),
+    ('EXPIRED', 'Expired'),
     ('CANCELLED', 'Cancelled'),
 )
 
@@ -179,6 +193,12 @@ class UserSubscription(models.Model):
         default=False
     )
 
+    access_status = models.CharField(
+        max_length=20,
+        choices=ACCESS_STATUS,
+        default='PENDING'
+    )
+
     start_date = models.DateTimeField(
         default=timezone.now
     )
@@ -196,6 +216,20 @@ class UserSubscription(models.Model):
     captured_at = models.DateTimeField(
         blank=True,
         null=True
+    )
+
+    activated_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    delivered_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    admin_notes = models.TextField(
+        blank=True
     )
 
     created_at = models.DateTimeField(
@@ -314,6 +348,17 @@ class Invoice(models.Model):
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2
+    )
+
+    tax_amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
+    )
+
+    invoice_file = models.FileField(
+        upload_to='invoices/',
+        blank=True
     )
 
     delivery_status = models.CharField(
@@ -447,6 +492,16 @@ class RefundRecord(models.Model):
         blank=True
     )
 
+    requested_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    processed_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
     gateway_response = models.JSONField(
         default=dict,
         blank=True
@@ -512,6 +567,11 @@ class DisputeEvidence(models.Model):
         null=True
     )
 
+    notice_received_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
     billing_proof = models.TextField(
         blank=True,
         help_text='Invoice, receipt, order confirmation or payment proof.'
@@ -544,6 +604,11 @@ class DisputeEvidence(models.Model):
     evidence_submitted_at = models.DateTimeField(
         blank=True,
         null=True
+    )
+
+    final_result = models.CharField(
+        max_length=100,
+        blank=True
     )
 
     created_at = models.DateTimeField(

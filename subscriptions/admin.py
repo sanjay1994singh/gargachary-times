@@ -39,9 +39,12 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'payment_method',
         'payment_status',
         'is_active',
+        'access_status',
         'invoice_number',
         'delivery_status',
         'paid_at',
+        'activated_at',
+        'delivered_at',
         'start_date',
         'end_date'
     )
@@ -49,6 +52,7 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
     list_filter = (
         'payment_status',
         'is_active',
+        'access_status',
         'plan',
         'reporter_mobile',
         'payment_method',
@@ -120,6 +124,7 @@ class InvoiceAdmin(admin.ModelAdmin):
         'billing_email',
         'billing_mobile',
         'amount',
+        'tax_amount',
         'delivery_status',
         'service_confirmed_at',
         'customer_notified_at',
@@ -149,6 +154,8 @@ class InvoiceAdmin(admin.ModelAdmin):
         'invoice_number',
         'subscription',
         'amount',
+        'tax_amount',
+        'invoice_file',
         'billing_name',
         'billing_email',
         'billing_mobile',
@@ -234,12 +241,16 @@ class RefundRecordAdmin(admin.ModelAdmin):
         'subscription',
         'amount',
         'status',
+        'requested_at',
+        'processed_at',
         'customer_notified_at',
         'created_at'
     )
 
     list_filter = (
         'status',
+        'requested_at',
+        'processed_at',
         'created_at',
         'customer_notified_at'
     )
@@ -266,15 +277,19 @@ class DisputeEvidenceAdmin(admin.ModelAdmin):
         'subscription',
         'amount',
         'status',
+        'notice_received_at',
         'response_due_at',
         'evidence_submitted_at',
+        'final_result',
         'created_at'
     )
 
     list_filter = (
         'status',
+        'notice_received_at',
         'response_due_at',
         'evidence_submitted_at',
+        'final_result',
         'created_at'
     )
 
