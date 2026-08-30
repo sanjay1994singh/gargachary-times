@@ -217,6 +217,36 @@ class RazorpaySubscriptionTests(TestCase):
         self.assertContains(response, 'Print / Save PDF')
         self.assertContains(response, invoice.invoice_number)
 
+    def test_my_subscription_backfills_missing_paid_invoice(self):
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_missing_invoice',
+            razorpay_order_id='order_missing_invoice',
+            razorpay_payment_id='pay_missing_invoice',
+            payment_status='SUCCESS',
+            access_status='ACTIVE',
+            is_active=True,
+            start_date=timezone.now(),
+            end_date=timezone.now() + timezone.timedelta(days=30),
+        )
+        self.client.force_login(self.subscriber)
+
+        response = self.client.get(reverse('my_subscription'))
+
+        subscription.refresh_from_db()
+        self.assertTrue(hasattr(subscription, 'invoice'))
+        self.assertContains(response, subscription.invoice.invoice_number)
+        self.assertContains(response, reverse(
+            'invoice_detail',
+            args=[subscription.invoice.invoice_number],
+        ))
+        self.assertContains(response, reverse(
+            'invoice_pdf',
+            args=[subscription.invoice.invoice_number],
+        ))
+
     def test_subscription_epaper_view_redirects_to_reader(self):
         UserSubscription.objects.create(
             user=self.subscriber,

@@ -32,6 +32,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.db.models import Q
 from django.core.mail import EmailMultiAlternatives
+from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
 
@@ -67,6 +68,19 @@ def unique_subscriptions_by_plan(subscriptions):
         seen_plan_ids.add(subscription.plan_id)
 
     return unique_subscriptions
+
+
+def ensure_paid_subscription_invoices(subscriptions):
+    for subscription in subscriptions:
+        if subscription.payment_status not in ('SUCCESS', 'CAPTURED'):
+            continue
+
+        try:
+            subscription.invoice
+        except ObjectDoesNotExist:
+            subscription.invoice = get_or_create_invoice(subscription)
+
+    return subscriptions
 
 
 # SUBSCRIPTION PLANS PAGE
@@ -2065,6 +2079,9 @@ def profile(request):
 
     )
 
+    if subscription:
+        ensure_paid_subscription_invoices([subscription])
+
     subscriptions = (
         UserSubscription.objects
         .select_related('plan', 'invoice')
@@ -2072,6 +2089,7 @@ def profile(request):
         .order_by('-created_at')
     )
     subscriptions = unique_subscriptions_by_plan(subscriptions)
+    subscriptions = ensure_paid_subscription_invoices(subscriptions)
 
     context = {
 
@@ -2106,6 +2124,7 @@ def my_subscription(request):
 
     )
     subscriptions = unique_subscriptions_by_plan(subscriptions)
+    subscriptions = ensure_paid_subscription_invoices(subscriptions)
 
     context = {
 
