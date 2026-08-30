@@ -308,7 +308,7 @@ Videos | Gargachary Times
                 });
 
                 var iframe = document.createElement('iframe');
-                iframe.src = embedUrl + '?autoplay=1&controls=1&rel=0';
+                iframe.src = embedUrl + '?autoplay=1&mute=1&playsinline=1&controls=1&rel=0';
                 iframe.title = title;
                 iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
                 iframe.allowFullscreen = true;
@@ -317,6 +317,10 @@ Videos | Gargachary Times
 
                 card.classList.add('is-playing');
                 thumbLink.style.display = 'none';
+                media.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
             });
         });
 
