@@ -3,6 +3,27 @@ from .models import *
 from .views import send_delivery_status_email
 
 
+class ProtectSuccessfulPaymentDeleteMixin:
+    def has_delete_permission(self, request, obj=None):
+        if obj and self.is_successful_payment_related(obj):
+            return False
+
+        return super().has_delete_permission(request, obj)
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        actions.pop('delete_selected', None)
+        return actions
+
+    def is_successful_payment_related(self, obj):
+        subscription = getattr(obj, 'subscription', obj)
+
+        if not isinstance(subscription, UserSubscription):
+            return False
+
+        return subscription_is_successful(subscription)
+
+
 @admin.register(SubscriptionPlan)
 class SubscriptionPlanAdmin(admin.ModelAdmin):
     list_display = (
@@ -26,7 +47,7 @@ class SubscriptionPlanAdmin(admin.ModelAdmin):
 
 
 @admin.register(UserSubscription)
-class UserSubscriptionAdmin(admin.ModelAdmin):
+class UserSubscriptionAdmin(ProtectSuccessfulPaymentDeleteMixin, admin.ModelAdmin):
     list_display = (
         'user',
         'user_email',
@@ -116,7 +137,7 @@ class EPaperAdmin(admin.ModelAdmin):
 
 
 @admin.register(Invoice)
-class InvoiceAdmin(admin.ModelAdmin):
+class InvoiceAdmin(ProtectSuccessfulPaymentDeleteMixin, admin.ModelAdmin):
     list_display = (
         'invoice_number',
         'subscription',
@@ -195,7 +216,7 @@ class InvoiceAdmin(admin.ModelAdmin):
 
 
 @admin.register(PaymentWebhookLog)
-class PaymentWebhookLogAdmin(admin.ModelAdmin):
+class PaymentWebhookLogAdmin(ProtectSuccessfulPaymentDeleteMixin, admin.ModelAdmin):
     list_display = (
         'event_name',
         'razorpay_order_id',
@@ -235,7 +256,7 @@ class PaymentWebhookLogAdmin(admin.ModelAdmin):
 
 
 @admin.register(RefundRecord)
-class RefundRecordAdmin(admin.ModelAdmin):
+class RefundRecordAdmin(ProtectSuccessfulPaymentDeleteMixin, admin.ModelAdmin):
     list_display = (
         'razorpay_refund_id',
         'subscription',
@@ -271,7 +292,7 @@ class RefundRecordAdmin(admin.ModelAdmin):
 
 
 @admin.register(DisputeEvidence)
-class DisputeEvidenceAdmin(admin.ModelAdmin):
+class DisputeEvidenceAdmin(ProtectSuccessfulPaymentDeleteMixin, admin.ModelAdmin):
     list_display = (
         'razorpay_dispute_id',
         'subscription',

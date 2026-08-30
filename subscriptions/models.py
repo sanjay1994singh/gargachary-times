@@ -1,5 +1,8 @@
 from django.db import models
+from django.db.models.deletion import ProtectedError
+from django.db.models.signals import pre_delete
 from django.conf import settings
+from django.dispatch import receiver
 from django.utils import timezone
 
 from dateutil.relativedelta import relativedelta
@@ -62,6 +65,29 @@ ACCESS_STATUS = (
     ('EXPIRED', 'Expired'),
     ('CANCELLED', 'Cancelled'),
 )
+
+
+SUCCESSFUL_PAYMENT_STATUSES = (
+    'SUCCESS',
+    'CAPTURED',
+)
+
+
+def subscription_is_successful(subscription):
+    return (
+        subscription.payment_status in SUCCESSFUL_PAYMENT_STATUSES or
+        bool(subscription.paid_at)
+    )
+
+
+def user_has_successful_subscription(user):
+    return UserSubscription.objects.filter(
+        user=user,
+        payment_status__in=SUCCESSFUL_PAYMENT_STATUSES
+    ).exists() or UserSubscription.objects.filter(
+        user=user,
+        paid_at__isnull=False
+    ).exists()
 
 
 class SubscriptionPlan(models.Model):
@@ -702,3 +728,57 @@ class EPaper(models.Model):
     def __str__(self):
 
         return self.title
+
+
+@receiver(pre_delete, sender=settings.AUTH_USER_MODEL)
+def protect_paid_subscription_user(sender, instance, **kwargs):
+    if user_has_successful_subscription(instance):
+        raise ProtectedError(
+            'Payment successful subscriber cannot be deleted.',
+            [instance]
+        )
+
+
+@receiver(pre_delete, sender=UserSubscription)
+def protect_successful_subscription(sender, instance, **kwargs):
+    if subscription_is_successful(instance):
+        raise ProtectedError(
+            'Successful payment subscription cannot be deleted.',
+            [instance]
+        )
+
+
+@receiver(pre_delete, sender=Invoice)
+def protect_successful_subscription_invoice(sender, instance, **kwargs):
+    if subscription_is_successful(instance.subscription):
+        raise ProtectedError(
+            'Invoice for successful payment subscription cannot be deleted.',
+            [instance]
+        )
+
+
+@receiver(pre_delete, sender=PaymentWebhookLog)
+def protect_successful_subscription_webhook_log(sender, instance, **kwargs):
+    if instance.subscription and subscription_is_successful(instance.subscription):
+        raise ProtectedError(
+            'Payment log for successful payment subscription cannot be deleted.',
+            [instance]
+        )
+
+
+@receiver(pre_delete, sender=RefundRecord)
+def protect_successful_subscription_refund(sender, instance, **kwargs):
+    if subscription_is_successful(instance.subscription):
+        raise ProtectedError(
+            'Refund record for successful payment subscription cannot be deleted.',
+            [instance]
+        )
+
+
+@receiver(pre_delete, sender=DisputeEvidence)
+def protect_successful_subscription_dispute(sender, instance, **kwargs):
+    if subscription_is_successful(instance.subscription):
+        raise ProtectedError(
+            'Dispute evidence for successful payment subscription cannot be deleted.',
+            [instance]
+        )

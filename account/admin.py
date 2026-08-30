@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Country, State, User
-from subscriptions.models import UserSubscription
+from subscriptions.models import UserSubscription, user_has_successful_subscription
 
 
 class UserSubscriptionInline(admin.TabularInline):
@@ -40,6 +40,17 @@ class UserAdmin(admin.ModelAdmin):
     inlines = (
         UserSubscriptionInline,
     )
+
+    def has_delete_permission(self, request, obj=None):
+        if obj and user_has_successful_subscription(obj):
+            return False
+
+        return super().has_delete_permission(request, obj)
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        actions.pop('delete_selected', None)
+        return actions
 
 
 admin.site.register(User, UserAdmin)

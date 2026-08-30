@@ -4,6 +4,8 @@ import hmac
 import json
 from unittest.mock import Mock, patch
 
+from django.db import transaction
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -158,6 +160,46 @@ class RazorpaySubscriptionTests(TestCase):
                 payment_status='PENDING',
             ).exists()
         )
+
+    def test_successful_payment_user_related_records_are_protected_from_delete(self):
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_protected_success',
+            payment_status='SUCCESS',
+            is_active=True,
+            paid_at=timezone.now(),
+        )
+        invoice = Invoice.objects.create(
+            subscription=subscription,
+            invoice_number='GT-PROTECTED-001',
+            billing_name='Protected Subscriber',
+            billing_email='protected@example.com',
+            billing_mobile='9000000001',
+            billing_address='Protected Address',
+            billing_city='Mathura',
+            billing_state='Uttar Pradesh',
+            billing_pincode='281001',
+            billing_country='India',
+            amount=self.plan.price,
+        )
+
+        with self.assertRaises(ProtectedError):
+            self.subscriber.delete()
+        transaction.set_rollback(False)
+
+        with self.assertRaises(ProtectedError):
+            subscription.delete()
+        transaction.set_rollback(False)
+
+        with self.assertRaises(ProtectedError):
+            invoice.delete()
+        transaction.set_rollback(False)
+
+        self.assertTrue(User.objects.filter(id=self.subscriber.id).exists())
+        self.assertTrue(UserSubscription.objects.filter(id=subscription.id).exists())
+        self.assertTrue(Invoice.objects.filter(id=invoice.id).exists())
 
     def test_different_plan_clears_selected_subscriber_checkout_session(self):
         self.client.force_login(self.reporter)
