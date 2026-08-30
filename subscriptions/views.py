@@ -1466,6 +1466,52 @@ def reporter_send_subscriber_invoice(request, subscription_id):
 
 
 @login_required
+def reporter_download_subscriber_invoice(request, subscription_id):
+    if not is_reporter_user(request.user):
+        messages.error(
+            request,
+            'Only reporter accounts can download subscriber invoices.'
+        )
+        return redirect('profile')
+
+    reporter_mobile = get_mobile_last10(request.user.mobile)
+
+    if not reporter_mobile:
+        messages.error(
+            request,
+            'Reporter mobile number is missing on your account.'
+        )
+        return redirect('profile')
+
+    subscription = get_object_or_404(
+        UserSubscription.objects.select_related('user', 'plan'),
+        id=subscription_id,
+        payment_status='SUCCESS'
+    )
+
+    if get_mobile_last10(subscription.reporter_mobile) != reporter_mobile:
+        messages.error(
+            request,
+            'This subscriber is not linked with your reporter account.'
+        )
+        return redirect('reporter_success_subscribers')
+
+    invoice = get_or_create_invoice(subscription)
+    response = render(
+        request,
+        'subscriptions/invoice_pdf.html',
+        {
+            'invoice': invoice,
+            'gst_breakup': calculate_inclusive_gst(invoice.amount),
+        }
+    )
+    response['Content-Disposition'] = (
+        f'attachment; filename="{invoice.invoice_number}.html"'
+    )
+    return response
+
+
+@login_required
 @require_POST
 def reporter_generate_subscriber_payment(request, user_id):
     if not is_reporter_user(request.user):

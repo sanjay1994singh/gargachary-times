@@ -225,6 +225,31 @@ class RazorpaySubscriptionTests(TestCase):
         invoice.refresh_from_db()
         self.assertIsNotNone(invoice.customer_notified_at)
 
+    def test_reporter_can_download_success_subscriber_invoice(self):
+        self.client.force_login(self.reporter)
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_reporter_invoice_download',
+            payment_status='SUCCESS',
+            reporter_mobile=self.reporter.mobile,
+            is_active=True,
+            paid_at=timezone.now(),
+        )
+
+        response = self.client.get(
+            reverse('reporter_download_subscriber_invoice', args=[subscription.id])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        invoice = Invoice.objects.get(subscription=subscription)
+        self.assertEqual(
+            response['Content-Disposition'],
+            f'attachment; filename="{invoice.invoice_number}.html"'
+        )
+        self.assertContains(response, invoice.invoice_number)
+
     def test_different_plan_clears_selected_subscriber_checkout_session(self):
         self.client.force_login(self.reporter)
         session = self.client.session
