@@ -244,11 +244,12 @@ class RazorpaySubscriptionTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         invoice = Invoice.objects.get(subscription=subscription)
+        self.assertEqual(response['Content-Type'], 'application/pdf')
         self.assertEqual(
             response['Content-Disposition'],
-            f'attachment; filename="{invoice.invoice_number}.html"'
+            f'attachment; filename="{invoice.invoice_number}.pdf"'
         )
-        self.assertContains(response, invoice.invoice_number)
+        self.assertTrue(response.content.startswith(b'%PDF'))
 
     def test_success_subscribers_send_invoice_button_requires_email(self):
         self.client.force_login(self.reporter)
@@ -392,10 +393,12 @@ class RazorpaySubscriptionTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Print / Save PDF')
-        self.assertContains(response, invoice.invoice_number)
-        self.assertContains(response, 'GST @ 5.00%')
-        self.assertContains(response, 'Rs. 4.71')
+        self.assertEqual(response['Content-Type'], 'application/pdf')
+        self.assertEqual(
+            response['Content-Disposition'],
+            f'inline; filename="{invoice.invoice_number}.pdf"'
+        )
+        self.assertTrue(response.content.startswith(b'%PDF'))
 
     def test_my_subscription_backfills_missing_paid_invoice(self):
         subscription = UserSubscription.objects.create(

@@ -3,6 +3,7 @@ import json
 import base64
 import hashlib
 import hmac
+import html
 import requests
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
@@ -36,6 +37,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string
 from django.views.decorators.http import require_POST
+import fitz
 
 from account.models import State, User
 from account.views import (
@@ -818,6 +820,129 @@ def send_delivery_status_email(invoice):
     email.send(fail_silently=True)
 
 
+def format_invoice_value(value, default='-'):
+    if value is None or value == '':
+        return default
+
+    return str(value)
+
+
+def build_invoice_pdf_bytes(invoice):
+    gst_breakup = calculate_inclusive_gst(invoice.amount)
+    subscription = invoice.subscription
+    plan = subscription.plan
+    order_id = subscription.razorpay_order_id or subscription.transaction_id
+    rows = [
+        ('Invoice No', invoice.invoice_number),
+        ('Date', invoice.created_at.strftime('%d %b %Y')),
+        ('Status', subscription.payment_status),
+        ('Order ID', order_id),
+        ('Payment ID', subscription.razorpay_payment_id),
+        ('Delivery', invoice.get_delivery_status_display()),
+    ]
+    bill_to = [
+        invoice.billing_name,
+        invoice.billing_email,
+        invoice.billing_mobile,
+        invoice.billing_address,
+        f'{invoice.billing_city}, {invoice.billing_state} {invoice.billing_pincode}',
+        invoice.billing_country,
+    ]
+    escaped_rows = ''.join(
+        f'<tr><th>{html.escape(label)}</th><td>{html.escape(format_invoice_value(value))}</td></tr>'
+        for label, value in rows
+    )
+    escaped_bill_to = ''.join(
+        f'<p>{html.escape(format_invoice_value(value))}</p>'
+        for value in bill_to
+    )
+    delivery_note = ''
+
+    if invoice.delivery_note:
+        delivery_note = (
+            '<p class="note"><strong>Delivery Note:</strong> '
+            f'{html.escape(invoice.delivery_note)}</p>'
+        )
+
+    invoice_html = f"""
+    <style>
+        body {{ font-family: sans-serif; color: #111827; }}
+        h1 {{ margin: 0 0 4px; font-size: 34px; }}
+        h2 {{ margin: 0 0 8px; font-size: 22px; color: #b91c1c; }}
+        h3 {{ margin: 28px 0 10px; font-size: 16px; }}
+        p {{ margin: 0 0 5px; font-size: 12px; }}
+        table {{ border-collapse: collapse; width: 100%; margin-top: 16px; }}
+        th, td {{ border: 1px solid #d1d5db; padding: 8px; font-size: 11px; }}
+        th {{ background: #f3f4f6; text-align: left; }}
+        .header {{ display: flex; justify-content: space-between; margin-bottom: 22px; }}
+        .muted {{ color: #6b7280; }}
+        .box {{ border: 1px solid #d1d5db; padding: 12px; margin-top: 12px; }}
+        .right {{ text-align: right; }}
+        .note {{ margin-top: 18px; }}
+    </style>
+    <div class="header">
+        <div>
+            <h1>Invoice</h1>
+            <p class="muted">{html.escape(invoice.invoice_number)}</p>
+        </div>
+        <div class="right">
+            <h2>Gargachary Times</h2>
+            <p>Mathura, Uttar Pradesh, India</p>
+        </div>
+    </div>
+    <div class="box">
+        <h3>Bill To</h3>
+        {escaped_bill_to}
+    </div>
+    <table>{escaped_rows}</table>
+    <table>
+        <thead>
+            <tr>
+                <th>Plan</th>
+                <th>Duration</th>
+                <th>Taxable Amount</th>
+                <th>GST @ {gst_breakup['gst_rate']}%</th>
+                <th>Total Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{html.escape(plan.name)}</td>
+                <td>{plan.duration} {html.escape(plan.duration_type)}</td>
+                <td>Rs. {gst_breakup['taxable_amount']}</td>
+                <td>Rs. {gst_breakup['tax_amount']}</td>
+                <td>Rs. {gst_breakup['total_amount']}</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="4">Total Including GST</th>
+                <th>Rs. {gst_breakup['total_amount']}</th>
+            </tr>
+        </tfoot>
+    </table>
+    {delivery_note}
+    """
+    doc = fitz.open()
+    page = doc.new_page(width=595, height=842)
+    page.insert_htmlbox(fitz.Rect(36, 36, 559, 806), invoice_html)
+    pdf_bytes = doc.tobytes(garbage=4, deflate=True)
+    doc.close()
+    return pdf_bytes
+
+
+def invoice_pdf_response(invoice, as_attachment=False):
+    response = HttpResponse(
+        build_invoice_pdf_bytes(invoice),
+        content_type='application/pdf'
+    )
+    disposition = 'attachment' if as_attachment else 'inline'
+    response['Content-Disposition'] = (
+        f'{disposition}; filename="{invoice.invoice_number}.pdf"'
+    )
+    return response
+
+
 def send_account_updated_email(user):
     if not user.email:
         return
@@ -1497,18 +1622,7 @@ def reporter_download_subscriber_invoice(request, subscription_id):
         return redirect('reporter_success_subscribers')
 
     invoice = get_or_create_invoice(subscription)
-    response = render(
-        request,
-        'subscriptions/invoice_pdf.html',
-        {
-            'invoice': invoice,
-            'gst_breakup': calculate_inclusive_gst(invoice.amount),
-        }
-    )
-    response['Content-Disposition'] = (
-        f'attachment; filename="{invoice.invoice_number}.html"'
-    )
-    return response
+    return invoice_pdf_response(invoice, as_attachment=True)
 
 
 @login_required
@@ -2139,18 +2253,7 @@ def invoice_pdf(request, invoice_number):
         invoice_number=invoice_number,
         subscription__user=request.user
     )
-    response = render(
-        request,
-        'subscriptions/invoice_pdf.html',
-        {
-            'invoice': invoice,
-            'gst_breakup': calculate_inclusive_gst(invoice.amount),
-        }
-    )
-    response['Content-Disposition'] = (
-        f'inline; filename="{invoice.invoice_number}.html"'
-    )
-    return response
+    return invoice_pdf_response(invoice)
 
 
 # USER PROFILE PAGE
