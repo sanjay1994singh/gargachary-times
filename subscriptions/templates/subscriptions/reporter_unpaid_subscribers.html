@@ -33,6 +33,7 @@
                         <i class="fa-solid fa-eye"></i> Detail
                     </a>
                     {% if active_menu == 'reporter_success_subscribers' and subscriber.latest_reporter_subscription.payment_status == 'SUCCESS' %}
+                    {% if subscriber.email %}
                     <form method="post"
                           action="{% url 'reporter_send_subscriber_invoice' subscriber.latest_reporter_subscription.id %}"
                           class="d-inline">
@@ -41,6 +42,7 @@
                             <i class="fa-solid fa-envelope"></i> Send Invoice
                         </button>
                     </form>
+                    {% endif %}
                     <a class="btn btn-sm btn-danger"
                        href="{% url 'reporter_download_subscriber_invoice' subscriber.latest_reporter_subscription.id %}">
                         <i class="fa-solid fa-download"></i> Download Invoice

@@ -250,6 +250,32 @@ class RazorpaySubscriptionTests(TestCase):
         )
         self.assertContains(response, invoice.invoice_number)
 
+    def test_success_subscribers_send_invoice_button_requires_email(self):
+        self.client.force_login(self.reporter)
+        UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_reporter_invoice_button',
+            payment_status='SUCCESS',
+            reporter_mobile=self.reporter.mobile,
+            is_active=True,
+            paid_at=timezone.now(),
+        )
+
+        response = self.client.get(reverse('reporter_success_subscribers'))
+
+        self.assertContains(response, 'Send Invoice')
+        self.assertContains(response, 'Download Invoice')
+
+        self.subscriber.email = ''
+        self.subscriber.save(update_fields=['email'])
+
+        response = self.client.get(reverse('reporter_success_subscribers'))
+
+        self.assertNotContains(response, 'Send Invoice')
+        self.assertContains(response, 'Download Invoice')
+
     def test_different_plan_clears_selected_subscriber_checkout_session(self):
         self.client.force_login(self.reporter)
         session = self.client.session
