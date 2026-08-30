@@ -36,6 +36,17 @@ class LoginWhitespaceTests(TestCase):
 
         self.assertRedirects(response, reverse('profile'))
 
+    def test_login_ignores_outer_spaces_in_password(self):
+        response = self.client.post(
+            reverse('login'),
+            {
+                'username': '9876543210',
+                'password': ' secret123 ',
+            }
+        )
+
+        self.assertRedirects(response, reverse('profile'))
+
     def test_text_fields_are_trimmed_before_save(self):
         user = User.objects.create_user(
             username='  trimmed-user  ',

@@ -201,6 +201,30 @@ class RazorpaySubscriptionTests(TestCase):
         self.assertTrue(UserSubscription.objects.filter(id=subscription.id).exists())
         self.assertTrue(Invoice.objects.filter(id=invoice.id).exists())
 
+    @patch('subscriptions.views.send_subscription_success_email')
+    def test_reporter_can_send_success_subscriber_invoice(self, mocked_email):
+        self.client.force_login(self.reporter)
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_reporter_invoice',
+            payment_status='SUCCESS',
+            reporter_mobile=self.reporter.mobile,
+            is_active=True,
+            paid_at=timezone.now(),
+        )
+
+        response = self.client.post(
+            reverse('reporter_send_subscriber_invoice', args=[subscription.id])
+        )
+
+        self.assertRedirects(response, reverse('reporter_success_subscribers'))
+        invoice = Invoice.objects.get(subscription=subscription)
+        mocked_email.assert_called_once_with(subscription, invoice)
+        invoice.refresh_from_db()
+        self.assertIsNotNone(invoice.customer_notified_at)
+
     def test_different_plan_clears_selected_subscriber_checkout_session(self):
         self.client.force_login(self.reporter)
         session = self.client.session

@@ -242,6 +242,7 @@ def login_view(request):
         password = request.POST.get(
             'password'
         )
+        password = (password or '').strip()
         mobile_login = normalize_mobile_login(username_input)
 
         user_obj = User.objects.filter(

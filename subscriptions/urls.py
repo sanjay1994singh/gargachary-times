@@ -47,6 +47,12 @@ urlpatterns = [
     ),
 
     path(
+        'reporter/subscriptions/<int:subscription_id>/send-invoice/',
+        views.reporter_send_subscriber_invoice,
+        name='reporter_send_subscriber_invoice'
+    ),
+
+    path(
         'payment/<int:plan_id>/',
         views.phonepe_payment,
         name='phonepe_payment'

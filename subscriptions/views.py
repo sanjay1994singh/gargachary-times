@@ -1416,6 +1416,57 @@ def reporter_unpaid_subscriber_detail(request, user_id):
 
 @login_required
 @require_POST
+def reporter_send_subscriber_invoice(request, subscription_id):
+    if not is_reporter_user(request.user):
+        messages.error(
+            request,
+            'Only reporter accounts can send subscriber invoices.'
+        )
+        return redirect('profile')
+
+    reporter_mobile = get_mobile_last10(request.user.mobile)
+
+    if not reporter_mobile:
+        messages.error(
+            request,
+            'Reporter mobile number is missing on your account.'
+        )
+        return redirect('profile')
+
+    subscription = get_object_or_404(
+        UserSubscription.objects.select_related('user', 'plan'),
+        id=subscription_id,
+        payment_status='SUCCESS'
+    )
+
+    if get_mobile_last10(subscription.reporter_mobile) != reporter_mobile:
+        messages.error(
+            request,
+            'This subscriber is not linked with your reporter account.'
+        )
+        return redirect('reporter_success_subscribers')
+
+    if not subscription.user.email:
+        messages.error(
+            request,
+            'Subscriber email missing hai, invoice email nahi bheja ja saka.'
+        )
+        return redirect('reporter_success_subscribers')
+
+    invoice = get_or_create_invoice(subscription)
+    send_subscription_success_email(subscription, invoice)
+    invoice.customer_notified_at = timezone.now()
+    invoice.save(update_fields=['customer_notified_at', 'updated_at'])
+
+    messages.success(
+        request,
+        f'Invoice {invoice.invoice_number} subscriber ko email kar diya gaya.'
+    )
+    return redirect('reporter_success_subscribers')
+
+
+@login_required
+@require_POST
 def reporter_generate_subscriber_payment(request, user_id):
     if not is_reporter_user(request.user):
         messages.error(
