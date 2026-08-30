@@ -634,6 +634,13 @@ Subscribe {{ plan.name }} | Gargachary Times
                                     Generate payment link
                                 </button>
                             </div>
+                            <p class="text-muted small mt-3 mb-0">
+                                By continuing, the subscriber agrees to the
+                                <a href="{% url 'terms_conditions' %}" target="_blank" rel="noopener">Terms & Conditions</a>
+                                and
+                                <a href="{% url 'refund_policy' %}" target="_blank" rel="noopener">Refund & Cancellation Policy</a>.
+                                Payment confirmation, invoice and service activation details are saved for support and dispute proof.
+                            </p>
                         </form>
 
                         <div id="razorpay-payment-error" class="alert alert-danger mt-3 d-none" role="alert"></div>

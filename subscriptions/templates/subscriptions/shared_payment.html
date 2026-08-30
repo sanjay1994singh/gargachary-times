@@ -40,6 +40,14 @@ Pay Subscription | Gargachary Times
                             </button>
                         </form>
 
+                        <p class="text-muted small mt-3 mb-0">
+                            By paying, you agree to the
+                            <a href="{% url 'terms_conditions' %}" target="_blank" rel="noopener">Terms & Conditions</a>
+                            and
+                            <a href="{% url 'refund_policy' %}" target="_blank" rel="noopener">Refund & Cancellation Policy</a>.
+                            Payment confirmation, invoice and service activation details are saved for support and dispute proof.
+                        </p>
+
                         <div id="shared-payment-error" class="alert alert-danger mt-3 d-none" role="alert"></div>
                     </div>
                 </div>

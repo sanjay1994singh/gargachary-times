@@ -25,6 +25,25 @@
 
         </p>
 
+        {% if subscription %}
+        <div class="border rounded text-start p-3 mt-4 mx-auto" style="max-width:520px;">
+            <p class="mb-2"><strong>Plan:</strong> {{ subscription.plan.name }}</p>
+            <p class="mb-2"><strong>Amount:</strong> Rs. {{ subscription.amount }}</p>
+            <p class="mb-2"><strong>Order ID:</strong> {{ subscription.razorpay_order_id|default:subscription.transaction_id }}</p>
+            {% if subscription.razorpay_payment_id %}
+            <p class="mb-2"><strong>Payment ID:</strong> {{ subscription.razorpay_payment_id }}</p>
+            {% endif %}
+            {% if invoice %}
+            <p class="mb-0">
+                <strong>Invoice:</strong>
+                <a href="{% url 'invoice_detail' invoice.invoice_number %}">
+                    {{ invoice.invoice_number }}
+                </a>
+            </p>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <a href="/"
            class="btn btn-success btn-lg rounded-pill px-5 mt-4">
 

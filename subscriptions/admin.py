@@ -34,10 +34,14 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'reporter_mobile_display',
         'plan',
         'amount',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'payment_method',
         'payment_status',
         'is_active',
         'invoice_number',
         'delivery_status',
+        'paid_at',
         'start_date',
         'end_date'
     )
@@ -47,6 +51,7 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'is_active',
         'plan',
         'reporter_mobile',
+        'payment_method',
         'invoice__delivery_status'
     )
 
@@ -56,11 +61,16 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
         'user__mobile',
         'reporter_mobile',
         'invoice__invoice_number',
-        'transaction_id'
+        'transaction_id',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'razorpay_receipt'
     )
 
     readonly_fields = (
         'created_at',
+        'updated_at',
+        'gateway_response',
     )
 
     def user_email(self, obj):
@@ -111,13 +121,17 @@ class InvoiceAdmin(admin.ModelAdmin):
         'billing_mobile',
         'amount',
         'delivery_status',
+        'service_confirmed_at',
+        'customer_notified_at',
         'created_at'
     )
 
     list_filter = (
         'delivery_status',
         'subscription__payment_status',
-        'created_at'
+        'created_at',
+        'service_confirmed_at',
+        'customer_notified_at'
     )
 
     search_fields = (
@@ -143,6 +157,8 @@ class InvoiceAdmin(admin.ModelAdmin):
         'billing_state',
         'billing_pincode',
         'billing_country',
+        'service_confirmed_at',
+        'customer_notified_at',
         'created_at'
     )
 
@@ -168,4 +184,110 @@ class InvoiceAdmin(admin.ModelAdmin):
 
     send_delivery_update_email.short_description = (
         'Send delivery status email to selected users'
+    )
+
+
+@admin.register(PaymentWebhookLog)
+class PaymentWebhookLogAdmin(admin.ModelAdmin):
+    list_display = (
+        'event_name',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'subscription',
+        'processed',
+        'created_at'
+    )
+
+    list_filter = (
+        'event_name',
+        'processed',
+        'created_at'
+    )
+
+    search_fields = (
+        'event_id',
+        'event_name',
+        'razorpay_order_id',
+        'razorpay_payment_id',
+        'subscription__user__email',
+        'subscription__user__mobile'
+    )
+
+    readonly_fields = (
+        'event_id',
+        'event_name',
+        'razorpay_payment_id',
+        'razorpay_order_id',
+        'subscription',
+        'signature',
+        'payload',
+        'processed',
+        'processing_note',
+        'created_at'
+    )
+
+
+@admin.register(RefundRecord)
+class RefundRecordAdmin(admin.ModelAdmin):
+    list_display = (
+        'razorpay_refund_id',
+        'subscription',
+        'amount',
+        'status',
+        'customer_notified_at',
+        'created_at'
+    )
+
+    list_filter = (
+        'status',
+        'created_at',
+        'customer_notified_at'
+    )
+
+    search_fields = (
+        'razorpay_refund_id',
+        'subscription__razorpay_payment_id',
+        'subscription__transaction_id',
+        'subscription__user__email',
+        'subscription__user__mobile'
+    )
+
+    readonly_fields = (
+        'gateway_response',
+        'created_at',
+        'updated_at'
+    )
+
+
+@admin.register(DisputeEvidence)
+class DisputeEvidenceAdmin(admin.ModelAdmin):
+    list_display = (
+        'razorpay_dispute_id',
+        'subscription',
+        'amount',
+        'status',
+        'response_due_at',
+        'evidence_submitted_at',
+        'created_at'
+    )
+
+    list_filter = (
+        'status',
+        'response_due_at',
+        'evidence_submitted_at',
+        'created_at'
+    )
+
+    search_fields = (
+        'razorpay_dispute_id',
+        'subscription__razorpay_payment_id',
+        'subscription__transaction_id',
+        'subscription__user__email',
+        'subscription__user__mobile',
+        'reason'
+    )
+
+    readonly_fields = (
+        'created_at',
+        'updated_at'
     )

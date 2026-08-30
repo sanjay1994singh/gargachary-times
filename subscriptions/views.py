@@ -4,6 +4,8 @@ import base64
 import hashlib
 import hmac
 import requests
+from datetime import datetime
+from decimal import Decimal
 
 from django.conf import settings
 from django.http import (
@@ -40,7 +42,9 @@ from account.views import (
 )
 
 from .models import (
+    PaymentWebhookLog,
     Invoice,
+    RefundRecord,
     SubscriptionPlan,
     UserSubscription,
     EPaper
@@ -487,20 +491,110 @@ def verify_razorpay_signature(message, signature, secret):
     return hmac.compare_digest(expected_signature, signature)
 
 
-def mark_subscription_success(subscription):
+def get_razorpay_datetime(timestamp):
+    if not timestamp:
+        return None
+
+    return datetime.fromtimestamp(
+        int(timestamp),
+        tz=timezone.get_current_timezone()
+    )
+
+
+def update_subscription_payment_details(
+    subscription,
+    payment_id='',
+    signature='',
+    payment_entity=None
+):
+    payment_entity = payment_entity or {}
+    update_fields = []
+
+    field_values = {
+        'razorpay_order_id': payment_entity.get('order_id') or subscription.transaction_id,
+        'razorpay_payment_id': payment_id or payment_entity.get('id') or '',
+        'razorpay_signature': signature or subscription.razorpay_signature,
+        'payment_method': payment_entity.get('method') or subscription.payment_method,
+        'currency': payment_entity.get('currency') or subscription.currency or 'INR',
+    }
+
+    created_at = get_razorpay_datetime(payment_entity.get('created_at'))
+
+    if created_at:
+        field_values['paid_at'] = created_at
+
+    if payment_entity.get('captured') or payment_entity.get('status') == 'captured':
+        field_values['captured_at'] = created_at or timezone.now()
+
+    if payment_entity:
+        field_values['gateway_response'] = payment_entity
+
+    for field, value in field_values.items():
+        if value and getattr(subscription, field) != value:
+            setattr(subscription, field, value)
+            update_fields.append(field)
+
+    if update_fields:
+        subscription.save(update_fields=update_fields)
+
+
+def mark_subscription_success(
+    subscription,
+    payment_id='',
+    signature='',
+    payment_entity=None
+):
     was_success = subscription.payment_status == 'SUCCESS'
+    update_subscription_payment_details(
+        subscription,
+        payment_id=payment_id,
+        signature=signature,
+        payment_entity=payment_entity
+    )
     subscription.payment_status = 'SUCCESS'
     subscription.is_active = True
-    subscription.save()
+    if not subscription.paid_at:
+        subscription.paid_at = timezone.now()
+    if not subscription.captured_at:
+        subscription.captured_at = subscription.paid_at
+    subscription.save(
+        update_fields=[
+            'payment_status',
+            'is_active',
+            'paid_at',
+            'captured_at',
+            'updated_at',
+        ]
+    )
 
     if subscription.user.user_type != 'subscriber':
         subscription.user.user_type = 'subscriber'
         subscription.user.save(update_fields=['user_type'])
 
     invoice = get_or_create_invoice(subscription)
+    invoice_fields = []
+
+    if not invoice.service_confirmed_at:
+        invoice.service_confirmed_at = timezone.now()
+        invoice.delivery_status = 'DELIVERED'
+        invoice.delivery_note = (
+            invoice.delivery_note or
+            'Subscription access activated after successful Razorpay payment.'
+        )
+        invoice_fields.extend([
+            'service_confirmed_at',
+            'delivery_status',
+            'delivery_note',
+        ])
 
     if not was_success:
         send_subscription_success_email(subscription, invoice)
+        invoice.customer_notified_at = timezone.now()
+        invoice_fields.append('customer_notified_at')
+
+    if invoice_fields:
+        invoice_fields = list(dict.fromkeys(invoice_fields + ['updated_at']))
+        invoice.save(update_fields=invoice_fields)
 
     (
         UserSubscription.objects
@@ -517,7 +611,7 @@ def mark_subscription_success(subscription):
 def mark_subscription_failed(subscription):
     subscription.payment_status = 'FAILED'
     subscription.is_active = False
-    subscription.save()
+    subscription.save(update_fields=['payment_status', 'is_active', 'updated_at'])
 
 
 def get_or_create_invoice(subscription):
@@ -583,6 +677,8 @@ def send_subscription_success_email(subscription, invoice):
         'invoice': invoice,
         'login_url': f'{settings.BASE_URL}/login/',
         'site_url': settings.BASE_URL,
+        'refund_policy_url': f'{settings.BASE_URL}/refund-policy/',
+        'terms_url': f'{settings.BASE_URL}/terms-and-conditions/',
     }
     subject = f'Subscription active - Invoice {invoice.invoice_number}'
     text_body = render_to_string(
@@ -751,9 +847,21 @@ def razorpay_create_order(request, plan_id):
         pending_subscription and
         pending_subscription.transaction_id.startswith('order_')
     ):
+        update_fields = []
+
         if pending_subscription.reporter_mobile != reporter_mobile:
             pending_subscription.reporter_mobile = reporter_mobile
-            pending_subscription.save(update_fields=['reporter_mobile'])
+            update_fields.append('reporter_mobile')
+
+        if not pending_subscription.razorpay_order_id:
+            pending_subscription.razorpay_order_id = (
+                pending_subscription.transaction_id
+            )
+            update_fields.append('razorpay_order_id')
+
+        if update_fields:
+            update_fields.append('updated_at')
+            pending_subscription.save(update_fields=update_fields)
 
         clear_subscription_customer_session(
             request,
@@ -829,12 +937,21 @@ def razorpay_create_order(request, plan_id):
         subscription = pending_subscription
         subscription.amount = plan.price
         subscription.transaction_id = order['id']
+        subscription.razorpay_order_id = order['id']
+        subscription.razorpay_receipt = order.get('receipt') or receipt
+        subscription.currency = order.get('currency') or 'INR'
+        subscription.gateway_response = order
         subscription.reporter_mobile = reporter_mobile
         subscription.save(
             update_fields=[
                 'amount',
                 'transaction_id',
+                'razorpay_order_id',
+                'razorpay_receipt',
+                'currency',
+                'gateway_response',
                 'reporter_mobile',
+                'updated_at',
             ]
         )
     else:
@@ -843,6 +960,10 @@ def razorpay_create_order(request, plan_id):
             plan=plan,
             amount=plan.price,
             transaction_id=order['id'],
+            razorpay_order_id=order['id'],
+            razorpay_receipt=order.get('receipt') or receipt,
+            currency=order.get('currency') or 'INR',
+            gateway_response=order,
             reporter_mobile=reporter_mobile,
             payment_status='PENDING'
         )
@@ -934,9 +1055,21 @@ def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobil
         pending_subscription and
         pending_subscription.transaction_id.startswith('order_')
     ):
+        update_fields = []
+
         if pending_subscription.reporter_mobile != reporter_mobile:
             pending_subscription.reporter_mobile = reporter_mobile
-            pending_subscription.save(update_fields=['reporter_mobile'])
+            update_fields.append('reporter_mobile')
+
+        if not pending_subscription.razorpay_order_id:
+            pending_subscription.razorpay_order_id = (
+                pending_subscription.transaction_id
+            )
+            update_fields.append('razorpay_order_id')
+
+        if update_fields:
+            update_fields.append('updated_at')
+            pending_subscription.save(update_fields=update_fields)
 
         return pending_subscription
 
@@ -973,12 +1106,21 @@ def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobil
     if pending_subscription:
         pending_subscription.amount = plan.price
         pending_subscription.transaction_id = order['id']
+        pending_subscription.razorpay_order_id = order['id']
+        pending_subscription.razorpay_receipt = order.get('receipt') or receipt
+        pending_subscription.currency = order.get('currency') or 'INR'
+        pending_subscription.gateway_response = order
         pending_subscription.reporter_mobile = reporter_mobile
         pending_subscription.save(
             update_fields=[
                 'amount',
                 'transaction_id',
+                'razorpay_order_id',
+                'razorpay_receipt',
+                'currency',
+                'gateway_response',
                 'reporter_mobile',
+                'updated_at',
             ]
         )
         return pending_subscription
@@ -988,6 +1130,10 @@ def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobil
         plan=plan,
         amount=plan.price,
         transaction_id=order['id'],
+        razorpay_order_id=order['id'],
+        razorpay_receipt=order.get('receipt') or receipt,
+        currency=order.get('currency') or 'INR',
+        gateway_response=order,
         reporter_mobile=reporter_mobile,
         payment_status='PENDING'
     )
@@ -1298,11 +1444,20 @@ def razorpay_payment_callback(request):
         signature,
         settings.RAZORPAY_KEY_SECRET
     ):
-        mark_subscription_success(subscription)
+        mark_subscription_success(
+            subscription,
+            payment_id=payment_id,
+            signature=signature
+        )
+        invoice = get_or_create_invoice(subscription)
         clear_subscription_customer_session(request, subscription.user_id)
         return render(
             request,
-            'subscriptions/payment_success.html'
+            'subscriptions/payment_success.html',
+            {
+                'subscription': subscription,
+                'invoice': invoice,
+            }
         )
 
     mark_subscription_failed(subscription)
@@ -1341,28 +1496,116 @@ def razorpay_webhook(request):
         .get('payment', {})
         .get('entity', {})
     )
+    refund = (
+        event.get('payload', {})
+        .get('refund', {})
+        .get('entity', {})
+    )
     order_id = payment.get('order_id')
     payment_id = payment.get('id')
+    subscription = None
+
+    if order_id:
+        subscription = (
+            UserSubscription.objects
+            .filter(transaction_id=order_id)
+            .first()
+        )
+
+    webhook_log = PaymentWebhookLog.objects.create(
+        event_id=event.get('id') or '',
+        event_name=event_name or '',
+        razorpay_payment_id=payment_id or refund.get('payment_id') or '',
+        razorpay_order_id=order_id or '',
+        subscription=subscription,
+        signature=signature or '',
+        payload=event
+    )
 
     if event_name in ('payment.captured', 'order.paid') and order_id:
-        subscription = (
-            UserSubscription.objects
-            .filter(transaction_id=order_id)
-            .first()
-        )
-
         if subscription:
-            mark_subscription_success(subscription)
+            mark_subscription_success(
+                subscription,
+                payment_id=payment_id,
+                payment_entity=payment
+            )
+            webhook_log.processed = True
+            webhook_log.processing_note = 'Subscription marked successful.'
+        else:
+            webhook_log.processing_note = 'No subscription found for order.'
 
     elif event_name == 'payment.failed' and order_id:
+        if subscription:
+            mark_subscription_failed(subscription)
+            update_subscription_payment_details(
+                subscription,
+                payment_id=payment_id,
+                payment_entity=payment
+            )
+            webhook_log.processed = True
+            webhook_log.processing_note = 'Subscription marked failed.'
+        else:
+            webhook_log.processing_note = 'No subscription found for order.'
+
+    elif event_name in ('refund.created', 'refund.processed', 'refund.failed'):
+        payment_id = refund.get('payment_id') or payment_id
         subscription = (
             UserSubscription.objects
-            .filter(transaction_id=order_id)
+            .filter(razorpay_payment_id=payment_id)
             .first()
         )
 
         if subscription:
-            mark_subscription_failed(subscription)
+            status_map = {
+                'refund.created': 'CREATED',
+                'refund.processed': 'PROCESSED',
+                'refund.failed': 'FAILED',
+            }
+            refund_amount = Decimal(refund.get('amount') or 0) / Decimal('100')
+            refund_id = refund.get('id') or ''
+            refund_defaults = {
+                'subscription': subscription,
+                'amount': refund_amount,
+                'status': status_map.get(event_name, 'REQUESTED'),
+                'reason': refund.get('notes', {}).get('reason', ''),
+                'gateway_response': refund,
+            }
+
+            if refund_id:
+                refund_record, _ = RefundRecord.objects.update_or_create(
+                    razorpay_refund_id=refund_id,
+                    defaults=refund_defaults
+                )
+            else:
+                refund_record = RefundRecord.objects.create(
+                    razorpay_refund_id='',
+                    **refund_defaults
+                )
+
+            if refund_record.status == 'PROCESSED':
+                subscription.payment_status = 'REFUNDED'
+                subscription.is_active = False
+                subscription.save(
+                    update_fields=[
+                        'payment_status',
+                        'is_active',
+                        'updated_at',
+                    ]
+                )
+
+            webhook_log.subscription = subscription
+            webhook_log.processed = True
+            webhook_log.processing_note = 'Refund record updated.'
+        else:
+            webhook_log.processing_note = 'No subscription found for refund.'
+
+    webhook_log.save(
+        update_fields=[
+            'subscription',
+            'processed',
+            'processing_note',
+        ]
+    )
 
     return HttpResponse(status=200)
 

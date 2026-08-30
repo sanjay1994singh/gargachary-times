@@ -35,6 +35,8 @@ PAYMENT_STATUS = (
 
     ('FAILED', 'Failed'),
 
+    ('REFUNDED', 'Refunded'),
+
 )
 
 
@@ -124,6 +126,43 @@ class UserSubscription(models.Model):
         unique=True
     )
 
+    razorpay_order_id = models.CharField(
+        max_length=255,
+        blank=True,
+        db_index=True
+    )
+
+    razorpay_payment_id = models.CharField(
+        max_length=255,
+        blank=True,
+        db_index=True
+    )
+
+    razorpay_signature = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+    razorpay_receipt = models.CharField(
+        max_length=80,
+        blank=True
+    )
+
+    payment_method = models.CharField(
+        max_length=50,
+        blank=True
+    )
+
+    currency = models.CharField(
+        max_length=10,
+        default='INR'
+    )
+
+    gateway_response = models.JSONField(
+        default=dict,
+        blank=True
+    )
+
     reporter_mobile = models.CharField(
         max_length=20,
         blank=True,
@@ -149,8 +188,22 @@ class UserSubscription(models.Model):
         null=True
     )
 
+    paid_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    captured_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
     )
 
     def save(self, *args, **kwargs):
@@ -274,12 +327,235 @@ class Invoice(models.Model):
         blank=True
     )
 
+    service_confirmed_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text='When the subscribed service/access was confirmed delivered.'
+    )
+
+    customer_notified_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text='When payment/invoice confirmation was sent to the customer.'
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
     )
 
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
     def __str__(self):
         return self.invoice_number
+
+
+class PaymentWebhookLog(models.Model):
+    event_id = models.CharField(
+        max_length=255,
+        blank=True,
+        db_index=True
+    )
+
+    event_name = models.CharField(
+        max_length=100,
+        db_index=True
+    )
+
+    razorpay_payment_id = models.CharField(
+        max_length=255,
+        blank=True,
+        db_index=True
+    )
+
+    razorpay_order_id = models.CharField(
+        max_length=255,
+        blank=True,
+        db_index=True
+    )
+
+    subscription = models.ForeignKey(
+        UserSubscription,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='webhook_logs'
+    )
+
+    signature = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+    payload = models.JSONField(
+        default=dict,
+        blank=True
+    )
+
+    processed = models.BooleanField(
+        default=False
+    )
+
+    processing_note = models.TextField(
+        blank=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        ordering = ('-created_at',)
+
+    def __str__(self):
+        return f'{self.event_name} - {self.razorpay_order_id or self.event_id}'
+
+
+class RefundRecord(models.Model):
+    REFUND_STATUS = (
+        ('REQUESTED', 'Requested'),
+        ('CREATED', 'Created'),
+        ('PROCESSED', 'Processed'),
+        ('FAILED', 'Failed'),
+    )
+
+    subscription = models.ForeignKey(
+        UserSubscription,
+        on_delete=models.CASCADE,
+        related_name='refunds'
+    )
+
+    razorpay_refund_id = models.CharField(
+        max_length=255,
+        blank=True,
+        db_index=True
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=REFUND_STATUS,
+        default='REQUESTED'
+    )
+
+    reason = models.TextField(
+        blank=True
+    )
+
+    gateway_response = models.JSONField(
+        default=dict,
+        blank=True
+    )
+
+    customer_notified_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def __str__(self):
+        return self.razorpay_refund_id or f'Refund for {self.subscription_id}'
+
+
+class DisputeEvidence(models.Model):
+    DISPUTE_STATUS = (
+        ('OPEN', 'Open'),
+        ('EVIDENCE_REQUIRED', 'Evidence Required'),
+        ('EVIDENCE_SUBMITTED', 'Evidence Submitted'),
+        ('WON', 'Won'),
+        ('LOST', 'Lost'),
+        ('ACCEPTED', 'Accepted'),
+    )
+
+    subscription = models.ForeignKey(
+        UserSubscription,
+        on_delete=models.CASCADE,
+        related_name='disputes'
+    )
+
+    razorpay_dispute_id = models.CharField(
+        max_length=255,
+        blank=True,
+        db_index=True
+    )
+
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
+
+    status = models.CharField(
+        max_length=30,
+        choices=DISPUTE_STATUS,
+        default='OPEN'
+    )
+
+    reason = models.CharField(
+        max_length=255,
+        blank=True
+    )
+
+    response_due_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    billing_proof = models.TextField(
+        blank=True,
+        help_text='Invoice, receipt, order confirmation or payment proof.'
+    )
+
+    proof_of_service = models.TextField(
+        blank=True,
+        help_text='Subscription activation, access, delivery or service proof.'
+    )
+
+    customer_communication = models.TextField(
+        blank=True,
+        help_text='Email, SMS, WhatsApp or support communication proof.'
+    )
+
+    access_activity_log = models.TextField(
+        blank=True,
+        help_text='Login/download/access logs for digital delivery.'
+    )
+
+    refund_policy_snapshot = models.TextField(
+        blank=True,
+        help_text='Refund/cancellation policy shown to the customer.'
+    )
+
+    explanation = models.TextField(
+        blank=True
+    )
+
+    evidence_submitted_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    def __str__(self):
+        return self.razorpay_dispute_id or f'Dispute for {self.subscription_id}'
 
 
 class MagazineOrder(models.Model):

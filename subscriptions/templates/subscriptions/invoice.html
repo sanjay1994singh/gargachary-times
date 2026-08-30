@@ -35,7 +35,14 @@ Invoice {{ invoice.invoice_number }} | Gargachary Times
             <div class="col-md-6 text-md-end">
                 <p><strong>Date:</strong> {{ invoice.created_at|date:"d M Y" }}</p>
                 <p><strong>Status:</strong> {{ invoice.subscription.payment_status }}</p>
+                <p><strong>Order ID:</strong> {{ invoice.subscription.razorpay_order_id|default:invoice.subscription.transaction_id }}</p>
+                {% if invoice.subscription.razorpay_payment_id %}
+                <p><strong>Payment ID:</strong> {{ invoice.subscription.razorpay_payment_id }}</p>
+                {% endif %}
                 <p><strong>Delivery:</strong> {{ invoice.get_delivery_status_display }}</p>
+                {% if invoice.service_confirmed_at %}
+                <p><strong>Service Confirmed:</strong> {{ invoice.service_confirmed_at|date:"d M Y, H:i" }}</p>
+                {% endif %}
                 {% if invoice.delivery_note %}
                 <p><strong>Delivery Note:</strong> {{ invoice.delivery_note }}</p>
                 {% endif %}
