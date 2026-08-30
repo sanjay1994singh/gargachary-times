@@ -1,4 +1,7 @@
 from decimal import Decimal
+import hashlib
+import hmac
+import json
 from unittest.mock import Mock, patch
 
 from django.test import TestCase, override_settings
@@ -6,7 +9,12 @@ from django.urls import reverse
 
 from account.models import User
 
-from .models import Invoice, SubscriptionPlan, UserSubscription
+from .models import (
+    Invoice,
+    PaymentWebhookLog,
+    SubscriptionPlan,
+    UserSubscription,
+)
 
 
 @override_settings(
@@ -175,3 +183,141 @@ class RazorpaySubscriptionTests(TestCase):
         self.assertEqual(invoice.billing_city, 'Fresh City')
         self.assertEqual(invoice.billing_pincode, '333333')
         self.assertEqual(invoice.amount, self.plan.price)
+
+    def test_razorpay_callback_activates_only_captured_payment(self):
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_test_captured',
+            razorpay_order_id='order_test_captured',
+            payment_status='PENDING',
+        )
+        payment_id = 'pay_test_captured'
+        signature = hmac.new(
+            b'rzp_test_secret',
+            f'{subscription.razorpay_order_id}|{payment_id}'.encode(),
+            hashlib.sha256
+        ).hexdigest()
+
+        with patch(
+            'subscriptions.views.fetch_razorpay_payment',
+            return_value={
+                'id': payment_id,
+                'order_id': subscription.razorpay_order_id,
+                'status': 'captured',
+                'captured': True,
+                'method': 'upi',
+                'currency': 'INR',
+            }
+        ):
+            response = self.client.post(
+                reverse('razorpay_payment_callback'),
+                {
+                    'razorpay_payment_id': payment_id,
+                    'razorpay_order_id': subscription.razorpay_order_id,
+                    'razorpay_signature': signature,
+                }
+            )
+
+        self.assertEqual(response.status_code, 200)
+        subscription.refresh_from_db()
+        self.assertEqual(subscription.payment_status, 'SUCCESS')
+        self.assertEqual(subscription.access_status, 'ACTIVE')
+        self.assertTrue(subscription.is_active)
+        self.assertEqual(subscription.razorpay_payment_id, payment_id)
+        self.assertEqual(subscription.payment_method, 'upi')
+        self.assertIsNotNone(subscription.activated_at)
+        self.assertIsNotNone(subscription.delivered_at)
+        self.assertTrue(hasattr(subscription, 'invoice'))
+
+    def test_razorpay_callback_does_not_activate_authorized_payment(self):
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_test_authorized',
+            razorpay_order_id='order_test_authorized',
+            payment_status='PENDING',
+        )
+        payment_id = 'pay_test_authorized'
+        signature = hmac.new(
+            b'rzp_test_secret',
+            f'{subscription.razorpay_order_id}|{payment_id}'.encode(),
+            hashlib.sha256
+        ).hexdigest()
+
+        with patch(
+            'subscriptions.views.fetch_razorpay_payment',
+            return_value={
+                'id': payment_id,
+                'order_id': subscription.razorpay_order_id,
+                'status': 'authorized',
+                'captured': False,
+                'method': 'card',
+                'currency': 'INR',
+            }
+        ):
+            response = self.client.post(
+                reverse('razorpay_payment_callback'),
+                {
+                    'razorpay_payment_id': payment_id,
+                    'razorpay_order_id': subscription.razorpay_order_id,
+                    'razorpay_signature': signature,
+                }
+            )
+
+        self.assertEqual(response.status_code, 200)
+        subscription.refresh_from_db()
+        self.assertEqual(subscription.payment_status, 'AUTHORIZED')
+        self.assertEqual(subscription.access_status, 'PENDING')
+        self.assertFalse(subscription.is_active)
+        self.assertEqual(subscription.razorpay_payment_id, payment_id)
+        self.assertFalse(Invoice.objects.filter(subscription=subscription).exists())
+
+    @override_settings(RAZORPAY_WEBHOOK_SECRET='webhook_secret')
+    def test_duplicate_razorpay_webhook_is_ignored(self):
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_test_webhook',
+            razorpay_order_id='order_test_webhook',
+            payment_status='PENDING',
+        )
+        payload = {
+            'id': 'evt_test_duplicate',
+            'event': 'payment.captured',
+            'payload': {
+                'payment': {
+                    'entity': {
+                        'id': 'pay_test_webhook',
+                        'order_id': subscription.razorpay_order_id,
+                        'status': 'captured',
+                        'captured': True,
+                        'method': 'netbanking',
+                        'currency': 'INR',
+                    }
+                }
+            }
+        }
+        raw_payload = json.dumps(payload).encode()
+        signature = hmac.new(
+            b'webhook_secret',
+            raw_payload,
+            hashlib.sha256
+        ).hexdigest()
+
+        for _ in range(2):
+            response = self.client.post(
+                reverse('razorpay_webhook'),
+                data=raw_payload,
+                content_type='application/json',
+                HTTP_X_RAZORPAY_SIGNATURE=signature
+            )
+            self.assertEqual(response.status_code, 200)
+
+        subscription.refresh_from_db()
+        self.assertEqual(subscription.payment_status, 'SUCCESS')
+        self.assertEqual(subscription.payment_method, 'netbanking')
+        self.assertEqual(PaymentWebhookLog.objects.count(), 1)

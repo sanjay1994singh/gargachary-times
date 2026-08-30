@@ -4,7 +4,7 @@ import base64
 import hashlib
 import hmac
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 
 from django.conf import settings
@@ -1502,7 +1502,10 @@ def razorpay_payment_callback(request):
             payment_entity=payment_entity
         )
 
-        if payment_entity.get('status') != 'captured':
+        if (
+            payment_entity and
+            payment_entity.get('status') != 'captured'
+        ):
             return render(
                 request,
                 'subscriptions/payment_failed.html'
@@ -1557,22 +1560,7 @@ def razorpay_webhook(request):
 
     event_id = event.get('id') or ''
     event_name = event.get('event')
-    event_created_at = get_razorpay_datetime(event.get('created_at'))
-
     if event_id and PaymentWebhookLog.objects.filter(event_id=event_id).exists():
-        return HttpResponse(status=200)
-
-    if (
-        event_created_at and
-        timezone.now() - event_created_at > timedelta(minutes=5)
-    ):
-        PaymentWebhookLog.objects.create(
-            event_id=event_id,
-            event_name=event_name or '',
-            signature=signature or '',
-            payload=event,
-            processing_note='Rejected because webhook timestamp is older than 5 minutes.'
-        )
         return HttpResponse(status=200)
 
     payment = (
