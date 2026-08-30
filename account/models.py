@@ -32,7 +32,7 @@ class State(models.Model):
 class User(AbstractUser):
     username = models.CharField(max_length=500, unique=True, null=True)
     user_type = models.CharField(max_length=20, null=True, blank=True)
-    email = models.EmailField(unique=True, null=True)
+    email = models.EmailField(null=True, blank=True)
     mobile = models.CharField(max_length=20, null=True)
     full_name = models.CharField(max_length=150, null=True, blank=True)
     address = models.TextField(null=True, blank=True)

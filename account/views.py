@@ -163,14 +163,6 @@ def register(request):
 
             return redirect('register')
 
-        if User.objects.filter(email=email).exists():
-            messages.error(
-                request,
-                'Email already exists'
-            )
-
-            return redirect('register')
-
         if mobile and User.objects.filter(mobile=mobile).exists():
             messages.error(
                 request,
@@ -180,7 +172,7 @@ def register(request):
             return redirect('register')
 
         password = generate_strong_password()
-        username = email or mobile
+        username = mobile
         full_name = f'{first_name} {last_name}'.strip()
 
         user = User.objects.create_user(

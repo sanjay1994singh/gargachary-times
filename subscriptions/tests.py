@@ -61,7 +61,8 @@ class RazorpaySubscriptionTests(TestCase):
             password='secret123',
         )
 
-    def test_subscribe_duplicate_email_shows_form_error(self):
+    @patch('subscriptions.views.send_account_created_email')
+    def test_subscribe_allows_duplicate_email_with_different_mobile(self, mocked_email):
         response = self.client.post(
             reverse('subscribe', args=[self.plan.id]),
             {
@@ -78,14 +79,14 @@ class RazorpaySubscriptionTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            'Email already exists. Please login with your existing account.'
-        )
         self.assertEqual(
             User.objects.filter(email__iexact='subscriber@example.com').count(),
-            1
+            2
         )
+        created_user = User.objects.get(mobile='9222222222')
+        self.assertEqual(created_user.email, 'subscriber@example.com')
+        self.assertEqual(created_user.username, '9222222222')
+        mocked_email.assert_called_once()
 
     @patch('subscriptions.views.send_account_created_email')
     def test_subscribe_allows_multiple_blank_optional_emails(self, mocked_email):

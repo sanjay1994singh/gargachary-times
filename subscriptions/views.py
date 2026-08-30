@@ -264,14 +264,6 @@ def create_reporter_account(request):
             status=400
         )
 
-    if User.objects.filter(email__iexact=email).exists():
-        return JsonResponse(
-            {
-                'error': 'Email already exists.'
-            },
-            status=400
-        )
-
     if User.objects.filter(mobile=mobile).exists():
         return JsonResponse(
             {
@@ -285,7 +277,7 @@ def create_reporter_account(request):
     try:
         with transaction.atomic():
             user = User.objects.create_user(
-                username=email,
+                username=mobile,
                 email=email,
                 mobile=mobile,
                 first_name=first_name,
@@ -398,21 +390,6 @@ def subscribe(request, plan_id):
                 )
             )
 
-        if email and User.objects.filter(email__iexact=email).exists():
-            messages.error(
-                request,
-                'Email already exists. Please login with your existing account.'
-            )
-            return render(
-                request,
-                'subscriptions/subscribe.html',
-                get_subscribe_context(
-                    request,
-                    plan,
-                    register_error='Email already exists. Please login with your existing account.',
-                )
-            )
-
         if mobile and User.objects.filter(mobile=mobile).exists():
             messages.error(
                 request,
@@ -435,7 +412,7 @@ def subscribe(request, plan_id):
         try:
             with transaction.atomic():
                 user = User(
-                    username=email or mobile,
+                    username=mobile,
                     email=email,
                     mobile=mobile,
                     first_name=first_name,
