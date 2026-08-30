@@ -4,7 +4,7 @@ import base64
 import hashlib
 import hmac
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 
 from django.conf import settings
@@ -52,6 +52,7 @@ from .models import (
 
 merchant_id = settings.PHONEPE_MERCHANT_ID
 RAZORPAY_ORDERS_URL = 'https://api.razorpay.com/v1/orders'
+RAZORPAY_PAYMENTS_URL = 'https://api.razorpay.com/v1/payments/{payment_id}'
 
 
 def unique_subscriptions_by_plan(subscriptions):
@@ -536,6 +537,25 @@ def update_subscription_payment_details(
 
     if update_fields:
         subscription.save(update_fields=update_fields)
+
+
+def fetch_razorpay_payment(payment_id):
+    if not payment_id:
+        return {}
+
+    response = requests.get(
+        RAZORPAY_PAYMENTS_URL.format(payment_id=payment_id),
+        auth=(
+            settings.RAZORPAY_KEY_ID,
+            settings.RAZORPAY_KEY_SECRET
+        ),
+        timeout=10
+    )
+
+    if response.status_code >= 400:
+        return {}
+
+    return response.json()
 
 
 def mark_subscription_success(
@@ -1438,16 +1458,40 @@ def razorpay_payment_callback(request):
             'subscriptions/payment_failed.html'
         )
 
-    message = f'{order_id}|{payment_id}'
+    stored_order_id = subscription.razorpay_order_id or subscription.transaction_id
+
+    if stored_order_id != order_id:
+        mark_subscription_failed(subscription)
+        return render(
+            request,
+            'subscriptions/payment_failed.html'
+        )
+
+    message = f'{stored_order_id}|{payment_id}'
     if verify_razorpay_signature(
         message,
         signature,
         settings.RAZORPAY_KEY_SECRET
     ):
+        payment_entity = fetch_razorpay_payment(payment_id)
+        update_subscription_payment_details(
+            subscription,
+            payment_id=payment_id,
+            signature=signature,
+            payment_entity=payment_entity
+        )
+
+        if payment_entity.get('status') != 'captured':
+            return render(
+                request,
+                'subscriptions/payment_failed.html'
+            )
+
         mark_subscription_success(
             subscription,
             payment_id=payment_id,
-            signature=signature
+            signature=signature,
+            payment_entity=payment_entity
         )
         invoice = get_or_create_invoice(subscription)
         clear_subscription_customer_session(request, subscription.user_id)
@@ -1490,10 +1534,34 @@ def razorpay_webhook(request):
     except json.JSONDecodeError:
         return HttpResponseBadRequest('Invalid payload')
 
+    event_id = event.get('id') or ''
     event_name = event.get('event')
+    event_created_at = get_razorpay_datetime(event.get('created_at'))
+
+    if event_id and PaymentWebhookLog.objects.filter(event_id=event_id).exists():
+        return HttpResponse(status=200)
+
+    if (
+        event_created_at and
+        timezone.now() - event_created_at > timedelta(minutes=5)
+    ):
+        PaymentWebhookLog.objects.create(
+            event_id=event_id,
+            event_name=event_name or '',
+            signature=signature or '',
+            payload=event,
+            processing_note='Rejected because webhook timestamp is older than 5 minutes.'
+        )
+        return HttpResponse(status=200)
+
     payment = (
         event.get('payload', {})
         .get('payment', {})
+        .get('entity', {})
+    )
+    order = (
+        event.get('payload', {})
+        .get('order', {})
         .get('entity', {})
     )
     refund = (
@@ -1501,7 +1569,7 @@ def razorpay_webhook(request):
         .get('refund', {})
         .get('entity', {})
     )
-    order_id = payment.get('order_id')
+    order_id = payment.get('order_id') or order.get('id')
     payment_id = payment.get('id')
     subscription = None
 
@@ -1513,7 +1581,7 @@ def razorpay_webhook(request):
         )
 
     webhook_log = PaymentWebhookLog.objects.create(
-        event_id=event.get('id') or '',
+        event_id=event_id,
         event_name=event_name or '',
         razorpay_payment_id=payment_id or refund.get('payment_id') or '',
         razorpay_order_id=order_id or '',
@@ -1531,6 +1599,20 @@ def razorpay_webhook(request):
             )
             webhook_log.processed = True
             webhook_log.processing_note = 'Subscription marked successful.'
+        else:
+            webhook_log.processing_note = 'No subscription found for order.'
+
+    elif event_name == 'payment.authorized' and order_id:
+        if subscription:
+            update_subscription_payment_details(
+                subscription,
+                payment_id=payment_id,
+                payment_entity=payment
+            )
+            webhook_log.processed = True
+            webhook_log.processing_note = (
+                'Payment authorized. Waiting for captured status before activation.'
+            )
         else:
             webhook_log.processing_note = 'No subscription found for order.'
 
