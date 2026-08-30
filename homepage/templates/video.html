@@ -302,6 +302,7 @@ Videos | Gargachary Times
                 }
 
                 event.preventDefault();
+                stopOtherVideos(card);
 
                 media.querySelectorAll('iframe').forEach(function (iframe) {
                     iframe.remove();
@@ -323,6 +324,28 @@ Videos | Gargachary Times
                 });
             });
         });
+
+        function stopOtherVideos(activeCard) {
+            document.querySelectorAll('.video-card.is-playing').forEach(function (card) {
+                if (card === activeCard) {
+                    return;
+                }
+
+                var media = card.querySelector('.video-media');
+                var thumbLink = card.querySelector('.video-thumb-link');
+
+                if (!media || !thumbLink) {
+                    return;
+                }
+
+                media.querySelectorAll('iframe').forEach(function (iframe) {
+                    iframe.remove();
+                });
+
+                thumbLink.style.display = 'block';
+                card.classList.remove('is-playing');
+            });
+        }
 
         document.querySelectorAll('.video-back-btn').forEach(function (button) {
             button.addEventListener('click', function () {
