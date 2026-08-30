@@ -184,6 +184,7 @@ class RazorpaySubscriptionTests(TestCase):
         self.assertEqual(invoice.billing_city, 'Fresh City')
         self.assertEqual(invoice.billing_pincode, '333333')
         self.assertEqual(invoice.amount, self.plan.price)
+        self.assertEqual(invoice.tax_amount, Decimal('4.71'))
 
     def test_invoice_pdf_view_renders_for_subscription_owner(self):
         subscription = UserSubscription.objects.create(
@@ -216,6 +217,8 @@ class RazorpaySubscriptionTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Print / Save PDF')
         self.assertContains(response, invoice.invoice_number)
+        self.assertContains(response, 'GST @ 5.00%')
+        self.assertContains(response, 'Rs. 4.71')
 
     def test_my_subscription_backfills_missing_paid_invoice(self):
         subscription = UserSubscription.objects.create(

@@ -5,7 +5,7 @@ import hashlib
 import hmac
 import requests
 from datetime import datetime
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 
 from django.conf import settings
 from django.http import (
@@ -81,6 +81,29 @@ def ensure_paid_subscription_invoices(subscriptions):
             subscription.invoice = get_or_create_invoice(subscription)
 
     return subscriptions
+
+
+def calculate_inclusive_gst(total_amount, gst_rate=Decimal('5.00')):
+    total_amount = Decimal(total_amount or 0).quantize(
+        Decimal('0.01'),
+        rounding=ROUND_HALF_UP
+    )
+    divisor = Decimal('1.00') + (gst_rate / Decimal('100'))
+    taxable_amount = (total_amount / divisor).quantize(
+        Decimal('0.01'),
+        rounding=ROUND_HALF_UP
+    )
+    tax_amount = (total_amount - taxable_amount).quantize(
+        Decimal('0.01'),
+        rounding=ROUND_HALF_UP
+    )
+
+    return {
+        'gst_rate': gst_rate.quantize(Decimal('0.01')),
+        'taxable_amount': taxable_amount,
+        'tax_amount': tax_amount,
+        'total_amount': total_amount,
+    }
 
 
 # SUBSCRIPTION PLANS PAGE
@@ -671,6 +694,7 @@ def mark_subscription_failed(subscription):
 def get_or_create_invoice(subscription):
     user = subscription.user
     invoice_number = f'GT-{timezone.now().strftime("%Y%m%d")}-{subscription.id:06d}'
+    gst_breakup = calculate_inclusive_gst(subscription.amount)
     billing_defaults = {
         'invoice_number': invoice_number,
         'billing_name': (
@@ -686,6 +710,7 @@ def get_or_create_invoice(subscription):
         'billing_pincode': user.pincode or '',
         'billing_country': user.country or 'India',
         'amount': subscription.amount,
+        'tax_amount': gst_breakup['tax_amount'],
     }
 
     invoice, _ = Invoice.objects.get_or_create(
@@ -703,6 +728,7 @@ def get_or_create_invoice(subscription):
         'billing_pincode',
         'billing_country',
         'amount',
+        'tax_amount',
     ]
     changed_fields = []
 
@@ -1994,7 +2020,8 @@ def invoice_detail(request, invoice_number):
         request,
         'subscriptions/invoice.html',
         {
-            'invoice': invoice
+            'invoice': invoice,
+            'gst_breakup': calculate_inclusive_gst(invoice.amount),
         }
     )
 
@@ -2014,7 +2041,8 @@ def invoice_pdf(request, invoice_number):
         request,
         'subscriptions/invoice_pdf.html',
         {
-            'invoice': invoice
+            'invoice': invoice,
+            'gst_breakup': calculate_inclusive_gst(invoice.amount),
         }
     )
     response['Content-Disposition'] = (

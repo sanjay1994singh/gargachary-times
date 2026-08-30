@@ -54,8 +54,9 @@ Invoice {{ invoice.invoice_number }} | Gargachary Times
             <tr>
                 <th>Plan</th>
                 <th>Duration</th>
-                <th class="text-end">Tax/GST</th>
-                <th class="text-end">Amount</th>
+                <th class="text-end">Taxable Amount</th>
+                <th class="text-end">GST @ {{ gst_breakup.gst_rate }}%</th>
+                <th class="text-end">Total Amount</th>
             </tr>
             </thead>
             <tbody>
@@ -65,14 +66,15 @@ Invoice {{ invoice.invoice_number }} | Gargachary Times
                     {{ invoice.subscription.plan.duration }}
                     {{ invoice.subscription.plan.duration_type }}
                 </td>
-                <td class="text-end">Rs. {{ invoice.tax_amount }}</td>
-                <td class="text-end">Rs. {{ invoice.amount }}</td>
+                <td class="text-end">Rs. {{ gst_breakup.taxable_amount }}</td>
+                <td class="text-end">Rs. {{ gst_breakup.tax_amount }}</td>
+                <td class="text-end">Rs. {{ gst_breakup.total_amount }}</td>
             </tr>
             </tbody>
             <tfoot>
             <tr>
-                <th colspan="3" class="text-end">Total</th>
-                <th class="text-end">Rs. {{ invoice.amount }}</th>
+                <th colspan="4" class="text-end">Total Inclusive of 5% GST</th>
+                <th class="text-end">Rs. {{ gst_breakup.total_amount }}</th>
             </tr>
             </tfoot>
         </table>
