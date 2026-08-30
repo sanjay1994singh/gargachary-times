@@ -22,22 +22,15 @@ Videos | Gargachary Times
     }
 
 
-    .latest-video-player {
-        max-width: 980px;
-        margin-bottom: 30px;
-    }
-
-    .video-frame {
+    .video-media {
         position: relative;
         width: 100%;
         aspect-ratio: 16/9;
         background: #111;
-        border-radius: 8px;
         overflow: hidden;
-        box-shadow: 0 5px 20px rgba(0,0,0,.12);
     }
 
-    .video-frame iframe {
+    .video-media iframe {
         position: absolute;
         inset: 0;
         width: 100%;
@@ -45,25 +38,44 @@ Videos | Gargachary Times
         border: 0;
     }
 
-    .latest-video-heading {
-        margin-top: 14px;
-        font-size: 22px;
-        font-weight: 700;
-        line-height: 1.35;
+    .video-thumb-link {
+        position: absolute;
+        inset: 0;
+        display: block;
     }
 
-    .channel-link {
+    .video-play-icon {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        margin-top: 8px;
-        color: #b91c1c;
-        font-weight: 700;
-        text-decoration: none;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #ff0000;
+        color: #fff;
+        font-size: 17px;
+        box-shadow: 0 8px 18px rgba(0,0,0,.28);
+        pointer-events: none;
     }
 
-    .channel-link:hover {
-        color: #8f1515;
+    .video-back-btn {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        z-index: 2;
+        display: none;
+        align-items: center;
+        gap: 6px;
+        border: 0;
+        border-radius: 6px;
+        background: rgba(0,0,0,.72);
+        color: #fff;
+        padding: 6px 10px;
+        font-size: 13px;
+        font-weight: 700;
     }
 
     .video-card{
@@ -83,7 +95,7 @@ Videos | Gargachary Times
 
     .video-thumb{
         width:100%;
-        aspect-ratio:16/9;
+        height:100%;
         object-fit:cover;
     }
 
@@ -121,11 +133,10 @@ Videos | Gargachary Times
 
     }
 
-    .section-subtitle {
-        font-size: 20px;
-        font-weight: 700;
-        margin-bottom: 18px;
+    .video-card.is-playing .video-back-btn {
+        display: inline-flex;
     }
+
 
 
     .play-btn:hover{
@@ -180,39 +191,6 @@ Videos | Gargachary Times
         Latest Videos
     </h1>
 
-    {% if latest_video %}
-
-    <section class="latest-video-player">
-        <div class="video-frame">
-            <iframe
-                    src="{{ latest_video.embed_url }}"
-                    title="{{ latest_video.title }}"
-                    referrerpolicy="strict-origin-when-cross-origin"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen>
-            </iframe>
-        </div>
-
-        <h2 class="latest-video-heading">
-            {{ latest_video.title }}
-        </h2>
-
-        <a href="{{ channel_url }}"
-           target="_blank"
-           rel="noopener"
-           class="channel-link">
-            <i class="fab fa-youtube"></i>
-            Samachar24 YouTube Channel
-        </a>
-    </section>
-
-    <h2 class="section-subtitle">
-        More Videos
-    </h2>
-
-    {% endif %}
-
-
     <div class="row g-4">
 
 
@@ -224,22 +202,27 @@ Videos | Gargachary Times
 
             <div class="video-card">
 
+                <div class="video-media">
+                    <button type="button" class="video-back-btn">
+                        <i class="fa fa-arrow-left"></i>
+                        Back
+                    </button>
 
-                <a href="{{ video.url }}"
-                   target="_blank"
-                   rel="noopener"
-                   class="video-select"
-                   data-embed-url="{{ video.embed_url }}"
-                   data-title="{{ video.title }}">
-
-
-                    <img
-                            src="{{ video.thumbnail }}"
-                            class="video-thumb"
-                            alt="{{ video.title }}">
-
-
-                </a>
+                    <a href="{{ video.url }}"
+                       target="_blank"
+                       rel="noopener"
+                       class="video-thumb-link video-select"
+                       data-embed-url="{{ video.embed_url }}"
+                       data-title="{{ video.title }}">
+                        <img
+                                src="{{ video.thumbnail }}"
+                                class="video-thumb"
+                                alt="{{ video.title }}">
+                        <span class="video-play-icon">
+                            <i class="fa fa-play"></i>
+                        </span>
+                    </a>
+                </div>
 
 
                 <div class="video-content">
@@ -306,34 +289,53 @@ Videos | Gargachary Times
 {% block js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        var player = document.querySelector('.video-frame iframe');
-        var heading = document.querySelector('.latest-video-heading');
-
-        if (!player) {
-            return;
-        }
-
         document.querySelectorAll('.video-select').forEach(function (link) {
             link.addEventListener('click', function (event) {
                 var embedUrl = link.getAttribute('data-embed-url');
                 var title = link.getAttribute('data-title') || 'Samachar24 video';
+                var card = link.closest('.video-card');
+                var media = card ? card.querySelector('.video-media') : null;
+                var thumbLink = card ? card.querySelector('.video-thumb-link') : null;
 
-                if (!embedUrl) {
+                if (!embedUrl || !card || !media || !thumbLink) {
                     return;
                 }
 
                 event.preventDefault();
-                player.src = embedUrl + '?autoplay=1';
-                player.title = title;
 
-                if (heading) {
-                    heading.textContent = title;
+                media.querySelectorAll('iframe').forEach(function (iframe) {
+                    iframe.remove();
+                });
+
+                var iframe = document.createElement('iframe');
+                iframe.src = embedUrl + '?autoplay=1&controls=1&rel=0';
+                iframe.title = title;
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+                iframe.allowFullscreen = true;
+                iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+                media.appendChild(iframe);
+
+                card.classList.add('is-playing');
+                thumbLink.style.display = 'none';
+            });
+        });
+
+        document.querySelectorAll('.video-back-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                var card = button.closest('.video-card');
+                var media = card ? card.querySelector('.video-media') : null;
+                var thumbLink = card ? card.querySelector('.video-thumb-link') : null;
+
+                if (!card || !media || !thumbLink) {
+                    return;
                 }
 
-                player.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
+                media.querySelectorAll('iframe').forEach(function (iframe) {
+                    iframe.remove();
                 });
+
+                thumbLink.style.display = 'block';
+                card.classList.remove('is-playing');
             });
         });
     });
