@@ -40,6 +40,7 @@ from django.views.decorators.http import require_POST
 import fitz
 
 from account.models import State, User
+from .forms import ReporterSubscriberForm
 from account.views import (
     generate_strong_password,
     send_account_created_email
@@ -1508,6 +1509,15 @@ def reporter_unpaid_subscriber_detail(request, user_id):
         )
         return redirect('reporter_unpaid_subscribers')
 
+    subscriber_form = ReporterSubscriberForm(
+        request.POST if request.method == 'POST' else None,
+        instance=subscriber,
+    )
+    if request.method == 'POST' and subscriber_form.is_valid():
+        subscriber_form.save()
+        messages.success(request, 'Subscriber details updated successfully.')
+        return redirect('reporter_unpaid_subscriber_detail', user_id=subscriber.id)
+
     subscriptions = (
         UserSubscription.objects
         .select_related('plan', 'invoice')
@@ -1532,6 +1542,7 @@ def reporter_unpaid_subscriber_detail(request, user_id):
         {
             'active_menu': 'reporter_subscribers',
             'page_title': 'Subscriber Detail',
+            'subscriber_form': subscriber_form,
             'subscriber': subscriber,
             'subscriptions': subscriptions,
             'pending_subscriptions': pending_subscriptions,

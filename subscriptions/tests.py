@@ -160,6 +160,59 @@ class RazorpaySubscriptionTests(TestCase):
                 self.assertEqual(self.client.session['reporter_mobile'], expected_mobile)
                 self.assertEqual(response.context['reporter_mobile'], expected_mobile)
 
+    def test_reporter_updates_only_linked_subscriber_details(self):
+        url = reverse('reporter_unpaid_subscriber_detail', args=[self.subscriber.id])
+        data = {
+            'full_name': 'Updated Subscriber', 'email': '', 'mobile': '9777777777',
+            'city': 'Mathura', 'district': 'Mathura', 'address': 'Updated address',
+            'pincode': '281001', 'state': 'Uttar Pradesh', 'country': 'India',
+            'user_type': 'reporter', 'is_staff': 'on',
+        }
+        self.client.force_login(self.reporter)
+        response = self.client.post(url, data)
+        self.assertRedirects(response, reverse('reporter_unpaid_subscribers'))
+        self.subscriber.refresh_from_db()
+        self.assertEqual(self.subscriber.full_name, 'Old Subscriber')
+
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber, plan=self.plan, amount=self.plan.price,
+            reporter_mobile=self.reporter.mobile, payment_status='PENDING',
+        )
+        response = self.client.get(reverse('reporter_unpaid_subscribers'))
+        self.assertContains(response, url + '#edit-subscriber')
+        response = self.client.post(url, data)
+        self.assertRedirects(response, url)
+        self.subscriber.refresh_from_db()
+        for name, value in data.items():
+            if name not in ('user_type', 'is_staff', 'email'):
+                self.assertEqual(getattr(self.subscriber, name), value)
+        self.assertFalse(self.subscriber.email)
+        self.assertEqual(self.subscriber.first_name, 'Updated')
+        self.assertEqual(self.subscriber.last_name, 'Subscriber')
+        self.assertEqual(self.subscriber.user_type, 'subscriber')
+        self.assertFalse(self.subscriber.is_staff)
+        self.assertTrue(self.subscriber.check_password('secret123'))
+        subscription.refresh_from_db()
+        self.assertEqual(subscription.reporter_mobile, self.reporter.mobile)
+        self.assertEqual(subscription.payment_status, 'PENDING')
+
+        for invalid in (
+            {'mobile': self.reporter.mobile}, {'email': 'invalid'}, {'full_name': ''},
+        ):
+            with self.subTest(invalid=invalid):
+                response = self.client.post(url, {**data, **invalid})
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue(response.context['subscriber_form'].errors)
+                self.subscriber.refresh_from_db()
+                self.assertEqual(self.subscriber.mobile, data['mobile'])
+                self.assertEqual(self.subscriber.full_name, data['full_name'])
+
+        self.client.force_login(self.subscriber)
+        response = self.client.post(url, {**data, 'full_name': 'Unauthorized'})
+        self.assertRedirects(response, reverse('profile'))
+        self.subscriber.refresh_from_db()
+        self.assertEqual(self.subscriber.full_name, data['full_name'])
+
     def test_create_order_clears_selected_subscriber_session(self):
         self.client.force_login(self.reporter)
         session = self.client.session
