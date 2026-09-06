@@ -352,6 +352,8 @@ def subscribe(request, plan_id):
         state = (request.POST.get('state') or 'Uttar Pradesh').strip()
         country = (request.POST.get('country') or 'India').strip()
         reporter_mobile = (request.POST.get('reporter_mobile') or '').strip()
+        if not reporter_mobile and is_reporter_user(request.user):
+            reporter_mobile = (request.user.mobile or '').strip()
 
         if not all([
             full_name,

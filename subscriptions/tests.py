@@ -123,6 +123,43 @@ class RazorpaySubscriptionTests(TestCase):
         )
         self.assertEqual(mocked_email.call_count, 2)
 
+    @patch('subscriptions.views.send_account_created_email')
+    def test_subscriber_registration_reporter_assignment(self, mocked_email):
+        other_reporter = User.objects.create_user(
+            username='other-reporter', mobile='9555555555', user_type='reporter',
+        )
+        cases = [
+            ('missing', self.reporter, {}, self.reporter.mobile),
+            ('blank', self.reporter, {'reporter_mobile': '  '}, self.reporter.mobile),
+            ('selected', self.reporter, {'reporter_mobile': other_reporter.mobile}, other_reporter.mobile),
+            ('anonymous', None, {}, ''),
+        ]
+        for index, (name, actor, selection, expected_mobile) in enumerate(cases):
+            with self.subTest(name=name):
+                self.client.logout()
+                if actor:
+                    self.client.force_login(actor)
+                mobile = f'966666666{index}'
+                response = self.client.post(
+                    reverse('subscribe', args=[self.plan.id]) + '?new=1',
+                    {
+                        'full_name': 'New Subscriber',
+                        'mobile': mobile,
+                        'city': 'Mathura',
+                        'district': 'Mathura',
+                        'address': 'Fresh Address',
+                        'pincode': '281001',
+                        'state': 'Uttar Pradesh',
+                        'country': 'India',
+                        **selection,
+                    },
+                )
+                self.assertEqual(response.status_code, 200)
+                subscription = UserSubscription.objects.get(user__mobile=mobile)
+                self.assertEqual(subscription.reporter_mobile, expected_mobile)
+                self.assertEqual(self.client.session['reporter_mobile'], expected_mobile)
+                self.assertEqual(response.context['reporter_mobile'], expected_mobile)
+
     def test_create_order_clears_selected_subscriber_session(self):
         self.client.force_login(self.reporter)
         session = self.client.session
