@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.core.exceptions import PermissionDenied
+from django.urls import path
+from .exports import subscription_excel_response
 from .models import *
 from .views import send_delivery_status_email
 
@@ -48,6 +51,24 @@ class SubscriptionPlanAdmin(admin.ModelAdmin):
 
 @admin.register(UserSubscription)
 class UserSubscriptionAdmin(ProtectSuccessfulPaymentDeleteMixin, admin.ModelAdmin):
+    change_list_template = 'admin/subscriptions/usersubscription/change_list.html'
+    actions = ('export_selected_excel',)
+
+    def get_urls(self):
+        return [path('export-excel/', self.admin_site.admin_view(self.export_all_excel),
+                     name='subscriptions_usersubscription_export_excel')] + super().get_urls()
+
+    def export_all_excel(self, request):
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+        return subscription_excel_response(self.get_queryset(request))
+
+    @admin.action(description='Download selected subscriptions (Excel)', permissions=['view'])
+    def export_selected_excel(self, request, queryset):
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+        return subscription_excel_response(queryset)
+
     list_display = (
         'user',
         'user_email',
