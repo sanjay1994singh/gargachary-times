@@ -1,9 +1,10 @@
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 from django.urls import path
+from django.shortcuts import get_object_or_404
 from .exports import subscription_excel_response
 from .models import *
-from .views import send_delivery_status_email
+from .views import send_delivery_status_email, invoice_pdf_response
 
 
 class ProtectSuccessfulPaymentDeleteMixin:
@@ -56,18 +57,30 @@ class UserSubscriptionAdmin(ProtectSuccessfulPaymentDeleteMixin, admin.ModelAdmi
 
     def get_urls(self):
         return [path('export-excel/', self.admin_site.admin_view(self.export_all_excel),
-                     name='subscriptions_usersubscription_export_excel')] + super().get_urls()
+                     name='subscriptions_usersubscription_export_excel'),
+                path('<int:subscription_id>/invoice-pdf/', self.admin_site.admin_view(self.invoice_pdf),
+                     name='subscriptions_usersubscription_invoice_pdf')] + super().get_urls()
+
+    def invoice_pdf(self, request, subscription_id):
+        if not self.has_view_permission(request):
+            raise PermissionDenied
+        subscription = get_object_or_404(self.get_queryset(request), pk=subscription_id)
+        if not self.has_view_permission(request, subscription):
+            raise PermissionDenied
+        invoice = get_object_or_404(Invoice.objects.select_related(
+            'subscription__user', 'subscription__plan'), subscription=subscription)
+        return invoice_pdf_response(invoice)
 
     def export_all_excel(self, request):
         if not self.has_view_permission(request):
             raise PermissionDenied
-        return subscription_excel_response(self.get_queryset(request))
+        return subscription_excel_response(self.get_queryset(request), request)
 
-    @admin.action(description='Download selected subscriptions (Excel)', permissions=['view'])
+    @admin.action(description='Download selected SUCCESS subscriptions (Excel)', permissions=['view'])
     def export_selected_excel(self, request, queryset):
         if not self.has_view_permission(request):
             raise PermissionDenied
-        return subscription_excel_response(queryset)
+        return subscription_excel_response(queryset, request)
 
     list_display = (
         'user',
