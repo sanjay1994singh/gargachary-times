@@ -40,6 +40,7 @@ from django.views.decorators.http import require_POST
 import fitz
 
 from account.models import State, User
+from account.passwords import get_mobile_password
 from .forms import ReporterSubscriberForm
 from account.views import (
     generate_strong_password,
@@ -276,7 +277,7 @@ def create_reporter_account(request):
         )
 
     full_name = f'{first_name} {last_name}'.strip()
-    password = generate_strong_password()
+    password = get_mobile_password(mobile) or generate_strong_password()
     try:
         with transaction.atomic():
             user = User.objects.create_user(
@@ -410,7 +411,7 @@ def subscribe(request, plan_id):
                 )
             )
 
-        password = generate_strong_password()
+        password = get_mobile_password(mobile) or generate_strong_password()
         name_parts = full_name.split(' ', 1)
         first_name = name_parts[0] if name_parts else ''
         last_name = name_parts[1] if len(name_parts) > 1 else ''

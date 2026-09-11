@@ -191,7 +191,7 @@ class RazorpaySubscriptionTests(TestCase):
         self.assertEqual(self.subscriber.last_name, 'Subscriber')
         self.assertEqual(self.subscriber.user_type, 'subscriber')
         self.assertFalse(self.subscriber.is_staff)
-        self.assertTrue(self.subscriber.check_password('secret123'))
+        self.assertTrue(self.subscriber.check_password('9111111111'))
         subscription.refresh_from_db()
         self.assertEqual(subscription.reporter_mobile, self.reporter.mobile)
         self.assertEqual(subscription.payment_status, 'PENDING')

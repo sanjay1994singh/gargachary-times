@@ -14,6 +14,9 @@ class LoginWhitespaceTests(TestCase):
             password='secret123',
         )
 
+        self.user.set_password('secret123')
+        self.user.save(update_fields=['password'])
+
     def test_login_ignores_spaces_in_email(self):
         response = self.client.post(
             reverse('login'),

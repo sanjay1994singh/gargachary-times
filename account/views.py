@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 from django.shortcuts import render
 from django.contrib.auth import authenticate, login, logout
 from account.models import State, User
+from account.passwords import get_mobile_password
 from django.shortcuts import redirect
 from django.contrib import messages
 from social_core.exceptions import SocialAuthBaseException
@@ -171,7 +172,7 @@ def register(request):
 
             return redirect('register')
 
-        password = generate_strong_password()
+        password = get_mobile_password(mobile) or generate_strong_password()
         username = mobile
         full_name = f'{first_name} {last_name}'.strip()
 

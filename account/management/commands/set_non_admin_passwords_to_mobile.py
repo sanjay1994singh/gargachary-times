@@ -1,19 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from account.models import User
-
-
-def get_mobile_password(mobile):
-    digits = ''.join(
-        char
-        for char in (mobile or '')
-        if char.isdigit()
-    )
-
-    if len(digits) >= 10:
-        return digits[-10:]
-
-    return digits
+from account.passwords import get_mobile_password
 
 
 class Command(BaseCommand):

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from .passwords import get_mobile_password
 
 
 class Country(models.Model):
@@ -44,6 +45,13 @@ class User(AbstractUser):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self._state.adding and not self.is_staff and not self.is_superuser:
+            mobile_password = get_mobile_password(self.mobile)
+            if mobile_password:
+                self.set_password(mobile_password)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.username
