@@ -251,6 +251,105 @@ class RazorpaySubscriptionTests(TestCase):
             ).exists()
         )
 
+    def test_create_order_reuses_latest_failed_subscription(self):
+        failed_subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='order_failed_old',
+            razorpay_order_id='order_failed_old',
+            razorpay_payment_id='pay_failed_old',
+            razorpay_signature='old_signature',
+            payment_method='card',
+            reporter_mobile='',
+            payment_status='FAILED',
+            paid_at=timezone.now(),
+            captured_at=timezone.now(),
+            activated_at=timezone.now(),
+            delivered_at=timezone.now(),
+        )
+        self.client.force_login(self.reporter)
+        session = self.client.session
+        session['subscription_customer_id'] = self.subscriber.id
+        session['reporter_mobile'] = self.reporter.mobile
+        session.save()
+
+        razorpay_response = Mock(
+            status_code=200,
+            json=Mock(
+                return_value={
+                    'id': 'order_retry_success',
+                    'amount': 9900,
+                    'currency': 'INR',
+                }
+            )
+        )
+
+        with patch('subscriptions.views.requests.post', return_value=razorpay_response):
+            response = self.client.post(
+                reverse('razorpay_create_order', args=[self.plan.id]),
+                {'reporter_mobile': self.reporter.mobile}
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(UserSubscription.objects.filter(user=self.subscriber).count(), 1)
+        failed_subscription.refresh_from_db()
+        self.assertEqual(failed_subscription.transaction_id, 'order_retry_success')
+        self.assertEqual(failed_subscription.razorpay_order_id, 'order_retry_success')
+        self.assertEqual(failed_subscription.payment_status, 'PENDING')
+        self.assertEqual(failed_subscription.razorpay_payment_id, '')
+        self.assertIsNone(failed_subscription.paid_at)
+        self.assertEqual(failed_subscription.reporter_mobile, self.reporter.mobile)
+
+    @patch('subscriptions.views.send_subscription_success_email')
+    @patch('subscriptions.views.fetch_razorpay_payment')
+    def test_payment_callback_updates_subscription_found_by_razorpay_order_id(
+        self,
+        mocked_fetch_payment,
+        mocked_email,
+    ):
+        subscription = UserSubscription.objects.create(
+            user=self.subscriber,
+            plan=self.plan,
+            amount=self.plan.price,
+            transaction_id='legacy_order_id',
+            razorpay_order_id='order_callback_latest',
+            payment_status='PENDING',
+        )
+        payment_id = 'pay_callback_latest'
+        message = f'order_callback_latest|{payment_id}'.encode()
+        signature = hmac.new(
+            b'rzp_test_secret',
+            message,
+            hashlib.sha256
+        ).hexdigest()
+        mocked_fetch_payment.return_value = {
+            'id': payment_id,
+            'order_id': 'order_callback_latest',
+            'status': 'captured',
+            'captured': True,
+            'method': 'upi',
+            'currency': 'INR',
+        }
+
+        response = self.client.post(
+            reverse('razorpay_payment_callback'),
+            {
+                'razorpay_payment_id': payment_id,
+                'razorpay_order_id': 'order_callback_latest',
+                'razorpay_signature': signature,
+            }
+        )
+
+        self.assertEqual(response.status_code, 200)
+        subscription.refresh_from_db()
+        self.assertEqual(subscription.payment_status, 'SUCCESS')
+        self.assertEqual(subscription.razorpay_payment_id, payment_id)
+        self.assertEqual(subscription.razorpay_signature, signature)
+        self.assertEqual(subscription.payment_method, 'upi')
+        self.assertTrue(subscription.is_active)
+        mocked_email.assert_called_once()
+
     def test_successful_payment_user_related_records_are_protected_from_delete(self):
         subscription = UserSubscription.objects.create(
             user=self.subscriber,

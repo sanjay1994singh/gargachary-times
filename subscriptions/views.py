@@ -610,6 +610,28 @@ def fetch_razorpay_payment(payment_id):
     return response.json()
 
 
+def get_reusable_payment_subscription(user, plan):
+    return (
+        UserSubscription.objects
+        .filter(user=user, plan=plan)
+        .exclude(payment_status__in=('SUCCESS', 'CAPTURED'))
+        .order_by('-updated_at', '-created_at')
+        .first()
+    )
+
+
+def get_subscription_by_razorpay_order(order_id):
+    return (
+        UserSubscription.objects
+        .filter(
+            Q(transaction_id=order_id) |
+            Q(razorpay_order_id=order_id)
+        )
+        .order_by('-updated_at', '-created_at')
+        .first()
+    )
+
+
 def mark_subscription_success(
     subscription,
     payment_id='',
@@ -1046,15 +1068,9 @@ def razorpay_create_order(request, plan_id):
             status=409
         )
 
-    pending_subscription = (
-        UserSubscription.objects
-        .filter(
-            user=payment_user,
-            plan=plan,
-            payment_status='PENDING'
-        )
-        .order_by('-created_at')
-        .first()
+    pending_subscription = get_reusable_payment_subscription(
+        payment_user,
+        plan
     )
 
     if (
@@ -1156,6 +1172,18 @@ def razorpay_create_order(request, plan_id):
         subscription.currency = order.get('currency') or 'INR'
         subscription.gateway_response = order
         subscription.reporter_mobile = reporter_mobile
+        subscription.start_date = timezone.now()
+        subscription.end_date = None
+        subscription.payment_status = 'PENDING'
+        subscription.is_active = False
+        subscription.access_status = 'PENDING'
+        subscription.razorpay_payment_id = ''
+        subscription.razorpay_signature = ''
+        subscription.payment_method = ''
+        subscription.paid_at = None
+        subscription.captured_at = None
+        subscription.activated_at = None
+        subscription.delivered_at = None
         subscription.save(
             update_fields=[
                 'amount',
@@ -1165,6 +1193,18 @@ def razorpay_create_order(request, plan_id):
                 'currency',
                 'gateway_response',
                 'reporter_mobile',
+                'start_date',
+                'end_date',
+                'payment_status',
+                'is_active',
+                'access_status',
+                'razorpay_payment_id',
+                'razorpay_signature',
+                'payment_method',
+                'paid_at',
+                'captured_at',
+                'activated_at',
+                'delivered_at',
                 'updated_at',
             ]
         )
@@ -1254,16 +1294,7 @@ def razorpay_shared_payment(request, order_id):
 
 
 def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobile=''):
-    pending_subscription = (
-        UserSubscription.objects
-        .filter(
-            user=subscriber,
-            plan=plan,
-            payment_status='PENDING'
-        )
-        .order_by('-created_at')
-        .first()
-    )
+    pending_subscription = get_reusable_payment_subscription(subscriber, plan)
 
     if (
         pending_subscription and
@@ -1325,6 +1356,18 @@ def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobil
         pending_subscription.currency = order.get('currency') or 'INR'
         pending_subscription.gateway_response = order
         pending_subscription.reporter_mobile = reporter_mobile
+        pending_subscription.start_date = timezone.now()
+        pending_subscription.end_date = None
+        pending_subscription.payment_status = 'PENDING'
+        pending_subscription.is_active = False
+        pending_subscription.access_status = 'PENDING'
+        pending_subscription.razorpay_payment_id = ''
+        pending_subscription.razorpay_signature = ''
+        pending_subscription.payment_method = ''
+        pending_subscription.paid_at = None
+        pending_subscription.captured_at = None
+        pending_subscription.activated_at = None
+        pending_subscription.delivered_at = None
         pending_subscription.save(
             update_fields=[
                 'amount',
@@ -1334,6 +1377,18 @@ def create_razorpay_subscription_order(request, subscriber, plan, reporter_mobil
                 'currency',
                 'gateway_response',
                 'reporter_mobile',
+                'start_date',
+                'end_date',
+                'payment_status',
+                'is_active',
+                'access_status',
+                'razorpay_payment_id',
+                'razorpay_signature',
+                'payment_method',
+                'paid_at',
+                'captured_at',
+                'activated_at',
+                'delivered_at',
                 'updated_at',
             ]
         )
@@ -1738,11 +1793,8 @@ def razorpay_payment_callback(request):
             'subscriptions/payment_failed.html'
         )
 
-    try:
-        subscription = UserSubscription.objects.get(
-            transaction_id=order_id
-        )
-    except UserSubscription.DoesNotExist:
+    subscription = get_subscription_by_razorpay_order(order_id)
+    if not subscription:
         return render(
             request,
             'subscriptions/payment_failed.html'
@@ -1857,11 +1909,7 @@ def razorpay_webhook(request):
     subscription = None
 
     if order_id:
-        subscription = (
-            UserSubscription.objects
-            .filter(transaction_id=order_id)
-            .first()
-        )
+        subscription = get_subscription_by_razorpay_order(order_id)
 
     webhook_log = PaymentWebhookLog.objects.create(
         event_id=event_id,
